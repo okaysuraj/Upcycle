@@ -1,0 +1,117 @@
+-- Clean up any Prisma tables if they exist
+DROP TABLE IF EXISTS "User" CASCADE;
+DROP TABLE IF EXISTS "Task" CASCADE;
+DROP TABLE IF EXISTS "Resource" CASCADE;
+DROP TABLE IF EXISTS "Notification" CASCADE;
+DROP TABLE IF EXISTS "_prisma_migrations" CASCADE;
+
+-- Create tables
+
+CREATE TABLE IF NOT EXISTS users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(50) DEFAULT 'volunteer',
+    skills TEXT[] DEFAULT '{}',
+    "availabilityHours" INTEGER DEFAULT 10,
+    "activeTasks" INTEGER DEFAULT 0,
+    reset_otp VARCHAR(10),
+    reset_otp_expiry TIMESTAMP WITH TIME ZONE,
+    is_verified BOOLEAN DEFAULT false,
+    verification_token VARCHAR(255),
+    verification_token_expiry TIMESTAMP WITH TIME ZONE,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS tasks (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    category VARCHAR(255) NOT NULL,
+    priority VARCHAR(50) DEFAULT 'Medium',
+    status VARCHAR(50) DEFAULT 'Pending',
+    "assignedTo" UUID REFERENCES users(id) ON DELETE SET NULL,
+    "assigneeName" VARCHAR(255),
+    "dueDate" TIMESTAMP WITH TIME ZONE,
+    "completedAt" TIMESTAMP WITH TIME ZONE,
+    "materialsUsed" JSONB,
+    notes TEXT,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS resources (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    quantity INTEGER NOT NULL,
+    unit VARCHAR(50) NOT NULL,
+    threshold INTEGER NOT NULL,
+    category VARCHAR(255) NOT NULL,
+    icon VARCHAR(255),
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS notifications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    type VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    "userId" UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    "taskId" UUID REFERENCES tasks(id) ON DELETE SET NULL,
+    read BOOLEAN DEFAULT false,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    date TIMESTAMP WITH TIME ZONE NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    "maxVolunteers" INTEGER,
+    status VARCHAR(50) DEFAULT 'Upcoming',
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS event_registrations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "eventId" UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    "userId" UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    status VARCHAR(50) DEFAULT 'Registered',
+    "hoursLogged" INTEGER DEFAULT 0,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE("eventId", "userId")
+);
+
+CREATE TABLE IF NOT EXISTS recycling_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "userId" UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    "materialType" VARCHAR(255) NOT NULL,
+    quantity DECIMAL NOT NULL,
+    unit VARCHAR(50) NOT NULL,
+    date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS plants (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    location VARCHAR(255),
+    "plantedDate" TIMESTAMP WITH TIME ZONE,
+    status VARCHAR(50) DEFAULT 'Healthy',
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS harvests (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "plantId" UUID NOT NULL REFERENCES plants(id) ON DELETE CASCADE,
+    quantity DECIMAL NOT NULL,
+    unit VARCHAR(50) NOT NULL,
+    date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
