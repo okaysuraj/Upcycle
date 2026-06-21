@@ -36,6 +36,11 @@ function AppInner() {
 
   const [authMode, setAuthMode] = useState(verifyToken ? 'verify-email' : 'landing');
 
+  // Persist current page to localStorage
+  useEffect(() => {
+    localStorage.setItem('upcycle_current_page', currentPage);
+  }, [currentPage]);
+
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', flexDirection: 'column', gap: '20px' }}>
@@ -45,11 +50,6 @@ function AppInner() {
       </div>
     );
   }
-
-  // Persist current page to localStorage
-  useEffect(() => {
-    localStorage.setItem('upcycle_current_page', currentPage);
-  }, [currentPage]);
 
   if (!user) {
     if (authMode === 'login') return <Login onNavigateToSignup={setAuthMode} />;
