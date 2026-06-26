@@ -41,10 +41,11 @@ upcycle/
 
 ### Prerequisites
 * **Node.js**: v18+
-* **PostgreSQL**: v14+ (Ensure Postgres is running locally or provide a remote URI).
+* **Neon Cloud PostgreSQL**: An active Neon project (or other hosted Postgres database).
 
 ### 1. Database Setup
-Ensure you have a PostgreSQL database running. You can set the connection URI in your `.env` files.
+Ensure you have created a database in Neon Cloud Postgres. Retrieve your database connection string from the Neon console. It should look like this:
+`postgresql://<user>:<password>@<neon-hostname>/neondb?sslmode=require`
 
 ### 2. Backend Configuration
 1. Navigate to the backend directory:
@@ -52,10 +53,10 @@ Ensure you have a PostgreSQL database running. You can set the connection URI in
    cd backend
    npm install
    ```
-2. Create a `.env` file in the `backend/` directory:
+2. Create a `.env` file in the `backend/` directory (you can use `.env.example` as a starting template):
    ```env
-   PORT=5440
-   DATABASE_URL=postgres://<user>:<password>@localhost:5432/upcycle
+   PORT=5000
+   DATABASE_URL="postgresql://neondb_owner:<password>@<neon-hostname>/neondb?sslmode=require"
    JWT_SECRET=your_super_secret_jwt_key
    
    # Optional: Email configuration for Nodemailer
@@ -66,7 +67,7 @@ Ensure you have a PostgreSQL database running. You can set the connection URI in
    SMTP_PASS=your_app_password
    SMTP_FROM="Upcycle App" <noreply@upcycle.edu>
    ```
-3. Initialize the database schema:
+3. Initialize the database schema and seed data on the Neon database:
    ```bash
    # Linux/Mac
    RESET_DB=true node -e "require('dotenv').config(); require('./config/db').connectDB().then(() => process.exit(0))"
