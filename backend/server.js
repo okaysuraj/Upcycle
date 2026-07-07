@@ -17,6 +17,12 @@ const notificationsRouter = require('./routes/notifications');
 const eventsRouter = require('./routes/events');
 const recyclingRouter = require('./routes/recycling');
 const horticultureRouter = require('./routes/horticulture');
+const campusRouter = require('./routes/campus');
+const wasteRouter = require('./routes/waste');
+const marketplaceRouter = require('./routes/marketplace');
+const paymentsRouter = require('./routes/payments');
+const esgRouter = require('./routes/esg');
+const gamificationRouter = require('./routes/gamification');
 
 app.use('/api/auth', authRouter);
 app.use('/api/tasks', tasksRouter);
@@ -25,6 +31,12 @@ app.use('/api/notifications', notificationsRouter);
 app.use('/api/events', eventsRouter);
 app.use('/api/recycling', recyclingRouter);
 app.use('/api/horticulture', horticultureRouter);
+app.use('/api/campuses', campusRouter);
+app.use('/api/waste', wasteRouter);
+app.use('/api/marketplace', marketplaceRouter);
+app.use('/api/payments', paymentsRouter);
+app.use('/api/esg', esgRouter);
+app.use('/api/gamification', gamificationRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {

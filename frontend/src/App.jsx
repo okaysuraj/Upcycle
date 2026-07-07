@@ -1,88 +1,73 @@
-import { useState, useEffect } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ForgotPassword from './pages/ForgotPassword';
 import VerifyEmail from './pages/VerifyEmail';
 import Landing from './pages/Landing';
+import AdminLayout from './components/AdminLayout';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
 import Inventory from './pages/Inventory';
 import Team from './pages/Team';
 import Events from './pages/Events';
-import Recycling from './pages/Recycling';
-import Horticulture from './pages/Horticulture';
-import Navbar from './components/Navbar';
+import Campuses from './pages/Campuses';
+import WasteAdmin from './pages/WasteAdmin';
+import ESGReports from './pages/ESGReports';
 import NotificationDrawer from './components/NotificationDrawer';
-import './index.css';
 
-const PAGES = {
-  dashboard: Dashboard,
-  tasks: Tasks,
-  inventory: Inventory,
-  team: Team,
-  events: Events,
-  recycling: Recycling,
-  horticulture: Horticulture,
-};
-
-function AppInner() {
+const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  const [currentPage, setCurrentPage] = useState(() => localStorage.getItem('upcycle_current_page') || 'dashboard');
-  const [showNotifications, setShowNotifications] = useState(false);
-
-  const queryParams = new URLSearchParams(window.location.search);
-  const verifyToken = queryParams.get('verify_token');
-
-  const [authMode, setAuthMode] = useState(verifyToken ? 'verify-email' : 'landing');
-
-  // Persist current page to localStorage
-  useEffect(() => {
-    localStorage.setItem('upcycle_current_page', currentPage);
-  }, [currentPage]);
-
   if (loading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', flexDirection: 'column', gap: '20px' }}>
-        <div style={{ fontSize: '3rem' }}>🌿</div>
-        <div className="spinner" />
-        <p style={{ color: 'var(--text-dim)', fontSize: '0.9rem' }}>Loading Upcycle...</p>
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+        <div className="text-4xl animate-bounce">🌿</div>
+        <p className="text-gray-500 font-medium">Loading Upcycle...</p>
       </div>
     );
   }
+  if (!user) return <Navigate to="/login" replace />;
+  return children;
+};
 
-  if (!user) {
-    if (authMode === 'login') return <Login onNavigateToSignup={setAuthMode} />;
-    if (authMode === 'signup') return <Signup onNavigateToLogin={() => setAuthMode('login')} />;
-    if (authMode === 'forgot-password') return <ForgotPassword onNavigateToLogin={() => setAuthMode('login')} />
-    if (authMode === 'verify-email') return <VerifyEmail token={verifyToken} onNavigateToLogin={() => setAuthMode('login')} />;
-    return <Landing onNavigate={() => setAuthMode('login')} />;
-  }
-
-
-  const PageComponent = PAGES[currentPage] || Dashboard;
-
+function AppRoutes() {
   return (
-    <div className="app-layout">
-      <Navbar
-        currentPage={currentPage}
-        onNavigate={setCurrentPage}
-        onNotifications={() => setShowNotifications(true)}
-      />
-      <main className="main-content">
-        <PageComponent onNavigate={setCurrentPage} />
-      </main>
-      {showNotifications && (
-        <NotificationDrawer onClose={() => setShowNotifications(false)} />
-      )}
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+
+        {/* Admin/User Dashboard Routes */}
+        <Route path="/admin" element={
+          <ProtectedRoute>
+            <AdminLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<Dashboard />} />
+          <Route path="tasks" element={<Tasks />} />
+          <Route path="campuses" element={<Campuses />} />
+          <Route path="users" element={<Team />} />
+          <Route path="waste" element={<WasteAdmin />} />
+          <Route path="marketplace" element={<Inventory />} />
+          <Route path="events" element={<Events />} />
+          <Route path="reports" element={<ESGReports />} />
+          <Route path="settings" element={<div>Settings Component</div>} />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Router>
   );
 }
 
 export default function App() {
   return (
     <AuthProvider>
-      <AppInner />
+      <AppRoutes />
     </AuthProvider>
   );
 }

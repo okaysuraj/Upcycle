@@ -1,13 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const { pool } = require('../config/db');
+const { prisma } = require('../config/db');
 const { auth } = require('./auth');
 
 // GET /api/events
 router.get('/', auth, async (req, res) => {
   try {
-    const events = await pool.query('SELECT * FROM events ORDER BY date ASC');
-    res.json(events.rows);
+    const events = await prisma.event.findMany({
+      include: {
+        campus: { select: { name: true } },
+        _count: { select: { registrations: true } }
+      },
+      orderBy: { date: 'asc' }
+    });
+    res.json(events);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -16,13 +22,13 @@ router.get('/', auth, async (req, res) => {
 // GET /api/events/:id/registrations
 router.get('/:id/registrations', auth, async (req, res) => {
   try {
-    const registrations = await pool.query(`
-      SELECT er.*, u.name, u.email
-      FROM event_registrations er
-      JOIN users u ON er."userId" = u.id
-      WHERE er."eventId" = $1
-    `, [req.params.id]);
-    res.json(registrations.rows);
+    const registrations = await prisma.eventRegistration.findMany({
+      where: { eventId: req.params.id },
+      include: {
+        user: { select: { name: true, email: true, role: true } }
+      }
+    });
+    res.json(registrations);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -31,19 +37,20 @@ router.get('/:id/registrations', auth, async (req, res) => {
 // POST /api/events
 router.post('/', auth, async (req, res) => {
   try {
-    // Only allow admins/coordinators ideally, but for now we'll allow any authenticated user or check role
-    if (req.user.role !== 'admin' && req.user.role !== 'coordinator') {
-      // return res.status(403).json({ message: 'Forbidden' });
-      // Depending on the answer to open question 1, we might allow everyone. Let's allow everyone for now to ensure functionality.
-    }
+    const { title, description, date, location, maxVolunteers, campusId } = req.body;
     
-    const { title, description, date, location, maxVolunteers } = req.body;
-    const newEvent = await pool.query(`
-      INSERT INTO events (title, description, date, location, "maxVolunteers")
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING *
-    `, [title, description, date, location, maxVolunteers]);
-    res.status(201).json(newEvent.rows[0]);
+    // Only EVENT_ORGANIZER or PLATFORM_ADMIN should ideally create events.
+    const newEvent = await prisma.event.create({
+      data: {
+        title,
+        description,
+        date: new Date(date),
+        location,
+        maxVolunteers: parseInt(maxVolunteers) || null,
+        campusId: campusId || null,
+      }
+    });
+    res.status(201).json(newEvent);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -56,18 +63,23 @@ router.post('/:id/rsvp', auth, async (req, res) => {
     const userId = req.user.id;
 
     // Check if already registered
-    const existing = await pool.query('SELECT * FROM event_registrations WHERE "eventId" = $1 AND "userId" = $2', [eventId, userId]);
-    if (existing.rows.length > 0) {
+    const existing = await prisma.eventRegistration.findFirst({
+      where: { eventId, userId }
+    });
+    
+    if (existing) {
       return res.status(400).json({ message: 'Already registered for this event' });
     }
 
-    const reg = await pool.query(`
-      INSERT INTO event_registrations ("eventId", "userId")
-      VALUES ($1, $2)
-      RETURNING *
-    `, [eventId, userId]);
+    const reg = await prisma.eventRegistration.create({
+      data: {
+        eventId,
+        userId,
+        status: 'REGISTERED'
+      }
+    });
     
-    res.status(201).json(reg.rows[0]);
+    res.status(201).json(reg);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -80,18 +92,23 @@ router.post('/:id/log-hours', auth, async (req, res) => {
     const userId = req.user.id;
     const { hours } = req.body;
 
-    const reg = await pool.query(`
-      UPDATE event_registrations
-      SET "hoursLogged" = $1, status = 'Completed'
-      WHERE "eventId" = $2 AND "userId" = $3
-      RETURNING *
-    `, [hours, eventId, userId]);
+    const existing = await prisma.eventRegistration.findFirst({
+      where: { eventId, userId }
+    });
 
-    if (reg.rows.length === 0) {
+    if (!existing) {
       return res.status(404).json({ message: 'Registration not found' });
     }
 
-    res.json(reg.rows[0]);
+    const reg = await prisma.eventRegistration.update({
+      where: { id: existing.id },
+      data: {
+        hoursLogged: parseFloat(hours),
+        status: 'ATTENDED'
+      }
+    });
+
+    res.json(reg);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

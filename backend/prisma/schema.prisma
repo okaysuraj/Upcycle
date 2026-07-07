@@ -1,0 +1,223 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// 1. Core User Roles & Auth
+model User {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String
+  email               String       @unique
+  password            String
+  role                Role         @default(VOLUNTEER) // Student, Campus Admin, Vendor, etc.
+  skills              String[]
+  availabilityHours   Int          @default(10)
+  activeTasks         Int          @default(0)
+  isVerified          Boolean      @default(false)
+  
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  campusId            String?      @db.Uuid
+  campus              Campus?      @relation(fields: [campusId], references: [id])
+
+  // Relations
+  tasksAssigned       Task[]       @relation("TaskAssignee")
+  notifications       Notification[]
+  eventRegistrations  EventRegistration[]
+  wasteLogs           WasteLog[]
+  marketplaceListings MarketplaceListing[]
+}
+
+enum Role {
+  STUDENT
+  CAMPUS_ADMIN
+  WASTE_STAFF
+  VENDOR
+  CONSULTANT
+  EVENT_ORGANIZER
+  PLATFORM_ADMIN
+  VOLUNTEER
+  ADMIN
+  STAFF
+}
+
+// 3. Campus Sustainability Management
+model Campus {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String
+  domain              String?      @unique
+  sustainabilityScore Float        @default(0)
+  location            String?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  users               User[]
+  bins                SmartBin[]
+  wasteLogs           WasteLog[]
+  events              Event[]
+}
+
+// 4. Waste Management
+model SmartBin {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  campusId            String       @db.Uuid
+  campus              Campus       @relation(fields: [campusId], references: [id])
+  location            String
+  category            WasteCategory
+  fillLevel           Float        @default(0.0) // 0 to 100%
+  lastEmptied         DateTime?
+}
+
+enum WasteCategory {
+  PLASTIC
+  ORGANIC
+  E_WASTE
+  PAPER
+  HAZARDOUS
+  GENERAL
+}
+
+model WasteLog {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  campusId            String       @db.Uuid
+  campus              Campus       @relation(fields: [campusId], references: [id])
+  userId              String       @db.Uuid
+  user                User         @relation(fields: [userId], references: [id])
+  category            WasteCategory
+  quantityKg          Float
+  date                DateTime     @default(now())
+}
+
+// 5. Eco-Friendly Marketplace
+model MarketplaceListing {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vendorId            String       @db.Uuid
+  vendor              User         @relation(fields: [vendorId], references: [id])
+  title               String
+  description         String
+  serviceType         ServiceType
+  price               Float?
+  isFeatured          Boolean      @default(false)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+}
+
+enum ServiceType {
+  SOLAR_INSTALLATION
+  GREEN_ARCHITECTURE
+  LANDSCAPING
+  WASTE_CONSULTING
+  MATERIAL_DONATION
+}
+
+// 6. Events
+model Event {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title               String
+  description         String
+  date                DateTime
+  location            String
+  campusId            String?      @db.Uuid
+  campus              Campus?      @relation(fields: [campusId], references: [id])
+  maxAttendees        Int?
+  status              EventStatus  @default(UPCOMING)
+  
+  registrations       EventRegistration[]
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+}
+
+enum EventStatus {
+  UPCOMING
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+model EventRegistration {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId             String       @db.Uuid
+  event               Event        @relation(fields: [eventId], references: [id])
+  userId              String       @db.Uuid
+  user                User         @relation(fields: [userId], references: [id])
+  status              RegistrationStatus @default(REGISTERED)
+  createdAt           DateTime     @default(now())
+
+  @@unique([eventId, userId])
+}
+
+enum RegistrationStatus {
+  REGISTERED
+  ATTENDED
+  CANCELLED
+}
+
+// Existing tables from old schema
+model Task {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title               String
+  description         String
+  category            String
+  priority            String       @default("Medium")
+  status              String       @default("Pending")
+  assignedToId        String?      @db.Uuid
+  assignee            User?        @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  assigneeName        String?
+  dueDate             DateTime?
+  completedAt         DateTime?
+  materialsUsed       Json?
+  notes               String?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  notifications       Notification[]
+}
+
+model Resource {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String
+  quantity            Int
+  unit                String
+  threshold           Int
+  category            String
+  icon                String?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+}
+
+model Notification {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type                String
+  message             String
+  userId              String       @db.Uuid
+  user                User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId              String?      @db.Uuid
+  task                Task?        @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  read                Boolean      @default(false)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+}
+
+model Plant {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String
+  location            String?
+  plantedDate         DateTime?
+  status              String       @default("Healthy")
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  harvests            Harvest[]
+}
+
+model Harvest {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  plantId             String       @db.Uuid
+  plant               Plant        @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  quantity            Float
+  unit                String
+  date                DateTime     @default(now())
+  createdAt           DateTime     @default(now())
+}
