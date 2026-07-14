@@ -38,6 +38,11 @@ router.get('/report/:campusId', auth, async (req, res) => {
         activeMembers: campus._count.users,
         eventsHosted: campus._count.events
       },
+      circularFlow: {
+        inbound: 12.4, // Mock tons
+        recirculated: 8.6,
+        efficiency: 68 // Mock percent
+      },
       // Mock generated compliance text
       aiSummary: `Overall ESG compliance is strong. Focus on increasing organic waste diversion to boost the sustainability score further.`
     });

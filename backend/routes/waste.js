@@ -117,20 +117,56 @@ router.post('/logs', auth, async (req, res) => {
 // For dashboard charts
 router.get('/stats', auth, async (req, res) => {
   try {
-    // Group by category to get total weight per category
-    const stats = await prisma.wasteLog.groupBy({
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Total daily waste
+    const dailyLogs = await prisma.wasteLog.aggregate({
+      where: { date: { gte: today } },
+      _sum: { quantityKg: true }
+    });
+    const totalDailyWasteKg = dailyLogs._sum.quantityKg || 0;
+
+    // Recycling rate (all time or daily - let's do all time for now)
+    const allLogs = await prisma.wasteLog.groupBy({
       by: ['category'],
-      _sum: {
-        quantityKg: true
+      _sum: { quantityKg: true }
+    });
+    
+    let totalWaste = 0;
+    let recycledWaste = 0;
+    const recycledCategories = ['PLASTIC', 'PAPER', 'ORGANIC']; // Assuming these count as recycled
+    
+    allLogs.forEach(log => {
+      const kg = log._sum.quantityKg || 0;
+      totalWaste += kg;
+      if (recycledCategories.includes(log.category)) {
+        recycledWaste += kg;
       }
     });
     
-    const formattedStats = stats.map(s => ({
+    const recyclingRate = totalWaste > 0 ? ((recycledWaste / totalWaste) * 100).toFixed(1) : 0;
+
+    // Critical bins
+    const criticalBins = await prisma.smartBin.findMany({
+      where: { fillLevel: { gt: 90 } },
+      include: { campus: { select: { name: true } } }
+    });
+
+    const totalBins = await prisma.smartBin.count();
+
+    const formattedStats = allLogs.map(s => ({
       category: s.category,
       totalKg: s._sum.quantityKg || 0
     }));
 
-    res.json(formattedStats);
+    res.json({
+      totalDailyWasteKg,
+      recyclingRate: parseFloat(recyclingRate),
+      criticalBins,
+      totalBins,
+      categoryBreakdown: formattedStats
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

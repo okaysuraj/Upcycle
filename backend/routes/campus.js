@@ -89,4 +89,31 @@ router.post('/:id/ai-score', auth, async (req, res) => {
   }
 });
 
+// GET /api/campuses/stats
+router.get('/stats', auth, async (req, res) => {
+  try {
+    const campusId = req.user.campusId; // Scope to user's campus if they have one
+
+    // In a real app, these would aggregate actual IoT tables, energy bills, and task alerts.
+    // For now, we will return some mock calculated KPI data that powers the CampusAdmin Dashboard.
+    const stats = {
+      carbonOffset: 42.8,
+      carbonOffsetTrend: 12,
+      wasteDiverted: 68,
+      wasteDivertedTarget: 75,
+      energyUsage: 12.4,
+      gridEfficiency: 88,
+      urgentTasks: [
+        { id: 1, title: 'Sensor Failure: West Wing', desc: 'Water flow meter at Building 4 is unresponsive.', type: 'warning' },
+        { id: 2, title: 'Bin Capacity Reached', desc: 'Main Library recycling cluster is at 95% capacity.', type: 'waste' },
+        { id: 3, title: 'Anomalous Usage Spike', desc: 'Gymnasium HVAC system exceeding baseline by 24%.', type: 'energy' }
+      ]
+    };
+
+    res.json(stats);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;

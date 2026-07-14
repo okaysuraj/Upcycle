@@ -1,81 +1,83 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import ScreenWrapper from '../../components/ui/ScreenWrapper';
+import Input from '../../components/ui/Input';
+import Button from '../../components/ui/Button';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleLogin = () => {
-    // Basic mock login routing based on role would go here
-    // For now, redirect to admin as a placeholder
-    router.replace('/(admin)/dashboard');
+  const handleLogin = async () => {
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    
+    const result = await login(email, password);
+    if (!result.success) {
+      setError(result.error);
+    }
+    // Note: RootLayout handles redirection on success
+    setLoading(false);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome to Upcycle</Text>
-      <Text style={styles.subtitle}>Sign in to continue</Text>
+    <ScreenWrapper className="justify-center">
+      <View className="items-center mb-10 mt-10">
+        <View className="w-20 h-20 bg-emerald-100 rounded-full items-center justify-center mb-6">
+          <Text className="text-4xl">🌿</Text>
+        </View>
+        <Text className="text-3xl font-black text-gray-900 mb-2">Welcome Back</Text>
+        <Text className="text-gray-500 text-base text-center px-4">
+          Sign in to track your campus sustainability journey.
+        </Text>
+      </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+      <View className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm mb-6">
+        <Input 
+          label="Email Address" 
+          placeholder="Enter your university email"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
+        <Input 
+          label="Password" 
+          placeholder="Enter your password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          className="mb-6"
+        />
+        
+        {error ? <Text className="text-red-500 text-center font-medium mb-4">{error}</Text> : null}
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Log In</Text>
-      </TouchableOpacity>
-    </View>
+        <Button 
+          title="Sign In" 
+          onPress={handleLogin} 
+          loading={loading} 
+        />
+      </View>
+      
+      <View className="flex-row justify-center mt-4">
+        <Text className="text-gray-500 text-base">New to Upcycle? </Text>
+        <Text 
+          className="text-emerald-600 font-bold text-base"
+          onPress={() => router.push('/(auth)/signup')}
+        >
+          Create Account
+        </Text>
+      </View>
+    </ScreenWrapper>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-    justifyContent: 'center',
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#065f46', // emerald-800
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#6b7280',
-    marginBottom: 32,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 16,
-    fontSize: 16,
-  },
-  button: {
-    backgroundColor: '#10b981', // emerald-500
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});

@@ -1,73 +1,51 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import ForgotPassword from './pages/ForgotPassword';
-import VerifyEmail from './pages/VerifyEmail';
-import Landing from './pages/Landing';
-import AdminLayout from './components/AdminLayout';
-import Dashboard from './pages/Dashboard';
-import Tasks from './pages/Tasks';
-import Inventory from './pages/Inventory';
-import Team from './pages/Team';
-import Events from './pages/Events';
-import Campuses from './pages/Campuses';
-import WasteAdmin from './pages/WasteAdmin';
-import ESGReports from './pages/ESGReports';
-import NotificationDrawer from './components/NotificationDrawer';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 
-const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-        <div className="text-4xl animate-bounce">🌿</div>
-        <p className="text-gray-500 font-medium">Loading Upcycle...</p>
-      </div>
-    );
-  }
-  if (!user) return <Navigate to="/login" replace />;
-  return children;
-};
+// Layouts
+import AuthLayout from './layouts/AuthLayout';
+import StudentLayout from './layouts/StudentLayout';
+import StaffLayout from './layouts/StaffLayout';
 
-function AppRoutes() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
+// Auth Pages
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import VerifyEmail from './pages/auth/VerifyEmail';
+import ResetPassword from './pages/auth/ResetPassword';
 
-        {/* Admin/User Dashboard Routes */}
-        <Route path="/admin" element={
-          <ProtectedRoute>
-            <AdminLayout />
-          </ProtectedRoute>
-        }>
-          <Route index element={<Dashboard />} />
-          <Route path="tasks" element={<Tasks />} />
-          <Route path="campuses" element={<Campuses />} />
-          <Route path="users" element={<Team />} />
-          <Route path="waste" element={<WasteAdmin />} />
-          <Route path="marketplace" element={<Inventory />} />
-          <Route path="events" element={<Events />} />
-          <Route path="reports" element={<ESGReports />} />
-          <Route path="settings" element={<div>Settings Component</div>} />
-        </Route>
-
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
-  );
-}
+// Dashboards\nimport Global Analytics from './pages/staff/Analytics';\nimport ESG Reports from './pages/staff/EsgReports';\nimport Task Approvals from './pages/staff/Tasks';\nimport Task Details from './pages/staff/TaskDetails';\nimport Waste Operations from './pages/staff/WasteLog';\nimport Waste Audits from './pages/staff/WasteAudits';\nimport Fleet Management from './pages/staff/Fleet';\nimport Vendor Logistics from './pages/staff/Vendors';\nimport Contracts Repository from './pages/staff/Contracts';\nimport Facilities Overview from './pages/staff/Facilities';\nimport IoT Sensors Map from './pages/staff/IoTSensors';\nimport Energy Metrics from './pages/staff/EnergyMetrics';\nimport Water Metrics from './pages/staff/WaterMetrics';\nimport Incident Reports from './pages/staff/Incidents';\nimport Staff Directory from './pages/staff/StaffDirectory';\nimport Shift Scheduling from './pages/staff/Shifts';\nimport Safety Training from './pages/staff/Training';\nimport Support Tickets from './pages/staff/SupportTickets';\nimport Platform Settings from './pages/staff/Settings';\nimport Events Hub from './pages/student/Events';\nimport Event Details from './pages/student/EventDetails';\nimport Marketplace from './pages/student/Marketplace';\nimport Marketplace Item from './pages/student/MarketplaceItem';\nimport Global Leaderboard from './pages/student/Leaderboard';\nimport User Profile from './pages/student/Profile';\nimport Badge Gallery from './pages/student/Badges';\nimport Account Settings from './pages/student/Settings';\nimport Waste Logging from './pages/student/WasteLog';\nimport Active Challenges from './pages/student/Challenges';\nimport Notifications Center from './pages/student/Notifications';\nimport Social Feed from './pages/student/SocialFeed';\nimport Direct Messaging from './pages/student/Chat';\nimport Student Orgs from './pages/student/Orgs';\nimport Grassroots Projects from './pages/student/Projects';\nimport Volunteering Hub from './pages/student/Volunteering';\nimport Impact Wallet from './pages/student/Wallet';\nimport EcoStore from './pages/student/Store';\nimport Impact Analytics from './pages/student/ImpactAnalytics';
+import StudentDashboard from './pages/student/StudentDashboard';
+import StaffDashboard from './pages/staff/StaffDashboard';
 
 export default function App() {
   return (
     <AuthProvider>
-      <AppRoutes />
+      <BrowserRouter>
+        <Routes>
+          {/* Default Route */}
+          <Route path="/" element={<Navigate to="/auth/login" replace />} />
+
+          {/* Auth Routes */}
+          <Route path="/auth" element={<AuthLayout />}>
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
+            <Route path="forgot-password" element={<ForgotPassword />} />
+            <Route path="verify-email" element={<VerifyEmail />} />
+            <Route path="reset-password" element={<ResetPassword />} />
+          </Route>
+
+          {/* Student Routes */}
+          <Route path="/student" element={<StudentLayout />}>
+            <Route index element={<StudentDashboard />} />\n            <Route path="event calendar" element={<Event Calendar />} />\n            <Route path="event rsvp" element={<Event RSVP />} />\n            <Route path="org directory" element={<Org Directory />} />\n            <Route path="org join" element={<Org Join />} />\n            <Route path="project create" element={<Project Create />} />\n            <Route path="project updates" element={<Project Updates />} />\n            <Route path="volunteer feedback" element={<Volunteer Feedback />} />\n            <Route path="wallet topup" element={<Wallet Topup />} />\n            <Route path="store categories" element={<Store Categories />} />\n            <Route path="store orders" element={<Store Orders />} />\n            <Route path="store order details" element={<Store Order Details />} />\n            <Route path="chat archived" element={<Chat Archived />} />\n            <Route path="social bookmarks" element={<Social Bookmarks />} />\n            <Route path="social following" element={<Social Following />} />\n            <Route path="waste log analytics" element={<Waste Log Analytics />} />\n            <Route path="impact calculator" element={<Impact Calculator />} />\n            <Route path="privacy settings" element={<Privacy Settings />} />\n            <Route path="accessibility settings" element={<Accessibility Settings />} />\n            <Route path="event registration" element={<Event Registration />} />\n            <Route path="event ticket" element={<Event Ticket />} />\n            <Route path="org details" element={<Org Details />} />\n            <Route path="project details" element={<Project Details />} />\n            <Route path="volunteer shift" element={<Volunteer Shift />} />\n            <Route path="volunteer history" element={<Volunteer History />} />\n            <Route path="wallet history" element={<Wallet History />} />\n            <Route path="wallet transfer" element={<Wallet Transfer />} />\n            <Route path="store item" element={<Store Item />} />\n            <Route path="store cart" element={<Store Cart />} />\n            <Route path="store checkout" element={<Store Checkout />} />\n            <Route path="chat thread" element={<Chat Thread />} />\n            <Route path="new chat" element={<New Chat />} />\n            <Route path="social post" element={<Social Post />} />\n            <Route path="create social post" element={<Create Social Post />} />\n            <Route path="waste log history" element={<Waste Log History />} />\n            <Route path="waste log details" element={<Waste Log Details />} />\n            <Route path="impact goals" element={<Impact Goals />} />\n            <Route path="impact badges" element={<Impact Badges />} />\n            <Route path="notification settings" element={<Notification Settings />} />\n            <Route path="leaderboard rules" element={<Leaderboard Rules />} />\n            <Route path="leaderboard rewards" element={<Leaderboard Rewards />} />\n            <Route path="challenge history" element={<Challenge History />} />\n            <Route path="badge details" element={<Badge Details />} />\n            <Route path="impact certificate" element={<Impact Certificate />} />\n            <Route path="impact share" element={<Impact Share />} />\n            <Route path="marketplace checkout" element={<Marketplace Checkout />} />\n            <Route path="marketplace receipt" element={<Marketplace Receipt />} />\n            <Route path="marketplace reviews" element={<Marketplace Reviews />} />\n            <Route path="leave review" element={<Leave Review />} />\n            <Route path="marketplace categories" element={<Marketplace Categories />} />\n            <Route path="appearance settings" element={<Appearance Settings />} />\n            <Route path="language settings" element={<Language Settings />} />\n            <Route path="contact us" element={<Contact Us />} />\n            <Route path="terms of service" element={<Terms of Service />} />\n            <Route path="events hub" element={<Events Hub />} />\n            <Route path="event details" element={<Event Details />} />\n            <Route path="marketplace" element={<Marketplace />} />\n            <Route path="marketplace item" element={<Marketplace Item />} />\n            <Route path="global leaderboard" element={<Global Leaderboard />} />\n            <Route path="user profile" element={<User Profile />} />\n            <Route path="badge gallery" element={<Badge Gallery />} />\n            <Route path="account settings" element={<Account Settings />} />\n            <Route path="waste logging" element={<Waste Logging />} />\n            <Route path="active challenges" element={<Active Challenges />} />\n            <Route path="notifications center" element={<Notifications Center />} />\n            <Route path="social feed" element={<Social Feed />} />\n            <Route path="direct messaging" element={<Direct Messaging />} />\n            <Route path="student orgs" element={<Student Orgs />} />\n            <Route path="grassroots projects" element={<Grassroots Projects />} />\n            <Route path="volunteering hub" element={<Volunteering Hub />} />\n            <Route path="impact wallet" element={<Impact Wallet />} />\n            <Route path="eco-store" element={<EcoStore />} />\n            <Route path="impact analytics" element={<Impact Analytics />} />
+          </Route>
+
+          {/* Staff Routes */}
+          <Route path="/staff" element={<StaffLayout />}>
+            <Route index element={<StaffDashboard />} />\n            <Route path="custom analytics" element={<Custom Analytics />} />\n            <Route path="esg archive" element={<ESG Archive />} />\n            <Route path="iot sensor map" element={<IoT Sensor Map />} />\n            <Route path="iot sensor logs" element={<IoT Sensor Logs />} />\n            <Route path="predictive energy" element={<Predictive Energy />} />\n            <Route path="predictive water" element={<Predictive Water />} />\n            <Route path="facility floorplan" element={<Facility Floorplan />} />\n            <Route path="incident archive" element={<Incident Archive />} />\n            <Route path="incident analytics" element={<Incident Analytics />} />\n            <Route path="fleet map" element={<Fleet Map />} />\n            <Route path="fleet analytics" element={<Fleet Analytics />} />\n            <Route path="staff onboarding" element={<Staff Onboarding />} />\n            <Route path="shift analytics" element={<Shift Analytics />} />\n            <Route path="training certificates" element={<Training Certificates />} />\n            <Route path="ticket analytics" element={<Ticket Analytics />} />\n            <Route path="integration settings" element={<Integration Settings />} />\n            <Route path="webhook settings" element={<Webhook Settings />} />\n            <Route path="audit log" element={<Audit Log />} />\n            <Route path="analytics export" element={<Analytics Export />} />\n            <Route path="esg export" element={<ESG Export />} />\n            <Route path="iot sensor details" element={<IoT Sensor Details />} />\n            <Route path="iot alerts" element={<IoT Alerts />} />\n            <Route path="energy report" element={<Energy Report />} />\n            <Route path="water report" element={<Water Report />} />\n            <Route path="facility details" element={<Facility Details />} />\n            <Route path="incident details" element={<Incident Details />} />\n            <Route path="resolve incident" element={<Resolve Incident />} />\n            <Route path="fleet vehicle" element={<Fleet Vehicle />} />\n            <Route path="fleet maintenance" element={<Fleet Maintenance />} />\n            <Route path="staff details" element={<Staff Details />} />\n            <Route path="shift details" element={<Shift Details />} />\n            <Route path="training details" element={<Training Details />} />\n            <Route path="ticket details" element={<Ticket Details />} />\n            <Route path="ticket respond" element={<Ticket Respond />} />\n            <Route path="security settings" element={<Security Settings />} />\n            <Route path="billing settings" element={<Billing Settings />} />\n            <Route path="api settings" element={<API Settings />} />\n            <Route path="roles settings" element={<Roles Settings />} />\n            <Route path="department analytics" element={<Department Analytics />} />\n            <Route path="campus comparison" element={<Campus Comparison />} />\n            <Route path="new audit" element={<New Audit />} />\n            <Route path="audit details" element={<Audit Details />} />\n            <Route path="vendor details" element={<Vendor Details />} />\n            <Route path="collection routes" element={<Collection Routes />} />\n            <Route path="collection schedule" element={<Collection Schedule />} />\n            <Route path="alerts hub" element={<Alerts Hub />} />\n            <Route path="broadcast alert" element={<Broadcast Alert />} />\n            <Route path="compliance tracking" element={<Compliance Tracking />} />\n            <Route path="contract details" element={<Contract Details />} />\n            <Route path="upload document" element={<Upload Document />} />\n            <Route path="staff profile" element={<Staff Profile />} />\n            <Route path="training module" element={<Training Module />} />\n            <Route path="shift swap" element={<Shift Swap />} />\n            <Route path="global analytics" element={<Global Analytics />} />\n            <Route path="esg reports" element={<ESG Reports />} />\n            <Route path="task approvals" element={<Task Approvals />} />\n            <Route path="task details" element={<Task Details />} />\n            <Route path="waste operations" element={<Waste Operations />} />\n            <Route path="waste audits" element={<Waste Audits />} />\n            <Route path="fleet management" element={<Fleet Management />} />\n            <Route path="vendor logistics" element={<Vendor Logistics />} />\n            <Route path="contracts repository" element={<Contracts Repository />} />\n            <Route path="facilities overview" element={<Facilities Overview />} />\n            <Route path="iot sensors map" element={<IoT Sensors Map />} />\n            <Route path="energy metrics" element={<Energy Metrics />} />\n            <Route path="water metrics" element={<Water Metrics />} />\n            <Route path="incident reports" element={<Incident Reports />} />\n            <Route path="staff directory" element={<Staff Directory />} />\n            <Route path="shift scheduling" element={<Shift Scheduling />} />\n            <Route path="safety training" element={<Safety Training />} />\n            <Route path="support tickets" element={<Support Tickets />} />\n            <Route path="platform settings" element={<Platform Settings />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </AuthProvider>
   );
 }

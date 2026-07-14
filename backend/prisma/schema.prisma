@@ -59,6 +59,7 @@ model Campus {
   bins                SmartBin[]
   wasteLogs           WasteLog[]
   events              Event[]
+  marketplaceListings MarketplaceListing[]
 }
 
 // 4. Waste Management
@@ -102,6 +103,11 @@ model MarketplaceListing {
   serviceType         ServiceType
   price               Float?
   isFeatured          Boolean      @default(false)
+  status              String       @default("ACTIVE")
+  category            String?
+  isService           Boolean      @default(false)
+  campusId            String?      @db.Uuid
+  campus              Campus?      @relation(fields: [campusId], references: [id])
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
 }

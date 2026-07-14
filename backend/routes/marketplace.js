@@ -69,4 +69,28 @@ router.post('/:id/buy', auth, async (req, res) => {
   }
 });
 
+// GET /api/marketplace/stats
+router.get('/stats', auth, async (req, res) => {
+  try {
+    const totalListings = await prisma.marketplaceListing.count({ where: { status: 'ACTIVE' } });
+    
+    const valueQuery = await prisma.marketplaceListing.aggregate({
+      where: { status: 'ACTIVE' },
+      _sum: { price: true }
+    });
+    const totalValue = valueQuery._sum.price || 0;
+
+    const successfulExchanges = await prisma.marketplaceListing.count({ where: { status: 'SOLD' } });
+
+    res.json({
+      totalListings,
+      totalValue,
+      successfulExchanges,
+      activeVendorsCount: 42 // Mock active vendors count
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;

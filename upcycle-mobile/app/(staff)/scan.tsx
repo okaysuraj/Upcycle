@@ -32,6 +32,7 @@ export default function QRScannerScreen() {
 
   return (
     <View style={styles.container}>
+      {/* @ts-ignore: React 19 typing mismatch for class components */}
       <CameraView
         style={StyleSheet.absoluteFillObject}
         facing="back"

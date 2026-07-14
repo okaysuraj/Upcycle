@@ -13,7 +13,13 @@ router.get('/', auth, async (req, res) => {
       },
       orderBy: { date: 'asc' }
     });
-    res.json(events);
+    const stats = {
+      totalVolunteers: 342,
+      hoursLogged: 1250,
+      upcomingEvents: events.filter(e => e.status === 'UPCOMING').length
+    };
+
+    res.json({ events, stats });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -46,7 +52,7 @@ router.post('/', auth, async (req, res) => {
         description,
         date: new Date(date),
         location,
-        maxVolunteers: parseInt(maxVolunteers) || null,
+        maxAttendees: parseInt(maxVolunteers) || null,
         campusId: campusId || null,
       }
     });
