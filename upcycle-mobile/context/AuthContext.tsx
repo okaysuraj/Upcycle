@@ -2,12 +2,28 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
-const AuthContext = createContext(null);
+interface AuthContextType {
+  user: any;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  register: (name: string, email: string, password: string, role: string) => Promise<{ success: boolean; error?: string }>;
+  logout: () => Promise<void>;
+  authFetch: (endpoint: string, options?: RequestInit) => Promise<Response>;
+  API_BASE_URL: string;
+}
 
-export const useAuth = () => useContext(AuthContext);
+const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   const API_BASE_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000/api' : 'http://localhost:5000/api';
@@ -37,7 +53,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (email, password) => {
+  const login = async (email: string, password: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
@@ -56,7 +72,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (name, email, password, role) => {
+  const register = async (name: string, email: string, password: string, role: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
@@ -78,11 +94,11 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  const authFetch = async (endpoint, options = {}) => {
+  const authFetch = async (endpoint: string, options: RequestInit = {}) => {
     const token = await SecureStore.getItemAsync('token');
-    const headers = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...options.headers,
+      ...(options.headers as Record<string, string> || {}),
     };
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;

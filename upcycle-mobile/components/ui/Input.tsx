@@ -1,12 +1,19 @@
+/// <reference types="nativewind/types" />
 import React from 'react';
-import { View, Text, TextInput } from 'react-native';
+import { View, Text, TextInput, TextInputProps } from 'react-native';
+
+interface InputProps extends TextInputProps {
+  label?: string;
+  error?: string;
+  className?: string;
+}
 
 export default function Input({ 
   label, 
   error, 
   className = '', 
   ...props 
-}) {
+}: InputProps) {
   return (
     <View className={`mb-4 ${className}`}>
       {label && <Text className="text-gray-700 font-semibold mb-2 ml-1">{label}</Text>}

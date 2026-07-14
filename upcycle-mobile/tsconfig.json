@@ -3,6 +3,8 @@
   "compilerOptions": {
     "strict": true,
     "jsx": "react-native",
+    "jsxImportSource": "nativewind",
     "skipLibCheck": true
-  }
+  },
+  "include": ["**/*.ts", "**/*.tsx", "nativewind-env.d.ts", ".expo/types/**/*.ts"]
 }

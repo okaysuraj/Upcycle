@@ -29,7 +29,7 @@ export default function SignupScreen() {
     if (result.success) {
       router.replace('/(auth)/login');
     } else {
-      setError(result.error);
+      setError(result.error || 'An error occurred');
     }
     setLoading(false);
   };
