@@ -17,6 +17,10 @@ model User {
   availabilityHours   Int          @default(10)
   activeTasks         Int          @default(0)
   isVerified          Boolean      @default(false)
+  kycStatus           String       @default("NONE") // NONE, PENDING, VERIFIED, REJECTED
+  privacySettings     Json?        // JSONB to store granular privacy toggles
+  roleMetadata        Json?        // JSONB to store role-specific data (e.g. vendor business details)
+  isActive            Boolean      @default(true) // Support for soft delete/deactivation
   
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
@@ -30,6 +34,19 @@ model User {
   eventRegistrations  EventRegistration[]
   wasteLogs           WasteLog[]
   marketplaceListings MarketplaceListing[]
+  points              Int          @default(0)
+  buyerTransactions   EscrowTransaction[] @relation("BuyerTransactions")
+  sellerTransactions  EscrowTransaction[] @relation("SellerTransactions")
+  vendorVerifications VendorVerification[]
+  userBadges          UserBadge[]
+  redemptions         Redemption[]
+  posts               Post[]
+  comments            Comment[]
+  ecoGroupMembers     EcoGroupMember[]
+  auditLogs           AuditLog[]
+  reportedContent     ContentModeration[] @relation("ReportedBy")
+  disputes            Dispute[]
+  quotes              Quote[]
 }
 
 enum Role {
@@ -60,6 +77,13 @@ model Campus {
   wasteLogs           WasteLog[]
   events              Event[]
   marketplaceListings MarketplaceListing[]
+  carbonFootprints    CarbonFootprint[]
+  waterUsages         WaterUsage[]
+  energyUsages        EnergyUsage[]
+  monthlyReports      MonthlyESGReport[]
+  rfps                RFP[]
+  posts               Post[]
+  ecoGroups           EcoGroup[]
 }
 
 // 4. Waste Management
@@ -110,6 +134,7 @@ model MarketplaceListing {
   campus              Campus?      @relation(fields: [campusId], references: [id])
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
+  escrowTransactions  EscrowTransaction[]
 }
 
 enum ServiceType {
@@ -227,3 +252,218 @@ model Harvest {
   date                DateTime     @default(now())
   createdAt           DateTime     @default(now())
 }
+
+// 7. ESG & Carbon Tracking
+model CarbonFootprint {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  campusId            String       @db.Uuid
+  campus              Campus       @relation(fields: [campusId], references: [id])
+  month               DateTime
+  totalEmissions      Float
+  reduction           Float
+  createdAt           DateTime     @default(now())
+}
+
+model WaterUsage {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  campusId            String       @db.Uuid
+  campus              Campus       @relation(fields: [campusId], references: [id])
+  date                DateTime
+  gallonsUsed         Float
+  saved               Float
+  createdAt           DateTime     @default(now())
+}
+
+model EnergyUsage {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  campusId            String       @db.Uuid
+  campus              Campus       @relation(fields: [campusId], references: [id])
+  date                DateTime
+  kwhUsed             Float
+  percentageRenewable Float
+  createdAt           DateTime     @default(now())
+}
+
+model MonthlyESGReport {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  campusId            String       @db.Uuid
+  campus              Campus       @relation(fields: [campusId], references: [id])
+  month               DateTime
+  reportUrl           String?
+  status              String       @default("GENERATED")
+  createdAt           DateTime     @default(now())
+}
+
+// 8. Expanded Marketplace & Vendor Management
+model RFP {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  campusId            String       @db.Uuid
+  campus              Campus       @relation(fields: [campusId], references: [id])
+  title               String
+  description         String
+  requirements        String
+  deadline            DateTime
+  status              String       @default("OPEN")
+  createdAt           DateTime     @default(now())
+  quotes              Quote[]
+}
+
+model Quote {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  rfpId               String       @db.Uuid
+  rfp                 RFP          @relation(fields: [rfpId], references: [id])
+  vendorId            String       @db.Uuid
+  vendor              User         @relation(fields: [vendorId], references: [id])
+  amount              Float
+  proposalDetails     String
+  status              String       @default("PENDING")
+  createdAt           DateTime     @default(now())
+}
+
+model EscrowTransaction {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  listingId           String?      @db.Uuid
+  listing             MarketplaceListing? @relation(fields: [listingId], references: [id])
+  buyerId             String       @db.Uuid
+  buyer               User         @relation("BuyerTransactions", fields: [buyerId], references: [id])
+  sellerId            String       @db.Uuid
+  seller              User         @relation("SellerTransactions", fields: [sellerId], references: [id])
+  amount              Float
+  status              String       @default("HELD") // HELD, RELEASED, REFUNDED
+  createdAt           DateTime     @default(now())
+}
+
+model VendorVerification {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vendorId            String       @db.Uuid
+  vendor              User         @relation(fields: [vendorId], references: [id])
+  documentsUrl        String[]
+  status              String       @default("PENDING") // PENDING, APPROVED, REJECTED
+  reviewedBy          String?      @db.Uuid
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+}
+
+// 9. Gamification
+model Badge {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String
+  description         String
+  iconUrl             String?
+  criteria            String
+  pointsAwarded       Int          @default(0)
+  userBadges          UserBadge[]
+}
+
+model UserBadge {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId              String       @db.Uuid
+  user                User         @relation(fields: [userId], references: [id])
+  badgeId             String       @db.Uuid
+  badge               Badge        @relation(fields: [badgeId], references: [id])
+  earnedAt            DateTime     @default(now())
+}
+
+model RewardItem {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String
+  description         String
+  pointsCost          Int
+  quantityAvailable   Int          @default(100)
+  redemptions         Redemption[]
+}
+
+model Redemption {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId              String       @db.Uuid
+  user                User         @relation(fields: [userId], references: [id])
+  rewardId            String       @db.Uuid
+  reward              RewardItem   @relation(fields: [rewardId], references: [id])
+  redeemedAt          DateTime     @default(now())
+}
+
+// 10. Community & Events
+model Post {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  authorId            String       @db.Uuid
+  author              User         @relation(fields: [authorId], references: [id])
+  campusId            String?      @db.Uuid
+  campus              Campus?      @relation(fields: [campusId], references: [id])
+  content             String
+  imageUrl            String?
+  likes               Int          @default(0)
+  createdAt           DateTime     @default(now())
+  comments            Comment[]
+  moderations         ContentModeration[]
+}
+
+model Comment {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  postId              String       @db.Uuid
+  post                Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId            String       @db.Uuid
+  author              User         @relation(fields: [authorId], references: [id])
+  content             String
+  createdAt           DateTime     @default(now())
+}
+
+model EcoGroup {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String
+  description         String
+  campusId            String?      @db.Uuid
+  campus              Campus?      @relation(fields: [campusId], references: [id])
+  members             EcoGroupMember[]
+  createdAt           DateTime     @default(now())
+}
+
+model EcoGroupMember {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  groupId             String       @db.Uuid
+  group               EcoGroup     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId              String       @db.Uuid
+  user                User         @relation(fields: [userId], references: [id])
+  role                String       @default("MEMBER") // ADMIN, MEMBER
+  joinedAt            DateTime     @default(now())
+}
+
+// 11. Admin & System
+model AuditLog {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId              String?      @db.Uuid
+  user                User?        @relation(fields: [userId], references: [id])
+  action              String
+  entity              String
+  entityId            String
+  details             Json?
+  timestamp           DateTime     @default(now())
+}
+
+model FeatureFlag {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String       @unique
+  isEnabled           Boolean      @default(false)
+  description         String?
+}
+
+model ContentModeration {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  postId              String?      @db.Uuid
+  post                Post?        @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reportedById        String       @db.Uuid
+  reportedBy          User         @relation("ReportedBy", fields: [reportedById], references: [id])
+  reason              String
+  status              String       @default("PENDING") // PENDING, RESOLVED, DISMISSED
+  createdAt           DateTime     @default(now())
+}
+
+model Dispute {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  transactionId       String?      
+  userId              String       @db.Uuid
+  user                User         @relation(fields: [userId], references: [id])
+  reason              String
+  status              String       @default("OPEN")
+  createdAt           DateTime     @default(now())
+}
+

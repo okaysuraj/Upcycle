@@ -1,16 +1,38 @@
 import React from 'react';
 
-export default function Button({ children, variant = 'primary', className = '', ...props }) {
-  const base = "px-4 py-2 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center disabled:opacity-50";
-  const variants = {
-    primary: "bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm",
-    secondary: "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50",
-    danger: "bg-red-500 text-white hover:bg-red-600"
-  };
+export default function Button({
+  children,
+  variant = 'primary',
+  size = 'md',
+  fullWidth = false,
+  className = '',
+  icon,
+  ...props
+}) {
+  const baseStyles = 'inline-flex items-center justify-center font-label-md transition-all active:scale-[0.98]';
   
+  const variants = {
+    primary: 'bg-primary text-white shadow-lg hover:shadow-primary/20 hover:scale-[1.02]',
+    secondary: 'bg-surface-container-high text-on-surface hover:bg-surface-container-highest',
+    outline: 'border border-outline-variant text-on-surface hover:bg-surface-container-low',
+    ghost: 'text-primary hover:bg-primary/10',
+  };
+
+  const sizes = {
+    sm: 'py-sm px-md text-label-sm rounded-lg',
+    md: 'py-md px-lg text-label-md rounded-full',
+    lg: 'py-lg px-xl text-body-lg rounded-full',
+  };
+
   return (
-    <button className={`${base} ${variants[variant]} ${className}`} {...props}>
-      {children}
+    <button
+      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${fullWidth ? 'w-full' : ''} ${className}`}
+      {...props}
+    >
+      <span className="flex items-center justify-center gap-base">
+        {children}
+        {icon && <span className="material-symbols-outlined text-[20px]">{icon}</span>}
+      </span>
     </button>
   );
 }

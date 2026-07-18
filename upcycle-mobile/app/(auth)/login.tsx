@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, Image } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import ScreenWrapper from '../../components/ui/ScreenWrapper';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -26,41 +27,60 @@ export default function LoginScreen() {
     if (!result.success) {
       setError(result.error);
     }
-    // Note: RootLayout handles redirection on success
+    // AuthContext handles state -> RootLayout handles redirection
     setLoading(false);
   };
 
   return (
-    <ScreenWrapper className="justify-center">
-      <View className="items-center mb-10 mt-10">
-        <View className="w-20 h-20 bg-emerald-100 rounded-full items-center justify-center mb-6">
-          <Text className="text-4xl">🌿</Text>
+    <ScreenWrapper className="justify-center bg-surface-ice">
+      {/* Background aesthetics */}
+      <View className="absolute top-0 left-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl opacity-50 -ml-20 -mt-20" />
+
+      <View className="items-center mb-10 mt-10 z-10">
+        <View className="w-16 h-16 bg-primary rounded-full items-center justify-center mb-6 shadow-sm">
+          <Ionicons name="leaf" size={32} color="#ffffff" />
         </View>
-        <Text className="text-3xl font-black text-gray-900 mb-2">Welcome Back</Text>
-        <Text className="text-gray-500 text-base text-center px-4">
-          Sign in to track your campus sustainability journey.
+        <Text className="text-3xl font-black text-on-background mb-2">Upcycle</Text>
+        <Text className="text-secondary text-base text-center px-4">
+          Transforming Municipal Waste Into Wealth.
         </Text>
       </View>
 
-      <View className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm mb-6">
+      <View className="bg-white/80 rounded-[32px] p-6 border border-outline-variant/30 shadow-sm mb-6 z-10">
+        <Text className="text-2xl font-bold text-on-background mb-1">Sign In</Text>
+        <Text className="text-sm text-secondary mb-6">Welcome back! Please enter your credentials.</Text>
+
+        {error ? (
+          <View className="bg-error-container p-3 rounded-xl mb-4">
+            <Text className="text-on-error-container text-center font-medium">{error}</Text>
+          </View>
+        ) : null}
+
         <Input 
           label="Email Address" 
-          placeholder="Enter your university email"
+          placeholder="coordinator@city-gov.eco"
+          icon="mail-outline"
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
           keyboardType="email-address"
         />
+        
+        <View className="flex-row justify-between items-center mt-4">
+          <Text className="text-sm font-medium text-on-surface-variant">Password</Text>
+          <TouchableOpacity onPress={() => router.push('/(auth)/forgot-password')}>
+            <Text className="text-sm font-medium text-primary">Forgot Password?</Text>
+          </TouchableOpacity>
+        </View>
+        
         <Input 
-          label="Password" 
-          placeholder="Enter your password"
+          placeholder="••••••••"
+          icon="lock-closed-outline"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
-          className="mb-6"
+          className="mt-1.5 mb-6"
         />
-        
-        {error ? <Text className="text-red-500 text-center font-medium mb-4">{error}</Text> : null}
 
         <Button 
           title="Sign In" 
@@ -69,14 +89,11 @@ export default function LoginScreen() {
         />
       </View>
       
-      <View className="flex-row justify-center mt-4">
-        <Text className="text-gray-500 text-base">New to Upcycle? </Text>
-        <Text 
-          className="text-emerald-600 font-bold text-base"
-          onPress={() => router.push('/(auth)/signup')}
-        >
-          Create Account
-        </Text>
+      <View className="flex-row justify-center mt-4 z-10">
+        <Text className="text-secondary text-base">Don't have an account? </Text>
+        <TouchableOpacity onPress={() => router.push('/(auth)/signup')}>
+          <Text className="text-primary font-bold text-base">Register Initiative</Text>
+        </TouchableOpacity>
       </View>
     </ScreenWrapper>
   );

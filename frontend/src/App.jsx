@@ -4,19 +4,124 @@ import { AuthProvider } from './context/AuthContext';
 
 // Layouts
 import AuthLayout from './layouts/AuthLayout';
-import StudentLayout from './layouts/StudentLayout';
-import StaffLayout from './layouts/StaffLayout';
+import DashboardLayout from './layouts/DashboardLayout';
 
-// Auth Pages
+// Auth Pages (Epic 1)
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import ForgotPassword from './pages/auth/ForgotPassword';
-import VerifyEmail from './pages/auth/VerifyEmail';
-import ResetPassword from './pages/auth/ResetPassword';
+import ChooseRole from './pages/auth/ChooseRole';
+import KycVerification from './pages/auth/KycVerification';
+import OtpVerification from './pages/auth/OtpVerification';
+import WelcomeOnboarding from './pages/auth/WelcomeOnboarding';
 
-// Dashboards\nimport Global Analytics from './pages/staff/Analytics';\nimport ESG Reports from './pages/staff/EsgReports';\nimport Task Approvals from './pages/staff/Tasks';\nimport Task Details from './pages/staff/TaskDetails';\nimport Waste Operations from './pages/staff/WasteLog';\nimport Waste Audits from './pages/staff/WasteAudits';\nimport Fleet Management from './pages/staff/Fleet';\nimport Vendor Logistics from './pages/staff/Vendors';\nimport Contracts Repository from './pages/staff/Contracts';\nimport Facilities Overview from './pages/staff/Facilities';\nimport IoT Sensors Map from './pages/staff/IoTSensors';\nimport Energy Metrics from './pages/staff/EnergyMetrics';\nimport Water Metrics from './pages/staff/WaterMetrics';\nimport Incident Reports from './pages/staff/Incidents';\nimport Staff Directory from './pages/staff/StaffDirectory';\nimport Shift Scheduling from './pages/staff/Shifts';\nimport Safety Training from './pages/staff/Training';\nimport Support Tickets from './pages/staff/SupportTickets';\nimport Platform Settings from './pages/staff/Settings';\nimport Events Hub from './pages/student/Events';\nimport Event Details from './pages/student/EventDetails';\nimport Marketplace from './pages/student/Marketplace';\nimport Marketplace Item from './pages/student/MarketplaceItem';\nimport Global Leaderboard from './pages/student/Leaderboard';\nimport User Profile from './pages/student/Profile';\nimport Badge Gallery from './pages/student/Badges';\nimport Account Settings from './pages/student/Settings';\nimport Waste Logging from './pages/student/WasteLog';\nimport Active Challenges from './pages/student/Challenges';\nimport Notifications Center from './pages/student/Notifications';\nimport Social Feed from './pages/student/SocialFeed';\nimport Direct Messaging from './pages/student/Chat';\nimport Student Orgs from './pages/student/Orgs';\nimport Grassroots Projects from './pages/student/Projects';\nimport Volunteering Hub from './pages/student/Volunteering';\nimport Impact Wallet from './pages/student/Wallet';\nimport EcoStore from './pages/student/Store';\nimport Impact Analytics from './pages/student/ImpactAnalytics';
-import StudentDashboard from './pages/student/StudentDashboard';
-import StaffDashboard from './pages/staff/StaffDashboard';
+// Dashboard Pages (Epic 2)
+import VolunteerDashboard from './pages/dashboards/VolunteerDashboard';
+import AdminDashboard from './pages/dashboards/AdminDashboard';
+import VendorDashboard from './pages/dashboards/VendorDashboard';
+import VendorAnalyticsDashboard from './pages/dashboards/VendorAnalyticsDashboard';
+import MainDashboard from './pages/dashboards/MainDashboard';
+
+// Operations Pages (Epic 3)
+import WasteDashboard from './pages/operations/WasteDashboard';
+import EnergyUsageDashboard from './pages/dashboards/EnergyUsageDashboard';
+import AddEditBuilding from './pages/operations/AddEditBuilding';
+import BuildingsZones from './pages/operations/BuildingsZones';
+import BuildingsZonesList from './pages/operations/BuildingsZonesList';
+import CampusApprovalQueue from './pages/dashboards/CampusApprovalQueue';
+import CampusComparisonDashboard from './pages/dashboards/CampusComparisonDashboard';
+import CampusDashboardAdmin from './pages/dashboards/CampusDashboardAdmin';
+import CampusMapView from './pages/dashboards/CampusMapView';
+import CampusOverviewAnalytics from './pages/dashboards/CampusOverviewAnalytics';
+import CampusReports from './pages/dashboards/CampusReports';
+import CampusReportsExportScreen from './pages/dashboards/CampusReportsExportScreen';
+import CarbonFootprintAnalytics from './pages/dashboards/CarbonFootprintAnalytics';
+import CircularEconomyDashboard from './pages/dashboards/CircularEconomyDashboard';
+import ComplianceTracking from './pages/dashboards/ComplianceTracking';
+import ConsumptionAnalytics from './pages/dashboards/ConsumptionAnalytics';
+import CollectionSchedule from './pages/operations/CollectionSchedule';
+import CreatePickupRequest from './pages/operations/CreatePickupRequest';
+import AddSmartBin from './pages/operations/AddSmartBin';
+import AddWasteEntry from './pages/operations/AddWasteEntry';
+import AlertDetail from './pages/operations/AlertDetail';
+
+// ESG Pages (Epic 4)
+import ESGDashboard from './pages/esg/ESGDashboard';
+
+// Marketplace Pages (Epic 5)
+// Marketplace Pages (Epic 5)
+import MarketplaceHome from './pages/marketplace/MarketplaceHome';
+import CompareVendorQuotes from './pages/marketplace/CompareVendorQuotes';
+import ContractDetails from './pages/marketplace/ContractDetails';
+import AiVendorMatchRecommendation from './pages/marketplace/AiVendorMatchRecommendation';
+
+// Community Pages (Epic 6)
+import CommunityFeed from './pages/community/CommunityFeed';
+import CommunityFeedHome from './pages/community/CommunityFeedHome';
+import ConnectedOrganizations from './pages/community/ConnectedOrganizations';
+import CreateOrganization from './pages/community/CreateOrganization';
+
+// Education Pages
+import CourseDetail from './pages/education/CourseDetail';
+
+// Admin Pages (Epic 7)
+// Admin Pages (Epic 7)
+import Settings from './pages/admin/Settings';
+import NotificationsCenter from './pages/admin/NotificationsCenter';
+import AiInsights from './pages/admin/AiInsights';
+import AiInsightsRecommendations from './pages/admin/AiInsightsRecommendations';
+import UserManagement from './pages/admin/UserManagement';
+import TermsPolicies from './pages/admin/TermsPolicies';
+import PrivacySettings from './pages/admin/PrivacySettings';
+import ContactSupport from './pages/admin/ContactSupport';
+import ContentModeration from './pages/admin/ContentModeration';
+import AccountDeactivation from './pages/user/AccountDeactivation';
+import AccountSettings from './pages/user/AccountSettings';
+import EditProfile from './pages/user/EditProfile';
+import UserProfile from './pages/user/UserProfile';
+import AchievementsBadges from './pages/user/AchievementsBadges';
+import ActivityHistory from './pages/user/ActivityHistory';
+import AppSettings from './pages/user/AppSettings';
+
+// Newly added components (Batch 4)
+import EventsHub from './pages/community/EventsHub';
+import GroupDetail from './pages/community/GroupDetail';
+import ExportPdfReport from './pages/dashboards/ExportPdfReport';
+import GlobalSearch from './pages/dashboards/GlobalSearch';
+import GoalProgressTracking from './pages/dashboards/GoalProgressTracking';
+import FaqPage from './pages/admin/FaqPage';
+import FeatureFlagsManager from './pages/admin/FeatureFlagsManager';
+import FinalizeProjectDetails from './pages/operations/FinalizeProjectDetails';
+
+// Newly added components (Batch 5)
+import HelpCenter from './pages/admin/HelpCenter';
+import JoinOrganization from './pages/community/JoinOrganization';
+import LeaderboardRewards from './pages/community/LeaderboardRewards';
+import LearningHub from './pages/education/LearningHub';
+import ListItem from './pages/marketplace/ListItem';
+import LiveCollectionMonitoring from './pages/operations/LiveCollectionMonitoring';
+import LiveSeminarsSpeakers from './pages/education/LiveSeminarsSpeakers';
+
+// Newly added components (Batch 6)
+import MarketplaceModeration from './pages/admin/MarketplaceModeration';
+import MatchSuggestions from './pages/marketplace/MatchSuggestions';
+import MaterialFlowTracker from './pages/operations/MaterialFlowTracker';
+import MilestoneTracking from './pages/dashboards/MilestoneTracking';
+import MonthlyESGReportViewer from './pages/esg/MonthlyESGReportViewer';
+import NotificationBroadcastSystem from './pages/admin/NotificationBroadcastSystem';
+
+// Newly added components (Batch 7)
+import NotificationSettings from './pages/admin/NotificationSettings';
+import OverflowAlert from './pages/operations/OverflowAlert';
+import PaymentEscrowManagement from './pages/marketplace/PaymentEscrowManagement';
+
+// Newly added components (Batch 8)
+import PickupAlerts from './pages/operations/PickupAlerts';
+import PickupVerification from './pages/operations/PickupVerification';
+import PlatformSettings from './pages/admin/PlatformSettings';
+import RolePermissionsManager from './pages/admin/RolePermissionsManager';
+import RouteOptimizationMap from './pages/operations/RouteOptimizationMap';
+import PortfolioShowcase from './pages/esg/PortfolioShowcase';
 
 export default function App() {
   return (
@@ -26,24 +131,128 @@ export default function App() {
           {/* Default Route */}
           <Route path="/" element={<Navigate to="/auth/login" replace />} />
 
-          {/* Auth Routes */}
-          <Route path="/auth" element={<AuthLayout />}>
-            <Route path="login" element={<Login />} />
-            <Route path="register" element={<Register />} />
-            <Route path="forgot-password" element={<ForgotPassword />} />
-            <Route path="verify-email" element={<VerifyEmail />} />
-            <Route path="reset-password" element={<ResetPassword />} />
+          {/* Epic 1: Auth Routes */}
+          <Route element={<AuthLayout />}>
+            <Route path="/onboarding" element={<WelcomeOnboarding />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/choose-role" element={<ChooseRole />} />
+            <Route path="/kyc-verification" element={<KycVerification />} />
+            <Route path="/verify-otp" element={<OtpVerification />} />
           </Route>
 
-          {/* Student Routes */}
-          <Route path="/student" element={<StudentLayout />}>
-            <Route index element={<StudentDashboard />} />\n            <Route path="event calendar" element={<Event Calendar />} />\n            <Route path="event rsvp" element={<Event RSVP />} />\n            <Route path="org directory" element={<Org Directory />} />\n            <Route path="org join" element={<Org Join />} />\n            <Route path="project create" element={<Project Create />} />\n            <Route path="project updates" element={<Project Updates />} />\n            <Route path="volunteer feedback" element={<Volunteer Feedback />} />\n            <Route path="wallet topup" element={<Wallet Topup />} />\n            <Route path="store categories" element={<Store Categories />} />\n            <Route path="store orders" element={<Store Orders />} />\n            <Route path="store order details" element={<Store Order Details />} />\n            <Route path="chat archived" element={<Chat Archived />} />\n            <Route path="social bookmarks" element={<Social Bookmarks />} />\n            <Route path="social following" element={<Social Following />} />\n            <Route path="waste log analytics" element={<Waste Log Analytics />} />\n            <Route path="impact calculator" element={<Impact Calculator />} />\n            <Route path="privacy settings" element={<Privacy Settings />} />\n            <Route path="accessibility settings" element={<Accessibility Settings />} />\n            <Route path="event registration" element={<Event Registration />} />\n            <Route path="event ticket" element={<Event Ticket />} />\n            <Route path="org details" element={<Org Details />} />\n            <Route path="project details" element={<Project Details />} />\n            <Route path="volunteer shift" element={<Volunteer Shift />} />\n            <Route path="volunteer history" element={<Volunteer History />} />\n            <Route path="wallet history" element={<Wallet History />} />\n            <Route path="wallet transfer" element={<Wallet Transfer />} />\n            <Route path="store item" element={<Store Item />} />\n            <Route path="store cart" element={<Store Cart />} />\n            <Route path="store checkout" element={<Store Checkout />} />\n            <Route path="chat thread" element={<Chat Thread />} />\n            <Route path="new chat" element={<New Chat />} />\n            <Route path="social post" element={<Social Post />} />\n            <Route path="create social post" element={<Create Social Post />} />\n            <Route path="waste log history" element={<Waste Log History />} />\n            <Route path="waste log details" element={<Waste Log Details />} />\n            <Route path="impact goals" element={<Impact Goals />} />\n            <Route path="impact badges" element={<Impact Badges />} />\n            <Route path="notification settings" element={<Notification Settings />} />\n            <Route path="leaderboard rules" element={<Leaderboard Rules />} />\n            <Route path="leaderboard rewards" element={<Leaderboard Rewards />} />\n            <Route path="challenge history" element={<Challenge History />} />\n            <Route path="badge details" element={<Badge Details />} />\n            <Route path="impact certificate" element={<Impact Certificate />} />\n            <Route path="impact share" element={<Impact Share />} />\n            <Route path="marketplace checkout" element={<Marketplace Checkout />} />\n            <Route path="marketplace receipt" element={<Marketplace Receipt />} />\n            <Route path="marketplace reviews" element={<Marketplace Reviews />} />\n            <Route path="leave review" element={<Leave Review />} />\n            <Route path="marketplace categories" element={<Marketplace Categories />} />\n            <Route path="appearance settings" element={<Appearance Settings />} />\n            <Route path="language settings" element={<Language Settings />} />\n            <Route path="contact us" element={<Contact Us />} />\n            <Route path="terms of service" element={<Terms of Service />} />\n            <Route path="events hub" element={<Events Hub />} />\n            <Route path="event details" element={<Event Details />} />\n            <Route path="marketplace" element={<Marketplace />} />\n            <Route path="marketplace item" element={<Marketplace Item />} />\n            <Route path="global leaderboard" element={<Global Leaderboard />} />\n            <Route path="user profile" element={<User Profile />} />\n            <Route path="badge gallery" element={<Badge Gallery />} />\n            <Route path="account settings" element={<Account Settings />} />\n            <Route path="waste logging" element={<Waste Logging />} />\n            <Route path="active challenges" element={<Active Challenges />} />\n            <Route path="notifications center" element={<Notifications Center />} />\n            <Route path="social feed" element={<Social Feed />} />\n            <Route path="direct messaging" element={<Direct Messaging />} />\n            <Route path="student orgs" element={<Student Orgs />} />\n            <Route path="grassroots projects" element={<Grassroots Projects />} />\n            <Route path="volunteering hub" element={<Volunteering Hub />} />\n            <Route path="impact wallet" element={<Impact Wallet />} />\n            <Route path="eco-store" element={<EcoStore />} />\n            <Route path="impact analytics" element={<Impact Analytics />} />
-          </Route>
+          {/* Core Dashboards & Shell */}
+          <Route element={<DashboardLayout />}>
+            <Route path="/student" element={<VolunteerDashboard />} />
+            <Route path="/volunteer" element={<VolunteerDashboard />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/platform_admin" element={<AdminDashboard />} />
+            <Route path="/vendor" element={<VendorDashboard />} />
+            <Route path="/vendor/analytics" element={<VendorAnalyticsDashboard />} />
+            <Route path="/eco-professional" element={<MainDashboard />} />
+            
+            {/* Epic 3: Waste Management & Energy */}
+            <Route path="/operations/waste" element={<WasteDashboard />} />
+            <Route path="/operations/energy" element={<EnergyUsageDashboard />} />
+            <Route path="/operations/buildings" element={<BuildingsZones />} />
+            <Route path="/operations/buildings/list" element={<BuildingsZonesList />} />
+            <Route path="/operations/buildings/add" element={<AddEditBuilding />} />
+            <Route path="/operations/buildings/edit/:id" element={<AddEditBuilding />} />
+            <Route path="/operations/approvals" element={<CampusApprovalQueue />} />
+            <Route path="/operations/comparison" element={<CampusComparisonDashboard />} />
+            <Route path="/operations/campus-admin" element={<CampusDashboardAdmin />} />
+            <Route path="/operations/map" element={<CampusMapView />} />
+            <Route path="/operations/analytics" element={<CampusOverviewAnalytics />} />
+            <Route path="/operations/reports" element={<CampusReports />} />
+            <Route path="/operations/reports/export" element={<CampusReportsExportScreen />} />
+            <Route path="/operations/carbon" element={<CarbonFootprintAnalytics />} />
+            <Route path="/operations/collection-schedule" element={<CollectionSchedule />} />
+            <Route path="/operations/pickup-request/new" element={<CreatePickupRequest />} />
+            <Route path="/operations/circular-economy" element={<CircularEconomyDashboard />} />
+            <Route path="/operations/compliance" element={<ComplianceTracking />} />
+            <Route path="/operations/compliance" element={<ComplianceTracking />} />
+            <Route path="/operations/consumption" element={<ConsumptionAnalytics />} />
+            <Route path="/operations/smart-bins/new" element={<AddSmartBin />} />
+            <Route path="/operations/waste/entry" element={<AddWasteEntry />} />
+            <Route path="/operations/alerts/:id" element={<AlertDetail />} />
 
-          {/* Staff Routes */}
-          <Route path="/staff" element={<StaffLayout />}>
-            <Route index element={<StaffDashboard />} />\n            <Route path="custom analytics" element={<Custom Analytics />} />\n            <Route path="esg archive" element={<ESG Archive />} />\n            <Route path="iot sensor map" element={<IoT Sensor Map />} />\n            <Route path="iot sensor logs" element={<IoT Sensor Logs />} />\n            <Route path="predictive energy" element={<Predictive Energy />} />\n            <Route path="predictive water" element={<Predictive Water />} />\n            <Route path="facility floorplan" element={<Facility Floorplan />} />\n            <Route path="incident archive" element={<Incident Archive />} />\n            <Route path="incident analytics" element={<Incident Analytics />} />\n            <Route path="fleet map" element={<Fleet Map />} />\n            <Route path="fleet analytics" element={<Fleet Analytics />} />\n            <Route path="staff onboarding" element={<Staff Onboarding />} />\n            <Route path="shift analytics" element={<Shift Analytics />} />\n            <Route path="training certificates" element={<Training Certificates />} />\n            <Route path="ticket analytics" element={<Ticket Analytics />} />\n            <Route path="integration settings" element={<Integration Settings />} />\n            <Route path="webhook settings" element={<Webhook Settings />} />\n            <Route path="audit log" element={<Audit Log />} />\n            <Route path="analytics export" element={<Analytics Export />} />\n            <Route path="esg export" element={<ESG Export />} />\n            <Route path="iot sensor details" element={<IoT Sensor Details />} />\n            <Route path="iot alerts" element={<IoT Alerts />} />\n            <Route path="energy report" element={<Energy Report />} />\n            <Route path="water report" element={<Water Report />} />\n            <Route path="facility details" element={<Facility Details />} />\n            <Route path="incident details" element={<Incident Details />} />\n            <Route path="resolve incident" element={<Resolve Incident />} />\n            <Route path="fleet vehicle" element={<Fleet Vehicle />} />\n            <Route path="fleet maintenance" element={<Fleet Maintenance />} />\n            <Route path="staff details" element={<Staff Details />} />\n            <Route path="shift details" element={<Shift Details />} />\n            <Route path="training details" element={<Training Details />} />\n            <Route path="ticket details" element={<Ticket Details />} />\n            <Route path="ticket respond" element={<Ticket Respond />} />\n            <Route path="security settings" element={<Security Settings />} />\n            <Route path="billing settings" element={<Billing Settings />} />\n            <Route path="api settings" element={<API Settings />} />\n            <Route path="roles settings" element={<Roles Settings />} />\n            <Route path="department analytics" element={<Department Analytics />} />\n            <Route path="campus comparison" element={<Campus Comparison />} />\n            <Route path="new audit" element={<New Audit />} />\n            <Route path="audit details" element={<Audit Details />} />\n            <Route path="vendor details" element={<Vendor Details />} />\n            <Route path="collection routes" element={<Collection Routes />} />\n            <Route path="collection schedule" element={<Collection Schedule />} />\n            <Route path="alerts hub" element={<Alerts Hub />} />\n            <Route path="broadcast alert" element={<Broadcast Alert />} />\n            <Route path="compliance tracking" element={<Compliance Tracking />} />\n            <Route path="contract details" element={<Contract Details />} />\n            <Route path="upload document" element={<Upload Document />} />\n            <Route path="staff profile" element={<Staff Profile />} />\n            <Route path="training module" element={<Training Module />} />\n            <Route path="shift swap" element={<Shift Swap />} />\n            <Route path="global analytics" element={<Global Analytics />} />\n            <Route path="esg reports" element={<ESG Reports />} />\n            <Route path="task approvals" element={<Task Approvals />} />\n            <Route path="task details" element={<Task Details />} />\n            <Route path="waste operations" element={<Waste Operations />} />\n            <Route path="waste audits" element={<Waste Audits />} />\n            <Route path="fleet management" element={<Fleet Management />} />\n            <Route path="vendor logistics" element={<Vendor Logistics />} />\n            <Route path="contracts repository" element={<Contracts Repository />} />\n            <Route path="facilities overview" element={<Facilities Overview />} />\n            <Route path="iot sensors map" element={<IoT Sensors Map />} />\n            <Route path="energy metrics" element={<Energy Metrics />} />\n            <Route path="water metrics" element={<Water Metrics />} />\n            <Route path="incident reports" element={<Incident Reports />} />\n            <Route path="staff directory" element={<Staff Directory />} />\n            <Route path="shift scheduling" element={<Shift Scheduling />} />\n            <Route path="safety training" element={<Safety Training />} />\n            <Route path="support tickets" element={<Support Tickets />} />\n            <Route path="platform settings" element={<Platform Settings />} />
+            {/* Epic 4: ESG & Resource Analytics */}
+            <Route path="/sustainability" element={<ESGDashboard />} />
+
+            {/* Epic 5: Eco-Marketplace */}
+            <Route path="/marketplace" element={<MarketplaceHome />} />
+            <Route path="/marketplace" element={<MarketplaceHome />} />
+            <Route path="/marketplace/quotes/compare" element={<CompareVendorQuotes />} />
+            <Route path="/marketplace/contracts/:id" element={<ContractDetails />} />
+            <Route path="/marketplace/match-recommendation" element={<AiVendorMatchRecommendation />} />
+
+            {/* Epic 6: Community */}
+            <Route path="/community" element={<CommunityFeed />} />
+            <Route path="/community/feed" element={<CommunityFeedHome />} />
+            <Route path="/community/organizations" element={<ConnectedOrganizations />} />
+            <Route path="/community/organizations/new" element={<CreateOrganization />} />
+            <Route path="/education/courses/:id" element={<CourseDetail />} />
+
+            {/* Epic 7: Settings */}
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/account-settings" element={<AccountSettings />} />
+            <Route path="/edit-profile" element={<EditProfile />} />
+            <Route path="/profile" element={<UserProfile />} />
+            <Route path="/achievements" element={<AchievementsBadges />} />
+            <Route path="/activity" element={<ActivityHistory />} />
+            <Route path="/app-settings" element={<AppSettings />} />
+            <Route path="/notifications" element={<NotificationsCenter />} />
+            <Route path="/ai-insights" element={<AiInsights />} />
+            <Route path="/ai-insights/recommendations" element={<AiInsightsRecommendations />} />
+            <Route path="/deactivate" element={<AccountDeactivation />} />
+            <Route path="/users" element={<UserManagement />} />
+            <Route path="/terms" element={<TermsPolicies />} />
+            <Route path="/privacy" element={<PrivacySettings />} />
+            <Route path="/support" element={<ContactSupport />} />
+            <Route path="/admin/moderation" element={<ContentModeration />} />
+
+            {/* Newly added routes (Batch 4) */}
+            <Route path="/community/events" element={<EventsHub />} />
+            <Route path="/community/groups/:id" element={<GroupDetail />} />
+            <Route path="/operations/reports/export-pdf" element={<ExportPdfReport />} />
+            <Route path="/search" element={<GlobalSearch />} />
+            <Route path="/sustainability/goals" element={<GoalProgressTracking />} />
+            <Route path="/admin/faq" element={<FaqPage />} />
+            <Route path="/admin/features" element={<FeatureFlagsManager />} />
+            <Route path="/operations/projects/new" element={<FinalizeProjectDetails />} />
+
+            {/* Newly added routes (Batch 5) */}
+            <Route path="/admin/help-center" element={<HelpCenter />} />
+            <Route path="/community/organizations/join" element={<JoinOrganization />} />
+            <Route path="/community/leaderboard" element={<LeaderboardRewards />} />
+            <Route path="/education/learning-hub" element={<LearningHub />} />
+            <Route path="/marketplace/items/new" element={<ListItem />} />
+            <Route path="/operations/live-collection" element={<LiveCollectionMonitoring />} />
+            <Route path="/education/live-seminars" element={<LiveSeminarsSpeakers />} />
+
+            {/* Newly added routes (Batch 6) */}
+            <Route path="/admin/marketplace-moderation" element={<MarketplaceModeration />} />
+            <Route path="/marketplace/suggestions" element={<MatchSuggestions />} />
+            <Route path="/operations/material-flow" element={<MaterialFlowTracker />} />
+            <Route path="/sustainability/milestones" element={<MilestoneTracking />} />
+            <Route path="/sustainability/reports/monthly" element={<MonthlyESGReportViewer />} />
+            <Route path="/admin/broadcasts" element={<NotificationBroadcastSystem />} />
+
+            {/* Newly added routes (Batch 7) */}
+            <Route path="/admin/notifications-settings" element={<NotificationSettings />} />
+            <Route path="/operations/overflow-alerts" element={<OverflowAlert />} />
+            <Route path="/marketplace/escrow" element={<PaymentEscrowManagement />} />
+
+            {/* Newly added routes (Batch 8) */}
+            <Route path="/operations/pickup-alerts" element={<PickupAlerts />} />
+            <Route path="/operations/pickup-verification" element={<PickupVerification />} />
+            <Route path="/admin/platform-settings" element={<PlatformSettings />} />
+            <Route path="/admin/role-permissions" element={<RolePermissionsManager />} />
+            <Route path="/operations/route-optimization" element={<RouteOptimizationMap />} />
+            <Route path="/sustainability/portfolio" element={<PortfolioShowcase />} />
           </Route>
+          
         </Routes>
       </BrowserRouter>
     </AuthProvider>

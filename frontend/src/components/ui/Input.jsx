@@ -1,14 +1,39 @@
 import React from 'react';
 
-export default function Input({ label, error, className = '', ...props }) {
+export default function Input({
+  label,
+  id,
+  type = 'text',
+  icon,
+  placeholder,
+  value,
+  onChange,
+  className = '',
+  required = false
+}) {
   return (
-    <div className={`flex flex-col gap-1.5 ${className}`}>
-      {label && <label className="text-sm font-medium text-gray-700">{label}</label>}
-      <input 
-        className={`px-4 py-2.5 rounded-xl border bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none ${error ? 'border-red-500' : 'border-gray-200'}`}
-        {...props}
-      />
-      {error && <span className="text-xs text-red-500">{error}</span>}
+    <div className={`space-y-base ${className}`}>
+      {label && (
+        <label className="font-label-md text-label-md text-on-surface-variant block" htmlFor={id}>
+          {label}
+        </label>
+      )}
+      <div className="relative flex items-center group">
+        {icon && (
+          <span className="material-symbols-outlined absolute left-md text-outline group-focus-within:text-primary transition-colors">
+            {icon}
+          </span>
+        )}
+        <input
+          id={id}
+          type={type}
+          placeholder={placeholder}
+          value={value}
+          onChange={onChange}
+          required={required}
+          className={`w-full py-md bg-surface-container-low border border-outline-variant/40 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-body-md ${icon ? 'pl-[52px] pr-md' : 'px-md'}`}
+        />
+      </div>
     </div>
   );
 }

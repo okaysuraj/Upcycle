@@ -25,6 +25,7 @@ app.use(express.json());
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 const { router: authRouter } = require('./routes/auth');
+const usersRouter = require('./routes/users');
 const tasksRouter = require('./routes/tasks');
 const resourcesRouter = require('./routes/resources');
 const notificationsRouter = require('./routes/notifications');
@@ -37,8 +38,12 @@ const marketplaceRouter = require('./routes/marketplace');
 const paymentsRouter = require('./routes/payments');
 const esgRouter = require('./routes/esg');
 const gamificationRouter = require('./routes/gamification');
+const communityRouter = require('./routes/community');
+const adminRouter = require('./routes/admin');
+const educationRouter = require('./routes/education');
 
 app.use('/api/auth', authRouter);
+app.use('/api/users', usersRouter);
 app.use('/api/tasks', tasksRouter);
 app.use('/api/resources', resourcesRouter);
 app.use('/api/notifications', notificationsRouter);
@@ -51,6 +56,9 @@ app.use('/api/marketplace', marketplaceRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/esg', esgRouter);
 app.use('/api/gamification', gamificationRouter);
+app.use('/api/community', communityRouter);
+app.use('/api/admin', adminRouter);
+app.use('/api/education', educationRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {

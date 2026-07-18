@@ -1,35 +1,62 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { auth } from '../config/firebase';
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  sendEmailVerification, 
+  signOut, 
+  onAuthStateChanged,
+  sendPasswordResetEmail
+} from 'firebase/auth';
 
 const AuthContext = createContext();
-
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
+  const [user, setUser] = useState(null); // This will hold our Postgres user data
+  const [firebaseUser, setFirebaseUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkUser();
+    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+      setFirebaseUser(fbUser);
+      if (fbUser) {
+        if (fbUser.emailVerified) {
+          await syncWithBackend(fbUser);
+        } else {
+          // They are logged in Firebase, but email not verified
+          setUser(null);
+          setLoading(false);
+        }
+      } else {
+        setUser(null);
+        setLoading(false);
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const checkUser = async () => {
+  const syncWithBackend = async (fbUser) => {
     try {
-      const savedToken = localStorage.getItem('upcycle_token');
-      if (savedToken) {
-        const response = await fetch(`${API_BASE_URL}/auth/me`, {
-          headers: { Authorization: `Bearer ${savedToken}` }
-        });
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-          setToken(savedToken);
-        } else {
-          localStorage.removeItem('upcycle_token');
-        }
+      const token = await fbUser.getIdToken();
+      localStorage.setItem('upcycle_token', token); // Optional: keep for legacy compat
+
+      // In a real app, this endpoint verifies the Firebase Token
+      // and creates/returns the Postgres User.
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+      } else {
+        console.error("Backend auth sync failed");
+        setUser(null);
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
+      console.error('Backend sync error:', error);
     } finally {
       setLoading(false);
     }
@@ -37,61 +64,85 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await response.json();
-      if (response.ok && data.token) {
-        setToken(data.token);
-        setUser(data.user);
-        localStorage.setItem('upcycle_token', data.token);
-        return { success: true };
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      if (!userCredential.user.emailVerified) {
+        await signOut(auth);
+        return { success: false, error: 'Please verify your email before logging in.' };
       }
-      return { success: false, error: data.message || 'Login failed' };
+      return { success: true };
     } catch (error) {
-      return { success: false, error: 'Network error. Please try again.' };
+      let msg = 'Login failed.';
+      if (error.code === 'auth/invalid-credential') msg = 'Invalid email or password.';
+      return { success: false, error: msg };
     }
   };
 
   const register = async (name, email, password, role) => {
     try {
+      // 1. Create in Firebase
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // 2. Send Verification Email
+      await sendEmailVerification(userCredential.user);
+
+      // 3. Register user profile in Postgres (Backend)
+      const token = await userCredential.user.getIdToken();
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, role })
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ name, email, role, firebaseUid: userCredential.user.uid })
       });
-      const data = await response.json();
-      if (response.ok) {
-        return { success: true };
+
+      if (!response.ok) {
+        throw new Error('Failed to create profile in database');
       }
-      return { success: false, error: data.message || 'Registration failed' };
+
+      // We sign them out immediately so they have to verify email to get back in
+      await signOut(auth);
+
+      return { success: true };
     } catch (error) {
-      return { success: false, error: 'Network error. Please try again.' };
+      console.error(error);
+      let msg = 'Registration failed.';
+      if (error.code === 'auth/email-already-in-use') msg = 'Email is already in use.';
+      if (error.code === 'auth/weak-password') msg = 'Password is too weak.';
+      return { success: false, error: msg };
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await signOut(auth);
     setUser(null);
-    setToken(null);
+    setFirebaseUser(null);
     localStorage.removeItem('upcycle_token');
   };
 
+  const resetPassword = async (email) => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  };
+
   const authFetch = async (endpoint, options = {}) => {
-    const savedToken = localStorage.getItem('upcycle_token');
+    if (!firebaseUser) return fetch(`${API_BASE_URL}${endpoint}`, options);
+    
+    const token = await firebaseUser.getIdToken();
     const headers = {
       'Content-Type': 'application/json',
       ...options.headers,
+      'Authorization': `Bearer ${token}`
     };
-    if (savedToken) {
-      headers['Authorization'] = `Bearer ${savedToken}`;
-    }
     return fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, authFetch }}>
+    <AuthContext.Provider value={{ user, firebaseUser, loading, login, register, logout, resetPassword, authFetch }}>
       {children}
     </AuthContext.Provider>
   );

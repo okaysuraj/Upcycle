@@ -11,21 +11,26 @@ router.get('/leaderboard', auth, async (req, res) => {
         id: true,
         name: true,
         role: true,
-        ecoPoints: true // We'll add this field or mock it if not in schema.
+        points: true
       },
-      // Since ecoPoints isn't explicitly in the schema initially, 
-      // we can mock it by calculating points based on events attended or activeTasks
-      orderBy: { activeTasks: 'desc' },
+      orderBy: { points: 'desc' },
       take: 10
     });
-    
-    // Mock mapping activeTasks to EcoPoints for the prototype
-    const leaderboard = users.map(u => ({
-      ...u,
-      ecoPoints: u.activeTasks * 50 + Math.floor(Math.random() * 100) // Mock logic
-    })).sort((a, b) => b.ecoPoints - a.ecoPoints);
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
-    res.json(leaderboard);
+// GET /api/gamification/badges/:userId
+router.get('/badges/:userId', auth, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const userBadges = await prisma.userBadge.findMany({
+      where: { userId },
+      include: { badge: true }
+    });
+    res.json(userBadges);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -37,13 +42,57 @@ router.post('/award/:userId', auth, async (req, res) => {
     const { userId } = req.params;
     const { points, reason } = req.body;
     
-    // In a real DB with an ecoPoints column:
-    // await prisma.user.update({ where: { id: userId }, data: { ecoPoints: { increment: points } } });
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { points: { increment: points } }
+    });
 
     res.json({
-      message: `Successfully awarded ${points} EcoPoints to user ${userId}`,
-      reason
+      message: `Successfully awarded ${points} points to user ${userId}`,
+      reason,
+      newTotal: user.points
     });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// GET /api/gamification/rewards
+router.get('/rewards', auth, async (req, res) => {
+  try {
+    const rewards = await prisma.rewardItem.findMany();
+    res.json(rewards);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// POST /api/gamification/redeem
+router.post('/redeem', auth, async (req, res) => {
+  try {
+    const { rewardId } = req.body;
+    const userId = req.user.id;
+
+    const reward = await prisma.rewardItem.findUnique({ where: { id: rewardId } });
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    if (!user || !reward) return res.status(404).json({ message: "User or Reward not found" });
+
+    if (user.points < reward.pointsCost) {
+      return res.status(400).json({ message: "Insufficient points" });
+    }
+
+    if (reward.quantityAvailable <= 0) {
+      return res.status(400).json({ message: "Reward out of stock" });
+    }
+
+    await prisma.$transaction([
+      prisma.user.update({ where: { id: userId }, data: { points: { decrement: reward.pointsCost } } }),
+      prisma.rewardItem.update({ where: { id: rewardId }, data: { quantityAvailable: { decrement: 1 } } }),
+      prisma.redemption.create({ data: { userId, rewardId } })
+    ]);
+
+    res.json({ message: "Reward redeemed successfully" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

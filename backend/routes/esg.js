@@ -8,8 +8,6 @@ router.get('/report/:campusId', auth, async (req, res) => {
   try {
     const { campusId } = req.params;
 
-    // In a real application, you'd aggregate data over a specific time range.
-    // For this prototype, we'll fetch lifetime stats for the campus.
     const campus = await prisma.campus.findUnique({
       where: { id: campusId },
       include: {
@@ -24,27 +22,48 @@ router.get('/report/:campusId', auth, async (req, res) => {
       where: { campusId },
       _sum: { quantityKg: true }
     });
-    
-    // Carbon offset mock logic: Assume 1kg waste diverted = 0.5kg CO2 offset
     const totalWasteDiverted = wasteStats._sum.quantityKg || 0;
-    const carbonOffsetKg = totalWasteDiverted * 0.5;
+
+    // Fetch actual carbon footprint, water, and energy
+    const carbonFootprints = await prisma.carbonFootprint.findMany({
+      where: { campusId },
+      orderBy: { month: 'desc' },
+      take: 12
+    });
+
+    const waterUsages = await prisma.waterUsage.findMany({
+      where: { campusId },
+      orderBy: { date: 'desc' },
+      take: 12
+    });
+
+    const energyUsages = await prisma.energyUsage.findMany({
+      where: { campusId },
+      orderBy: { date: 'desc' },
+      take: 12
+    });
+
+    const latestCarbon = carbonFootprints[0] || { totalEmissions: 0, reduction: 0 };
+    const latestWater = waterUsages[0] || { gallonsUsed: 0, saved: 0 };
+    const latestEnergy = energyUsages[0] || { kwhUsed: 0, percentageRenewable: 0 };
 
     res.json({
       campusName: campus.name,
       sustainabilityScore: campus.sustainabilityScore,
       totalWasteDivertedKg: totalWasteDiverted,
-      estimatedCarbonOffsetKg: carbonOffsetKg,
+      estimatedCarbonOffsetKg: totalWasteDiverted * 0.5,
+      carbon: latestCarbon,
+      water: latestWater,
+      energy: latestEnergy,
+      history: {
+        carbon: carbonFootprints,
+        water: waterUsages,
+        energy: energyUsages
+      },
       communityEngagement: {
         activeMembers: campus._count.users,
         eventsHosted: campus._count.events
-      },
-      circularFlow: {
-        inbound: 12.4, // Mock tons
-        recirculated: 8.6,
-        efficiency: 68 // Mock percent
-      },
-      // Mock generated compliance text
-      aiSummary: `Overall ESG compliance is strong. Focus on increasing organic waste diversion to boost the sustainability score further.`
+      }
     });
 
   } catch (err) {
@@ -53,15 +72,18 @@ router.get('/report/:campusId', auth, async (req, res) => {
 });
 
 // GET /api/esg/corporate
-// Aggregate stats across ALL campuses for a corporate-level view
 router.get('/corporate', auth, async (req, res) => {
   try {
-    // Only allow PLATFORM_ADMIN ideally
     const totalWaste = await prisma.wasteLog.aggregate({ _sum: { quantityKg: true } });
     const campusCount = await prisma.campus.count();
     const eventCount = await prisma.event.count();
     const userCount = await prisma.user.count();
     
+    // Summing across all campuses
+    const totalCarbon = await prisma.carbonFootprint.aggregate({ _sum: { totalEmissions: true, reduction: true } });
+    const totalWater = await prisma.waterUsage.aggregate({ _sum: { gallonsUsed: true, saved: true } });
+    const totalEnergy = await prisma.energyUsage.aggregate({ _sum: { kwhUsed: true } });
+
     res.json({
       globalImpact: {
         totalCampuses: campusCount,
@@ -69,8 +91,31 @@ router.get('/corporate', auth, async (req, res) => {
         totalEvents: eventCount,
         totalWasteDivertedKg: totalWaste._sum.quantityKg || 0,
         estimatedCarbonOffsetKg: (totalWaste._sum.quantityKg || 0) * 0.5,
+        totalCarbonEmissions: totalCarbon._sum.totalEmissions || 0,
+        totalWaterGallons: totalWater._sum.gallonsUsed || 0,
+        totalEnergyKwh: totalEnergy._sum.kwhUsed || 0
       }
     });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// POST /api/esg/report/:campusId/generate
+router.post('/report/:campusId/generate', auth, async (req, res) => {
+  try {
+    const { campusId } = req.params;
+    const { month } = req.body;
+    
+    const newReport = await prisma.monthlyESGReport.create({
+      data: {
+        campusId,
+        month: new Date(month),
+        status: "GENERATING"
+      }
+    });
+
+    res.json(newReport);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

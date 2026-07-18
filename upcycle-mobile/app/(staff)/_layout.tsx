@@ -2,7 +2,7 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { View, Text } from 'react-native';
 
-function TabIcon({ emoji, focused }) {
+function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
   return (
     <View className={`items-center justify-center pt-2 ${focused ? 'opacity-100' : 'opacity-50'}`}>
       <Text className="text-2xl">{emoji}</Text>
@@ -60,6 +60,8 @@ export default function StaffLayout() {
       <Tabs.Screen name="maintenance" options={{ href: null }} />
       <Tabs.Screen name="reports" options={{ href: null }} />
       <Tabs.Screen name="users" options={{ href: null }} />
+      <Tabs.Screen name="analytics" options={{ href: null }} />
+      <Tabs.Screen name="benchmarking" options={{ href: null }} />
     </Tabs>
   );
 }

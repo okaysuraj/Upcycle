@@ -1,20 +1,38 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
+import { authFetch } from '../../utils/api';
 
 export default function DriverRouteScreen() {
   const router = useRouter();
+  const [routeStops, setRouteStops] = useState([]);
+  const [loading, setLoading] = useState(true);
   
-  // Mock data for bins that need pickup
-  const routeStops = [
-    { id: 'bin-1', location: 'North Campus Cafeteria', fillLevel: 95, category: 'ORGANIC' },
-    { id: 'bin-2', location: 'Science Block A', fillLevel: 88, category: 'PLASTIC' },
-    { id: 'bin-3', location: 'Main Library', fillLevel: 92, category: 'PAPER' },
-  ];
+  useEffect(() => {
+    const fetchBins = async () => {
+      try {
+        const res = await authFetch('/waste/bins');
+        if (res.ok) {
+          const bins = await res.json();
+          // Filter only bins that need pickup (e.g. > 80% full)
+          const pickupBins = bins.filter(b => b.fillLevel > 80);
+          // Sort by fill level descending as a simple optimization
+          pickupBins.sort((a, b) => b.fillLevel - a.fillLevel);
+          setRouteStops(pickupBins);
+        }
+      } catch (err) {
+        console.error("Error fetching route bins:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBins();
+  }, []);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Optimal Pickup Route</Text>
-      <Text style={styles.subtitle}>3 Smart Bins require attention</Text>
+      <Text style={styles.subtitle}>{routeStops.length} Smart Bins require attention</Text>
       
       {/* Mock Map Area */}
       <View style={styles.mapMock}>
@@ -22,33 +40,37 @@ export default function DriverRouteScreen() {
         <Text style={styles.mapSubText}>Route optimized for lowest carbon footprint</Text>
       </View>
       
-      <ScrollView style={styles.stopsList}>
-        {routeStops.map((stop, index) => (
-          <View key={stop.id} style={styles.stopCard}>
-            <View style={styles.stopHeader}>
-              <View style={styles.stopNumberBadge}>
-                <Text style={styles.stopNumberText}>{index + 1}</Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="#065f46" style={{ marginTop: 20 }} />
+      ) : (
+        <ScrollView style={styles.stopsList}>
+          {routeStops.map((stop, index) => (
+            <View key={stop.id} style={styles.stopCard}>
+              <View style={styles.stopHeader}>
+                <View style={styles.stopNumberBadge}>
+                  <Text style={styles.stopNumberText}>{index + 1}</Text>
+                </View>
+                <Text style={styles.stopLocation}>{stop.location}</Text>
               </View>
-              <Text style={styles.stopLocation}>{stop.location}</Text>
+              
+              <View style={styles.stopDetails}>
+                <Text style={styles.stopCategory}>{stop.category}</Text>
+                <Text style={styles.stopFill}>Fill: {stop.fillLevel}%</Text>
+              </View>
+              
+              <TouchableOpacity 
+                style={styles.actionButton}
+                onPress={() => router.push({
+                  pathname: '/(staff)/scan',
+                  params: { expectedBin: stop.id }
+                })}
+              >
+                <Text style={styles.actionButtonText}>Arrived - Scan Bin</Text>
+              </TouchableOpacity>
             </View>
-            
-            <View style={styles.stopDetails}>
-              <Text style={styles.stopCategory}>{stop.category}</Text>
-              <Text style={styles.stopFill}>Fill: {stop.fillLevel}%</Text>
-            </View>
-            
-            <TouchableOpacity 
-              style={styles.actionButton}
-              onPress={() => router.push({
-                pathname: '/(staff)/scan',
-                params: { expectedBin: stop.id }
-              })}
-            >
-              <Text style={styles.actionButtonText}>Arrived - Scan Bin</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
-      </ScrollView>
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 }
@@ -98,8 +120,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   stopHeader: {
     flexDirection: 'row',
@@ -107,10 +132,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   stopNumberBadge: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#10b981',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#059669',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -118,37 +143,38 @@ const styles = StyleSheet.create({
   stopNumberText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 12,
   },
   stopLocation: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: '#1f2937',
   },
   stopDetails: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 16,
+    paddingLeft: 36,
   },
   stopCategory: {
-    backgroundColor: '#f3f4f6',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    color: '#4b5563',
-    fontWeight: '500',
+    fontSize: 14,
+    color: '#6b7280',
+    fontWeight: '600',
   },
   stopFill: {
-    color: '#ef4444',
+    fontSize: 14,
+    color: '#dc2626',
     fontWeight: 'bold',
   },
   actionButton: {
-    backgroundColor: '#047857',
-    padding: 12,
+    backgroundColor: '#059669',
+    paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
   },
   actionButtonText: {
     color: '#fff',
-    fontWeight: '600',
-  }
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
 });
