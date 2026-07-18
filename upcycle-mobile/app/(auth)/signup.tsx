@@ -35,7 +35,7 @@ export default function SignupScreen() {
     if (result.success) {
       setSuccessMsg('A verification link has been sent to your email. Please click the link to verify your account before logging in.');
     } else {
-      setError(result.error);
+      setError(result.error || 'An error occurred during registration.');
     }
     setLoading(false);
   };

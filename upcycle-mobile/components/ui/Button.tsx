@@ -1,5 +1,11 @@
 import React from 'react';
-import { TouchableOpacity, Text, ActivityIndicator } from 'react-native';
+import { TouchableOpacity, Text, ActivityIndicator, TouchableOpacityProps } from 'react-native';
+
+interface ButtonProps extends TouchableOpacityProps {
+  title: string;
+  variant?: 'primary' | 'secondary' | 'outline';
+  loading?: boolean;
+}
 
 export default function Button({ 
   title, 
@@ -7,8 +13,9 @@ export default function Button({
   variant = 'primary', 
   loading = false, 
   disabled = false, 
-  className = '' 
-}) {
+  className = '',
+  ...props
+}: ButtonProps) {
   let bgClass = 'bg-primary';
   let textClass = 'text-white';
 
@@ -28,6 +35,7 @@ export default function Button({
       disabled={disabled || loading}
       className={`flex-row items-center justify-center py-4 px-6 rounded-full ${bgClass} ${opacityClass} ${className}`}
       activeOpacity={0.8}
+      {...props}
     >
       {loading ? (
         <ActivityIndicator color={variant === 'outline' ? '#00522d' : '#ffffff'} />

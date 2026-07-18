@@ -25,7 +25,7 @@ export default function LoginScreen() {
     
     const result = await login(email, password);
     if (!result.success) {
-      setError(result.error);
+      setError(result.error || 'An error occurred during login.');
     }
     // AuthContext handles state -> RootLayout handles redirection
     setLoading(false);

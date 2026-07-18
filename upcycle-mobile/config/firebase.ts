@@ -1,5 +1,7 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, initializeAuth, getReactNativePersistence } from "firebase/auth";
+import { getAuth, initializeAuth } from "firebase/auth";
+// @ts-ignore - getReactNativePersistence is missing from TS types in Firebase 12
+import { getReactNativePersistence } from "firebase/auth";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
@@ -14,6 +16,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase Auth with React Native persistence to persist login across reloads
+// @ts-ignore - getReactNativePersistence is missing from TS types in Firebase 12 but works at runtime
 export const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage)
 });
