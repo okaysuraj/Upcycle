@@ -123,13 +123,15 @@ import RolePermissionsManager from './pages/admin/RolePermissionsManager';
 import RouteOptimizationMap from './pages/operations/RouteOptimizationMap';
 import PortfolioShowcase from './pages/esg/PortfolioShowcase';
 
+import LandingPage from './pages/LandingPage';
+
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
           {/* Default Route */}
-          <Route path="/" element={<Navigate to="/auth/login" replace />} />
+          <Route path="/" element={<LandingPage />} />
 
           {/* Epic 1: Auth Routes */}
           <Route element={<AuthLayout />}>
