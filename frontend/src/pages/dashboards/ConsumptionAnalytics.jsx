@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 const barData = [
   { day: 'Mon', energy: 40, water: 30, gas: 10 },
