@@ -1,11 +1,12 @@
 const admin = require('firebase-admin');
+const { getApps, initializeApp } = require('firebase-admin/app');
 
 // In production, this would use a service account key JSON file
 // For this mock/development, we initialize it without credentials to avoid crashing,
 // but auth verification will require real credentials in prod.
-if (!admin.apps.length) {
+if (getApps().length === 0) {
   try {
-    admin.initializeApp({
+    initializeApp({
       // credential: admin.credential.cert(serviceAccount)
       projectId: process.env.FIREBASE_PROJECT_ID || 'upcycle-mock'
     });
