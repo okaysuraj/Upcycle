@@ -1,5 +1,7 @@
 # 🌿 Upcycle: Campus Sustainability Platform
 
+**Live Website:** [https://upcycleapp.netlify.app](https://upcycleapp.netlify.app)
+
 Upcycle is a full-stack, cross-platform monorepo designed to track, manage, and gamify campus sustainability efforts. It supports students logging their eco-impact and staff managing campus-wide operations (waste audits, IoT sensors, ESG reporting).
 
 ## 🏗 Architecture
