@@ -18,7 +18,7 @@ export default function Navbar({ currentPage, onNavigate, onNotifications }) {
 
   const fetchUnread = useCallback(async () => {
     try {
-      const res = await authFetch('/api/notifications/unread-count');
+      const res = await authFetch('/notifications/unread-count');
       if (res.ok) {
         const data = await res.json();
         setUnreadCount(data.count || 0);

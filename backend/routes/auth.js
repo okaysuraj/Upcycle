@@ -1,18 +1,29 @@
 const express = require('express');
 const router = express.Router();
 const { prisma } = require('../config/db');
-const admin = require('../config/firebaseAdmin');
+require('../config/firebaseAdmin'); // Ensure it's initialized
+const { getAuth } = require('firebase-admin/auth');
+
+const log = (msg) => {
+  console.log(`${new Date().toISOString()} - ${msg}`);
+};
 
 // Middleware: authenticate Firebase ID Token
 const auth = async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'No token provided' });
+  if (!token) {
+    log('[AUTH] No token provided');
+    return res.status(401).json({ message: 'No token provided' });
+  }
   
   try {
-    const decodedToken = await admin.auth().verifyIdToken(token);
+    log('[AUTH] Verifying Firebase token...');
+    const decodedToken = await getAuth().verifyIdToken(token);
+    log(`[AUTH] Token verified for: ${decodedToken.email} | email_verified: ${decodedToken.email_verified}`);
     
     // Look up the Postgres user to attach the ID and role
     const user = await prisma.user.findUnique({ where: { email: decodedToken.email } });
+    log(`[AUTH] Postgres user lookup: ${user ? `found (id: ${user.id})` : 'not found'}`);
     
     req.user = { 
       firebaseUid: decodedToken.uid, 
@@ -23,7 +34,7 @@ const auth = async (req, res, next) => {
     };
     next();
   } catch (error) {
-    console.error('Firebase token verification failed:', error);
+    log(`[AUTH] Firebase token verification FAILED: ${error.code || error.message}`);
     res.status(401).json({ message: 'Invalid or expired token' });
   }
 };
@@ -32,13 +43,21 @@ const auth = async (req, res, next) => {
 // Called by the frontend after Firebase user is created
 router.post('/register', auth, async (req, res) => {
   try {
-    const { name, role, skills, availabilityHours } = req.body;
+    const { name, skills, availabilityHours, role: requestedRole } = req.body;
     
     // We get the email and firebaseUid from the verified token in `req.user`
     const { email, firebaseUid } = req.user;
     
+    const allowedRegistrationRoles = ['VOLUNTEER', 'VENDOR', 'STUDENT'];
+    const role = allowedRegistrationRoles.includes(requestedRole) ? requestedRole : 'VOLUNTEER';
+    
+    log(`[REGISTER] Attempting to create user: ${JSON.stringify({ name, email, role, firebaseUid })}`);
+    
     const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) return res.status(400).json({ message: 'User already exists in database' });
+    if (existing) {
+      log('[REGISTER] User already exists in DB, skipping creation');
+      return res.status(400).json({ message: 'User already exists in database' });
+    }
 
     const user = await prisma.user.create({
       data: {
@@ -49,12 +68,14 @@ router.post('/register', auth, async (req, res) => {
         skills: skills || [],
         availabilityHours: availabilityHours || 10,
         activeTasks: 0,
-        isVerified: req.user.email_verified || false, // Should be false initially for email-link verification
+        isVerified: req.user.email_verified || false,
       }
     });
 
+    log(`[REGISTER] ✅ User created successfully: ${user.id}`);
     res.status(201).json({ message: 'Profile created successfully', user });
   } catch (err) {
+    log(`[REGISTER] ❌ Error creating user: ${err.message} \nStack: ${err.stack}`);
     res.status(500).json({ message: err.message });
   }
 });
@@ -109,5 +130,7 @@ router.get('/volunteers', auth, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
+
 
 module.exports = { router, auth };

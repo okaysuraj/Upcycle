@@ -1,16 +1,50 @@
 import React, { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function AddWasteEntry() {
+  const { authFetch } = useAuth();
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  
+  // Form State
   const [category, setCategory] = useState('');
+  const [weight, setWeight] = useState('');
+  const [facility, setFacility] = useState('Central District Hub');
+  const [notes, setNotes] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCategorySelect = (cat) => {
     setCategory(cat);
     setStep(2);
   };
 
-  const handleNext = () => {
-    setStep(3);
+  const handleSubmit = async () => {
+    if (!weight) return alert("Please enter weight.");
+    
+    setIsSubmitting(true);
+    try {
+      const res = await authFetch('/waste/logs', {
+        method: 'POST',
+        body: JSON.stringify({
+          campusId: 'dummy-campus-id', // In a real app, this comes from user context
+          category: category.toUpperCase(),
+          quantityKg: weight
+        })
+      });
+      
+      if (res.ok) {
+        setStep(3);
+      } else {
+        const error = await res.json();
+        alert(`Failed to submit: ${error.message}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error submitting entry");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -97,29 +131,45 @@ export default function AddWasteEntry() {
               <div className="grid grid-cols-2 gap-gutter ml-12 flex-1">
                 <div className="col-span-1 space-y-2">
                   <label className="text-label-sm font-bold text-on-surface-variant uppercase tracking-wider">Weight (kg)</label>
-                  <input className="w-full bg-surface-container-low px-4 py-3 rounded-xl border border-outline-variant/30 focus:ring-2 focus:ring-primary focus:border-primary font-display text-body-lg" placeholder="0.00" type="number" />
+                  <input 
+                    value={weight}
+                    onChange={(e) => setWeight(e.target.value)}
+                    className="w-full bg-surface-container-low px-4 py-3 rounded-xl border border-outline-variant/30 focus:ring-2 focus:ring-primary focus:border-primary font-display text-body-lg" 
+                    placeholder="0.00" 
+                    type="number" 
+                  />
                 </div>
                 <div className="col-span-1 space-y-2">
                   <label className="text-label-sm font-bold text-on-surface-variant uppercase tracking-wider">Source Facility</label>
-                  <select className="w-full bg-surface-container-low px-4 py-3 rounded-xl border border-outline-variant/30 focus:ring-2 focus:ring-primary focus:border-primary font-display text-body-lg">
+                  <select 
+                    value={facility}
+                    onChange={(e) => setFacility(e.target.value)}
+                    className="w-full bg-surface-container-low px-4 py-3 rounded-xl border border-outline-variant/30 focus:ring-2 focus:ring-primary focus:border-primary font-display text-body-lg"
+                  >
                     <option>Central District Hub</option>
                     <option>North Industrial Complex</option>
                     <option>Eastside Sorting Yard</option>
                   </select>
                 </div>
                 <div className="col-span-2 space-y-2">
-                  <label className="text-label-sm font-bold text-on-surface-variant uppercase tracking-wider">Arrival Timestamp</label>
-                  <input className="w-full bg-surface-container-low px-4 py-3 rounded-xl border border-outline-variant/30 focus:ring-2 focus:ring-primary focus:border-primary font-display text-body-lg" type="datetime-local" />
-                </div>
-                <div className="col-span-2 space-y-2">
                   <label className="text-label-sm font-bold text-on-surface-variant uppercase tracking-wider">Notes (Optional)</label>
-                  <textarea className="w-full bg-surface-container-low px-4 py-3 rounded-xl border border-outline-variant/30 focus:ring-2 focus:ring-primary focus:border-primary font-display text-body-md" placeholder="Any specific details regarding quality or contaminants..." rows="3"></textarea>
+                  <textarea 
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    className="w-full bg-surface-container-low px-4 py-3 rounded-xl border border-outline-variant/30 focus:ring-2 focus:ring-primary focus:border-primary font-display text-body-md" 
+                    placeholder="Any specific details regarding quality or contaminants..." 
+                    rows="3"
+                  ></textarea>
                 </div>
               </div>
               
               <div className="mt-8 pt-6 border-t border-outline-variant/20 flex justify-end">
-                 <button onClick={handleNext} className="bg-primary text-on-primary px-8 py-3 rounded-full font-bold shadow-md hover:opacity-90 active:scale-95 transition-all">
-                    Submit Entry
+                 <button 
+                    onClick={handleSubmit} 
+                    disabled={isSubmitting}
+                    className="bg-primary text-on-primary px-8 py-3 rounded-full font-bold shadow-md hover:opacity-90 active:scale-95 transition-all disabled:opacity-50"
+                  >
+                    {isSubmitting ? 'Submitting...' : 'Submit Entry'}
                  </button>
               </div>
             </div>
@@ -136,10 +186,21 @@ export default function AddWasteEntry() {
                 Your entry for <span className="font-bold">{category}</span> waste has been logged in the system and inventory updated.
               </p>
               <div className="flex gap-4">
-                <button onClick={() => setStep(1)} className="px-6 py-2.5 rounded-full border border-outline-variant text-on-surface-variant hover:bg-surface-variant transition-colors font-bold">
+                <button 
+                  onClick={() => {
+                    setCategory('');
+                    setWeight('');
+                    setNotes('');
+                    setStep(1);
+                  }} 
+                  className="px-6 py-2.5 rounded-full border border-outline-variant text-on-surface-variant hover:bg-surface-variant transition-colors font-bold"
+                >
                   Log Another Entry
                 </button>
-                <button className="px-6 py-2.5 rounded-full bg-primary text-on-primary shadow-md hover:opacity-90 transition-opacity font-bold">
+                <button 
+                  onClick={() => navigate('/operations/waste')}
+                  className="px-6 py-2.5 rounded-full bg-primary text-on-primary shadow-md hover:opacity-90 transition-opacity font-bold"
+                >
                   View Dashboard
                 </button>
               </div>

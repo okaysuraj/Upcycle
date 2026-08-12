@@ -1,17 +1,25 @@
+const { getApps, initializeApp, cert } = require('firebase-admin/app');
 const admin = require('firebase-admin');
-const { getApps, initializeApp } = require('firebase-admin/app');
 
-// In production, this would use a service account key JSON file
-// For this mock/development, we initialize it without credentials to avoid crashing,
-// but auth verification will require real credentials in prod.
 if (getApps().length === 0) {
   try {
+    const serviceAccount = {
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      // The private key comes from .env with escaped newlines — replace them
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    };
+
     initializeApp({
-      // credential: admin.credential.cert(serviceAccount)
-      projectId: process.env.FIREBASE_PROJECT_ID || 'upcycle-mock'
+      credential: cert(serviceAccount),
     });
+    console.log('✅ Firebase Admin initialized');
   } catch (error) {
-    console.error('Firebase admin initialization error', error.stack);
+    console.error('Firebase admin initialization error:', error.message);
+    // Fallback: initialize without credentials (token verification will fail)
+    initializeApp({
+      projectId: process.env.FIREBASE_PROJECT_ID || 'upcycle-mock',
+    });
   }
 }
 

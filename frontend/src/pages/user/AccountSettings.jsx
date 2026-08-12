@@ -7,16 +7,39 @@ import { useAuth } from '../../context/AuthContext';
 
 export default function AccountSettings() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, authFetch } = useAuth();
   
   const [formData, setFormData] = useState({
-    name: user?.name || 'Alex Donovan',
-    email: user?.email || 'alex.donovan@upcycle.admin',
-    role: user?.role || 'Admin',
+    name: user?.name || '',
+    email: user?.email || '',
+    role: user?.role || 'VOLUNTEER',
   });
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    setMessage('');
+    try {
+      const res = await authFetch('/users/profile', {
+        method: 'PUT',
+        body: JSON.stringify({ name: formData.name })
+      });
+      if (res.ok) {
+        setMessage('Profile updated successfully! (Note: email & role are read-only here)');
+      } else {
+        setMessage('Failed to update profile.');
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage('An error occurred while saving.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
-    <div className="max-w-6xl mx-auto py-8">
+    <div className="max-w-6xl mx-auto py-8 px-4 md:px-8">
       {/* Page Header */}
       <div className="flex justify-between items-end mb-8">
         <div>
@@ -24,10 +47,18 @@ export default function AccountSettings() {
           <p className="text-secondary font-body-md">Manage your administrative credentials and security preferences.</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline">Discard Changes</Button>
-          <Button>Save Profile</Button>
+          <Button variant="outline" onClick={() => navigate(-1)}>Discard Changes</Button>
+          <Button onClick={handleSave} disabled={isSaving}>
+            {isSaving ? 'Saving...' : 'Save Profile'}
+          </Button>
         </div>
       </div>
+      
+      {message && (
+        <div className="mb-4 p-4 rounded-lg bg-primary-container text-on-primary-container font-bold">
+          {message}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
         {/* Left Column: Primary Information & Security */}
@@ -49,18 +80,20 @@ export default function AccountSettings() {
                 type="email" 
                 value={formData.email} 
                 onChange={(e) => setFormData({...formData, email: e.target.value})} 
+                disabled
+                title="Email cannot be changed here."
               />
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-bold text-secondary">Administrative Role</label>
                 <div className="flex items-center gap-3 border border-[#c1c8c2] rounded-lg px-4 py-2 bg-[#f3f4f5] cursor-not-allowed">
                   <span className="material-symbols-outlined text-[18px] text-secondary">shield_person</span>
-                  <span className="text-base text-on-surface">{formData.role}</span>
+                  <span className="text-base text-on-surface capitalize">{formData.role.replace('_', ' ').toLowerCase()}</span>
                 </div>
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-bold text-secondary">ID Number</label>
                 <div className="flex items-center gap-3 border border-[#c1c8c2] rounded-lg px-4 py-2 bg-[#f3f4f5] cursor-not-allowed">
-                  <span className="font-mono text-sm text-on-surface">#UC-4492</span>
+                  <span className="font-mono text-sm text-on-surface">#{user?.id ? user.id.split('-')[0].toUpperCase() : 'UC-4492'}</span>
                 </div>
               </div>
             </div>
@@ -147,7 +180,7 @@ export default function AccountSettings() {
                 <span className="material-symbols-outlined text-4xl">person</span>
               </div>
               <h4 className="text-xl font-bold">{formData.name}</h4>
-              <p className="text-white/80 text-xs mb-4">Lead Systems Administrator</p>
+              <p className="text-white/80 text-xs mb-4 capitalize">{formData.role.replace('_', ' ').toLowerCase()}</p>
               <div className="flex gap-2">
                 <span className="px-3 py-1 bg-white/10 border border-white/20 rounded-full text-[10px] font-bold uppercase">Tier 1 Access</span>
                 <span className="px-3 py-1 bg-white/10 border border-white/20 rounded-full text-[10px] font-bold uppercase">Internal</span>

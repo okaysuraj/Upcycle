@@ -41,6 +41,8 @@ const gamificationRouter = require('./routes/gamification');
 const communityRouter = require('./routes/community');
 const adminRouter = require('./routes/admin');
 const educationRouter = require('./routes/education');
+const uploadRouter = require('./routes/upload');
+const analyticsRouter = require('./routes/analytics');
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
@@ -59,6 +61,8 @@ app.use('/api/gamification', gamificationRouter);
 app.use('/api/community', communityRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/education', educationRouter);
+app.use('/api/upload', uploadRouter);
+app.use('/api/analytics', analyticsRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -7,23 +7,46 @@ export default function MarketplaceHome() {
   const { authFetch } = useAuth();
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
-    const fetchListings = async () => {
-      try {
-        const res = await authFetch('/marketplace');
-        if (res.ok) {
-          const data = await res.json();
-          setListings(data);
-        }
-      } catch (err) {
-        console.error("Error fetching marketplace listings:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchListings();
   }, [authFetch]);
+
+  const fetchListings = async () => {
+    try {
+      const res = await authFetch('/marketplace');
+      if (res.ok) {
+        const data = await res.json();
+        setListings(data);
+      }
+    } catch (err) {
+      console.error("Error fetching marketplace listings:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePurchase = async (listingId) => {
+    try {
+      const res = await authFetch(`/marketplace/${listingId}/buy`, {
+        method: 'POST'
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setMessage(data.message || 'Purchase successful!');
+        fetchListings(); // Refresh listings after purchase
+      } else {
+        setMessage(data.message || 'Purchase failed.');
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage('An error occurred during purchase.');
+    }
+    
+    // Clear message after 5 seconds
+    setTimeout(() => setMessage(''), 5000);
+  };
 
   return (
     <>
@@ -90,6 +113,12 @@ export default function MarketplaceHome() {
           </div>
         </div>
         
+        {message && (
+          <div className="mb-4 p-4 bg-primary-container text-on-primary-container font-bold rounded-xl">
+            {message}
+          </div>
+        )}
+
         {loading ? (
           <div className="text-center text-on-surface-variant py-8">Loading listings...</div>
         ) : (
@@ -113,7 +142,9 @@ export default function MarketplaceHome() {
                     <span className="text-xs bg-surface-container px-2 py-1 rounded-md text-on-surface-variant">by {listing.vendor?.name}</span>
                   </div>
                   
-                  <Button className="w-full" variant="outline">Purchase / Quote</Button>
+                  <Button className="w-full" variant="outline" onClick={() => handlePurchase(listing.id)}>
+                    {listing.isService ? 'Request Service Quote' : 'Purchase via Escrow'}
+                  </Button>
                 </div>
               </Card>
             ))}

@@ -22,6 +22,7 @@ model User {
   privacySettings     Json?        // JSONB to store granular privacy toggles
   roleMetadata        Json?        // JSONB to store role-specific data (e.g. vendor business details)
   isActive            Boolean      @default(true) // Support for soft delete/deactivation
+  profilePicUrl       String?      // Cloudinary URL for user avatar
   
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
@@ -70,6 +71,8 @@ model Campus {
   domain              String?      @unique
   sustainabilityScore Float        @default(0)
   location            String?
+  logoUrl             String?      // Cloudinary URL for campus logo
+  photoUrls           String[]     // Cloudinary URLs for campus photos
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
 
@@ -115,6 +118,7 @@ model WasteLog {
   user                User         @relation(fields: [userId], references: [id])
   category            WasteCategory
   quantityKg          Float
+  photoUrl            String?      // Cloudinary URL for waste photo proof
   date                DateTime     @default(now())
 }
 
@@ -131,6 +135,7 @@ model MarketplaceListing {
   status              String       @default("ACTIVE")
   category            String?
   isService           Boolean      @default(false)
+  images              String[]     // Cloudinary URLs for listing images
   campusId            String?      @db.Uuid
   campus              Campus?      @relation(fields: [campusId], references: [id])
   createdAt           DateTime     @default(now())
@@ -156,6 +161,7 @@ model Event {
   campusId            String?      @db.Uuid
   campus              Campus?      @relation(fields: [campusId], references: [id])
   maxAttendees        Int?
+  coverImageUrl       String?      // Cloudinary URL for event cover image
   status              EventStatus  @default(UPCOMING)
   
   registrations       EventRegistration[]

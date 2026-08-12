@@ -40,10 +40,9 @@ export function AuthProvider({ children }) {
   const syncWithBackend = async (fbUser) => {
     try {
       const token = await fbUser.getIdToken();
-      localStorage.setItem('upcycle_token', token); // Optional: keep for legacy compat
+      localStorage.setItem('upcycle_token', token);
 
-      // In a real app, this endpoint verifies the Firebase Token
-      // and creates/returns the Postgres User.
+      // Try to fetch existing Postgres user profile
       const response = await fetch(`${API_BASE_URL}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -51,12 +50,47 @@ export function AuthProvider({ children }) {
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
-      } else {
-        console.error("Backend auth sync failed");
-        setUser(null);
+        return true;
       }
+
+      // If user doesn't exist in Postgres (404), auto-create their profile
+      // This handles the case where Firebase registration succeeded but backend failed
+      if (response.status === 404) {
+        console.warn('User not found in Postgres, auto-creating profile...');
+        const registerResponse = await fetch(`${API_BASE_URL}/auth/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            name: fbUser.displayName || fbUser.email.split('@')[0],
+            email: fbUser.email,
+            role: 'VOLUNTEER',
+            firebaseUid: fbUser.uid,
+          }),
+        });
+
+        if (registerResponse.ok) {
+          // Now fetch the newly created user
+          const retryResponse = await fetch(`${API_BASE_URL}/auth/me`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (retryResponse.ok) {
+            const userData = await retryResponse.json();
+            setUser(userData);
+            return true;
+          }
+        }
+      }
+
+      console.error('Backend auth sync failed, status:', response.status);
+      setUser(null);
+      return false;
     } catch (error) {
       console.error('Backend sync error:', error);
+      setUser(null);
+      return false;
     } finally {
       setLoading(false);
     }
@@ -68,6 +102,12 @@ export function AuthProvider({ children }) {
       if (!userCredential.user.emailVerified) {
         await signOut(auth);
         return { success: false, error: 'Please verify your email before logging in.' };
+      }
+      // Sync with backend and check if user profile exists/was created
+      const synced = await syncWithBackend(userCredential.user);
+      if (!synced) {
+        await signOut(auth);
+        return { success: false, error: 'Unable to load your profile. Please try again or contact support.' };
       }
       return { success: true };
     } catch (error) {
@@ -86,18 +126,25 @@ export function AuthProvider({ children }) {
       await sendEmailVerification(userCredential.user);
 
       // 3. Register user profile in Postgres (Backend)
-      const token = await userCredential.user.getIdToken();
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` 
-        },
-        body: JSON.stringify({ name, email, role, firebaseUid: userCredential.user.uid })
-      });
+      // This is best-effort — even if it fails, the Firebase user + email were created.
+      // The backend /me endpoint can re-create the profile on first verified login if needed.
+      try {
+        const token = await userCredential.user.getIdToken();
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          },
+          body: JSON.stringify({ name, email, role, firebaseUid: userCredential.user.uid })
+        });
 
-      if (!response.ok) {
-        throw new Error('Failed to create profile in database');
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.warn('Backend profile creation returned non-OK:', response.status, errorData.message);
+        }
+      } catch (backendError) {
+        console.warn('Backend profile creation failed (non-critical):', backendError.message);
       }
 
       // We sign them out immediately so they have to verify email to get back in
@@ -105,7 +152,7 @@ export function AuthProvider({ children }) {
 
       return { success: true };
     } catch (error) {
-      console.error(error);
+      console.error('Registration error:', error);
       let msg = 'Registration failed.';
       if (error.code === 'auth/email-already-in-use') msg = 'Email is already in use.';
       if (error.code === 'auth/weak-password') msg = 'Password is too weak.';

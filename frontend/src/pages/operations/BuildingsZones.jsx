@@ -1,52 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 export default function BuildingsZones() {
   const navigate = useNavigate();
+  const { authFetch } = useAuth();
   const [filter, setFilter] = useState('All');
+  const [buildings, setBuildings] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const buildings = [
-    {
-      id: 'CL-01',
-      name: 'Central Library',
-      location: 'North Campus',
-      status: 'Operational',
-      statusColor: 'bg-success-container',
-      zones: 12,
-      efficiency: 96,
-      img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA-Qtvu5cspEwUfqAMF5spgzLexDk6jAnToK75hmZRAZpzMeREUwKVh80YD1g8kAVF4oF8QHlF5jfK9uNgA43FLcZqDhmnVneZYiMrh9O0K3sv-PU8_RsQan0LvZ9iZ8rtk14ZiDZxpKbM2GOzzAyoZJN0eKMAzscxVZvMuHfxlYRnkQxw9PJLByxepU0xCQhdRmhokRUTjEEMLZ1cwPV1K5kgsxUmlHm9JzogOh8FaZMo6T2d_Pzgo3fes1B1m5o3_hXNujKStouY'
-    },
-    {
-      id: 'EH-04',
-      name: 'Engineering Hub',
-      location: 'West Complex',
-      status: 'Operational',
-      statusColor: 'bg-success-container',
-      zones: 28,
-      efficiency: 89,
-      img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBx8KpPzVubPdy3BGecyJl8YyEHPlrSn3PpfvKdxhFISkEG6OUFSdN9PiP0eUnFxLpHAEK13TsQu-lpmSZFZbZy73MGFZoGcZyV9a8wQkSzB3VSloyBJboIg_FZVkeWJF6NV5YqCAg_g7fDTeDN30L6gwED2bMlxhOsYleSvpAUzdW6j2qeP4LVW_PVt8jJut5inM2lpKH3CTZaukbmDXlq82h4WSQBpgVpHSght-aF06nfv9k-feuURs2fIPHfY-UPbGO3XmkBiJ0'
-    },
-    {
-      id: 'SC-02',
-      name: 'Student Center',
-      location: 'Central Plaza',
-      status: 'Maintenance',
-      statusColor: 'bg-error',
-      zones: 18,
-      efficiency: 72,
-      img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDAzzTHEmRT8Qlwyz8OiOd2s68R2BUjOSjQshn_xI6YfdPNZ4-J-TyP42x36FvtkzB7czejDv9uY2DyVt4mFBO-ddINlGAz9-pon4yfMvvP0OvIPa9HbuAvi-mE5uRO5y_0J8faUZy3L-bcwq89CGD_RKHdp-7hJ05ZEZWilWEz_erj83hy3uvfX8c9dcDA96Hs7tYgNqP6ksqHs3f6UwvTOyTj-f0i1vRb64dAwNaz_1pqQlRNu3Z1_QJa6CdEZ8wlqBK5U3tI420'
-    },
-    {
-      id: 'IL-09',
-      name: 'Innovation Lab',
-      location: 'South Sector',
-      status: 'Operational',
-      statusColor: 'bg-success-container',
-      zones: 8,
-      efficiency: 98,
-      img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC904ji_gbgayge2nKoDJNbMG4vyg1FeVhw-VDGoSItMjZEBrMIhWHOUVDqXpEKBgSieItZRHf2pzBTW-MvB9dXDyJigxpzVfBtIUn6mGUxBLAe0KsJ_4lo-cexqDH5h35AP2oZJmHccKfTRrXyfzm7GCXDPeSxMUj3nUcAHnEZ_tkhfE7pVXOjexxNr9wrNGCXFux6QJ1qRlhUEpbCoXX__G9vfJCiGsqHvr2-StRPlVcOKN8gdUnAc3DXOJVAs1qMuYUem89NFAs'
-    }
-  ];
+  useEffect(() => {
+    const fetchBuildings = async () => {
+      try {
+        const res = await authFetch('/campuses');
+        if (res.ok) {
+          const data = await res.json();
+          const mappedBuildings = data.map((campus, idx) => ({
+            id: campus.id,
+            name: campus.name,
+            location: campus.location || 'Unknown Location',
+            status: campus.sustainabilityScore > 75 ? 'Operational' : 'Maintenance',
+            statusColor: campus.sustainabilityScore > 75 ? 'bg-success-container' : 'bg-error',
+            zones: campus._count?.users || 12, // Mocking zones as user count for now
+            efficiency: campus.sustainabilityScore || 0,
+            img: `https://picsum.photos/seed/${campus.id}/400/300` // Placeholder image based on ID
+          }));
+          setBuildings(mappedBuildings);
+        }
+      } catch (err) {
+        console.error("Failed to fetch campuses", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchBuildings();
+  }, [authFetch]);
 
   return (
     <div className="flex flex-col gap-lg">

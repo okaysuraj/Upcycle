@@ -14,6 +14,9 @@ import ChooseRole from './pages/auth/ChooseRole';
 import KycVerification from './pages/auth/KycVerification';
 import OtpVerification from './pages/auth/OtpVerification';
 import WelcomeOnboarding from './pages/auth/WelcomeOnboarding';
+import TwoFactorSetup from './pages/auth/TwoFactorSetup';
+import TwoFactorVerify from './pages/auth/TwoFactorVerify';
+import ResetPasswordSuccess from './pages/auth/ResetPasswordSuccess';
 
 // Dashboard Pages (Epic 2)
 import VolunteerDashboard from './pages/dashboards/VolunteerDashboard';
@@ -48,7 +51,6 @@ import AlertDetail from './pages/operations/AlertDetail';
 // ESG Pages (Epic 4)
 import ESGDashboard from './pages/esg/ESGDashboard';
 
-// Marketplace Pages (Epic 5)
 // Marketplace Pages (Epic 5)
 import MarketplaceHome from './pages/marketplace/MarketplaceHome';
 import CompareVendorQuotes from './pages/marketplace/CompareVendorQuotes';
@@ -85,6 +87,7 @@ import AppSettings from './pages/user/AppSettings';
 
 // Newly added components (Batch 4)
 import EventsHub from './pages/community/EventsHub';
+import CreateEvent from './pages/community/CreateEvent';
 import GroupDetail from './pages/community/GroupDetail';
 import ExportPdfReport from './pages/dashboards/ExportPdfReport';
 import GlobalSearch from './pages/dashboards/GlobalSearch';
@@ -125,6 +128,31 @@ import PortfolioShowcase from './pages/esg/PortfolioShowcase';
 
 import LandingPage from './pages/LandingPage';
 
+// --- NEWLY BUILT EPIC COMPONENTS ---
+// Staff Domains
+import IoTSensors from './pages/staff/IoTSensors';
+import Facilities from './pages/staff/Facilities';
+import Tasks from './pages/staff/Tasks';
+import SupportTickets from './pages/staff/SupportTickets';
+import StaffDirectory from './pages/staff/StaffDirectory';
+import ShiftManagement from './pages/staff/ShiftManagement';
+import VendorManagement from './pages/staff/VendorManagement';
+import ComplianceAudits from './pages/staff/ComplianceAudits';
+import LogisticsRoutes from './pages/staff/LogisticsRoutes';
+import LogisticsSchedule from './pages/staff/LogisticsSchedule';
+import Fleet from './pages/staff/Fleet';
+import FleetMap from './pages/staff/FleetMap';
+
+// Student Domains
+import ImpactAnalytics from './pages/student/ImpactAnalytics';
+import Badges from './pages/student/Badges';
+import Events from './pages/student/Events';
+import EventDetails from './pages/student/EventDetails';
+import Organizations from './pages/student/Organizations';
+import Projects from './pages/student/Projects';
+import VolunteerPortal from './pages/student/VolunteerPortal';
+import WasteLogger from './pages/student/WasteLogger';
+
 export default function App() {
   return (
     <AuthProvider>
@@ -142,6 +170,9 @@ export default function App() {
             <Route path="/choose-role" element={<ChooseRole />} />
             <Route path="/kyc-verification" element={<KycVerification />} />
             <Route path="/verify-otp" element={<OtpVerification />} />
+            <Route path="/2fa-setup" element={<TwoFactorSetup />} />
+            <Route path="/2fa-verify" element={<TwoFactorVerify />} />
+            <Route path="/reset-password-success" element={<ResetPasswordSuccess />} />
           </Route>
 
           {/* Core Dashboards & Shell */}
@@ -173,7 +204,6 @@ export default function App() {
             <Route path="/operations/pickup-request/new" element={<CreatePickupRequest />} />
             <Route path="/operations/circular-economy" element={<CircularEconomyDashboard />} />
             <Route path="/operations/compliance" element={<ComplianceTracking />} />
-            <Route path="/operations/compliance" element={<ComplianceTracking />} />
             <Route path="/operations/consumption" element={<ConsumptionAnalytics />} />
             <Route path="/operations/smart-bins/new" element={<AddSmartBin />} />
             <Route path="/operations/waste/entry" element={<AddWasteEntry />} />
@@ -184,7 +214,6 @@ export default function App() {
 
             {/* Epic 5: Eco-Marketplace */}
             <Route path="/marketplace" element={<MarketplaceHome />} />
-            <Route path="/marketplace" element={<MarketplaceHome />} />
             <Route path="/marketplace/quotes/compare" element={<CompareVendorQuotes />} />
             <Route path="/marketplace/contracts/:id" element={<ContractDetails />} />
             <Route path="/marketplace/match-recommendation" element={<AiVendorMatchRecommendation />} />
@@ -194,6 +223,7 @@ export default function App() {
             <Route path="/community/feed" element={<CommunityFeedHome />} />
             <Route path="/community/organizations" element={<ConnectedOrganizations />} />
             <Route path="/community/organizations/new" element={<CreateOrganization />} />
+            <Route path="/community/events/new" element={<CreateEvent />} />
             <Route path="/education/courses/:id" element={<CourseDetail />} />
 
             {/* Epic 7: Settings */}
@@ -253,6 +283,31 @@ export default function App() {
             <Route path="/admin/role-permissions" element={<RolePermissionsManager />} />
             <Route path="/operations/route-optimization" element={<RouteOptimizationMap />} />
             <Route path="/sustainability/portfolio" element={<PortfolioShowcase />} />
+
+            {/* --- NEWLY BUILT EPIC ROUTES --- */}
+            {/* Staff Routes */}
+            <Route path="/staff/sensors" element={<IoTSensors />} />
+            <Route path="/staff/facilities" element={<Facilities />} />
+            <Route path="/staff/tasks" element={<Tasks />} />
+            <Route path="/staff/tickets" element={<SupportTickets />} />
+            <Route path="/staff/directory" element={<StaffDirectory />} />
+            <Route path="/staff/shifts" element={<ShiftManagement />} />
+            <Route path="/staff/vendors" element={<VendorManagement />} />
+            <Route path="/staff/compliance" element={<ComplianceAudits />} />
+            <Route path="/staff/logistics" element={<LogisticsRoutes />} />
+            <Route path="/staff/logistics/schedule" element={<LogisticsSchedule />} />
+            <Route path="/staff/fleet" element={<Fleet />} />
+            <Route path="/staff/fleet/map" element={<FleetMap />} />
+
+            {/* Student Routes */}
+            <Route path="/student/impact" element={<ImpactAnalytics />} />
+            <Route path="/student/badges" element={<Badges />} />
+            <Route path="/student/events" element={<Events />} />
+            <Route path="/student/events/:id" element={<EventDetails />} />
+            <Route path="/student/organizations" element={<Organizations />} />
+            <Route path="/student/projects" element={<Projects />} />
+            <Route path="/student/volunteer-portal" element={<VolunteerPortal />} />
+            <Route path="/student/waste-logger" element={<WasteLogger />} />
           </Route>
           
         </Routes>

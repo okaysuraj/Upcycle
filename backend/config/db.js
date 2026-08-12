@@ -17,4 +17,4 @@ async function connectDB() {
   }
 }
 
-module.exports = { connectDB, prisma };
+module.exports = { connectDB, prisma, pool };

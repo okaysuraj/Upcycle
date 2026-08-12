@@ -4,8 +4,20 @@ import { useAuth } from '../../context/AuthContext';
 import Card from '../../components/ui/Card';
 
 export default function UserProfile() {
-  const { user, logout } = useAuth();
+  const { user, logout, authFetch } = useAuth();
   const navigate = useNavigate();
+  const [badges, setBadges] = useState([]);
+
+  useEffect(() => {
+    if (user?.id) {
+      authFetch(`/gamification/badges/${user.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) setBadges(data);
+        })
+        .catch(console.error);
+    }
+  }, [user?.id, authFetch]);
 
   const handleLogout = async () => {
     await logout();
@@ -115,22 +127,20 @@ export default function UserProfile() {
           <Card className="p-6 flex-1 shadow-sm border border-[#bec9be]/30">
             <h2 className="font-display text-2xl font-bold text-on-surface mb-6">Achievements</h2>
             <div className="grid grid-cols-2 gap-3">
-              <div className="flex flex-col items-center gap-1 p-3 bg-white/70 border border-[#a5d6a7]/30 rounded-xl text-center group cursor-help hover:scale-105 transition-transform shadow-sm">
-                <span className="material-symbols-outlined text-primary text-[40px] group-hover:font-variation-[FILL_1]">workspace_premium</span>
-                <span className="text-xs font-bold">Compost Master</span>
-              </div>
-              <div className="flex flex-col items-center gap-1 p-3 bg-white/70 border border-[#a5d6a7]/30 rounded-xl text-center group cursor-help hover:scale-105 transition-transform shadow-sm">
-                <span className="material-symbols-outlined text-[#556158] text-[40px] group-hover:font-variation-[FILL_1]">energy_savings_leaf</span>
-                <span className="text-xs font-bold">Grid Guardian</span>
-              </div>
-              <div className="flex flex-col items-center gap-1 p-3 bg-white/70 border border-[#a5d6a7]/30 rounded-xl text-center group cursor-help hover:scale-105 transition-transform shadow-sm">
-                <span className="material-symbols-outlined text-[#24502c] text-[40px] group-hover:font-variation-[FILL_1]">forest</span>
-                <span className="text-xs font-bold">Reforester</span>
-              </div>
-              <div className="flex flex-col items-center gap-1 p-3 border border-dashed border-[#bec9be] rounded-xl text-center opacity-40">
-                <span className="material-symbols-outlined text-[40px]">lock</span>
-                <span className="text-xs font-bold">Urban Grower</span>
-              </div>
+              {badges.length === 0 ? (
+                <div className="col-span-2 text-center py-8 text-on-surface-variant text-sm">
+                  No badges earned yet. Start contributing!
+                </div>
+              ) : (
+                badges.map(userBadge => (
+                  <div key={userBadge.id} className="flex flex-col items-center gap-1 p-3 bg-white/70 border border-[#a5d6a7]/30 rounded-xl text-center group cursor-help hover:scale-105 transition-transform shadow-sm">
+                    <span className="material-symbols-outlined text-primary text-[40px] group-hover:font-variation-[FILL_1]">
+                      {userBadge.badge.iconUrl || 'workspace_premium'}
+                    </span>
+                    <span className="text-xs font-bold">{userBadge.badge.name}</span>
+                  </div>
+                ))
+              )}
             </div>
             <button className="w-full mt-6 py-3 border-t border-[#bec9be]/30 text-sm font-bold text-primary hover:bg-[#f4faff] transition-colors">
               View All Badges

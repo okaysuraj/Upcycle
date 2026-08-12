@@ -1,118 +1,54 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, SafeAreaView, TouchableOpacity, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-export default function EventsFeed() {
-  const router = useRouter();
-  
-  // Mock data for events
-  const events = [
-    { id: 'evt-1', title: 'Campus Clean-up Drive', date: 'Oct 15, 2026', location: 'North Quad', organizer: 'EcoClub' },
-    { id: 'evt-2', title: 'Upcycling Workshop: Clothing', date: 'Oct 18, 2026', location: 'Student Union Rm 204', organizer: 'Design Dept' },
-    { id: 'evt-3', title: 'Composting 101', date: 'Oct 22, 2026', location: 'Community Garden', organizer: 'AgriStudents' },
-  ];
+export default function EventsScreen() {
+  const [events] = useState([
+    { id: 1, title: 'Campus Clean-up Drive', date: 'Oct 15, 2026', attendees: 124, type: 'Volunteering' },
+    { id: 2, title: 'Upcycling Workshop', date: 'Oct 20, 2026', attendees: 45, type: 'Education' },
+  ]);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.headerTitle}>Upcoming Events</Text>
-      
-      <ScrollView contentContainerStyle={styles.list}>
-        {events.map(evt => (
-          <View key={evt.id} style={styles.card}>
-            <View style={styles.dateBadge}>
-              <Text style={styles.dateBadgeMonth}>{evt.date.split(' ')[0]}</Text>
-              <Text style={styles.dateBadgeDay}>{evt.date.split(' ')[1].replace(',', '')}</Text>
-            </View>
-            
-            <View style={styles.cardBody}>
-              <Text style={styles.cardTitle}>{evt.title}</Text>
-              <Text style={styles.cardLocation}>{evt.location}</Text>
-              <Text style={styles.cardOrganizer}>By {evt.organizer}</Text>
-              
-              <TouchableOpacity style={styles.rsvpButton}>
-                <Text style={styles.rsvpButtonText}>RSVP</Text>
-              </TouchableOpacity>
-            </View>
+    <SafeAreaView className="flex-1 bg-white">
+      <ScrollView className="p-4">
+        <View className="mb-6 flex-row justify-between items-center">
+          <View>
+            <Text className="text-3xl font-bold text-green-700">Events Hub</Text>
+            <Text className="text-gray-500 mt-1">Discover campus activities</Text>
           </View>
-        ))}
+          <TouchableOpacity className="bg-gray-100 p-3 rounded-full">
+            <Ionicons name="search" size={24} color="#374151" />
+          </TouchableOpacity>
+        </View>
+
+        <View className="space-y-4">
+          {events.map(event => (
+            <TouchableOpacity key={event.id} className="bg-white rounded-3xl overflow-hidden border border-gray-200 shadow-sm">
+              <View className="h-32 bg-green-100 relative items-center justify-center">
+                <Ionicons name="image-outline" size={48} color="#15803d" className="opacity-20" />
+                <View className="absolute top-3 right-3 bg-white/90 px-3 py-1 rounded-full">
+                  <Text className="text-xs font-bold text-green-800">{event.type}</Text>
+                </View>
+              </View>
+              
+              <View className="p-4">
+                <Text className="font-bold text-xl text-gray-800 mb-2">{event.title}</Text>
+                
+                <View className="flex-row items-center space-x-4">
+                  <View className="flex-row items-center">
+                    <Ionicons name="calendar-outline" size={16} color="#6b7280" />
+                    <Text className="text-sm text-gray-600 ml-1">{event.date}</Text>
+                  </View>
+                  <View className="flex-row items-center">
+                    <Ionicons name="people-outline" size={16} color="#6b7280" />
+                    <Text className="text-sm text-gray-600 ml-1">{event.attendees} going</Text>
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f3f4f6',
-    paddingTop: 60,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#065f46',
-    paddingHorizontal: 20,
-    marginBottom: 20,
-  },
-  list: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    marginBottom: 16,
-    overflow: 'hidden',
-    flexDirection: 'row',
-    padding: 16,
-  },
-  dateBadge: {
-    width: 60,
-    height: 60,
-    backgroundColor: '#ecfdf5',
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  dateBadgeMonth: {
-    color: '#10b981',
-    fontWeight: 'bold',
-    fontSize: 12,
-    textTransform: 'uppercase',
-  },
-  dateBadgeDay: {
-    color: '#047857',
-    fontWeight: 'bold',
-    fontSize: 20,
-  },
-  cardBody: {
-    flex: 1,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    marginBottom: 4,
-  },
-  cardLocation: {
-    fontSize: 14,
-    color: '#4b5563',
-    marginBottom: 4,
-  },
-  cardOrganizer: {
-    fontSize: 12,
-    color: '#9ca3af',
-    marginBottom: 12,
-  },
-  rsvpButton: {
-    backgroundColor: '#10b981',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    alignSelf: 'flex-start',
-  },
-  rsvpButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 14,
-  }
-});

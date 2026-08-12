@@ -23,7 +23,7 @@ router.get('/', auth, async (req, res) => {
 // POST /api/marketplace
 router.post('/', auth, async (req, res) => {
   try {
-    const { title, description, price, category, campusId, isService, serviceType } = req.body;
+    const { title, description, price, category, campusId, isService, serviceType, images } = req.body;
     
     const listing = await prisma.marketplaceListing.create({
       data: {
@@ -33,6 +33,7 @@ router.post('/', auth, async (req, res) => {
         category,
         serviceType: serviceType || 'MATERIAL_DONATION',
         isService: isService || false,
+        images: images || [],
         vendorId: req.user.id,
         campusId: campusId || null,
         status: 'ACTIVE'

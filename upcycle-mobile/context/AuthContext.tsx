@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 import { auth } from '../config/firebase';
 import { 
   createUserWithEmailAndPassword, 
@@ -17,10 +18,12 @@ interface AuthContextType {
   firebaseUser: FirebaseUser | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  register: (name: string, email: string, password: string, role: string) => Promise<{ success: boolean; error?: string }>;
+  register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
   authFetch: (endpoint: string, options?: RequestInit) => Promise<Response>;
+  updateProfile: (data: any) => Promise<{ success: boolean; error?: string }>;
+  uploadProfilePic: (uri: string) => Promise<{ success: boolean; url?: string; error?: string }>;
   API_BASE_URL: string;
 }
 
@@ -39,7 +42,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const API_BASE_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000/api' : 'http://localhost:5000/api';
+  const debuggerHost = Constants.expoConfig?.hostUri;
+  const localhost = debuggerHost?.split(':')[0] || 'localhost';
+  const API_BASE_URL = `http://${localhost}:5000/api`;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
@@ -64,7 +69,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const syncWithBackend = async (fbUser: FirebaseUser) => {
     try {
       const token = await fbUser.getIdToken();
-      // Store token in SecureStore for offline usage/legacy fallback if needed
       await SecureStore.setItemAsync('token', token);
 
       const response = await fetch(`${API_BASE_URL}/auth/me`, {
@@ -74,12 +78,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
+        return true;
       } else {
-        console.error("Backend auth sync failed");
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Backend auth sync failed:", errorData);
         setUser(null);
+        return false;
       }
     } catch (error) {
       console.error('Backend sync error:', error);
+      setUser(null);
+      return false;
     } finally {
       setLoading(false);
     }
@@ -92,15 +101,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         await signOut(auth);
         return { success: false, error: 'Please verify your email before logging in.' };
       }
+      
+      // Explicitly wait for backend sync during login so we can catch DB missing profile errors
+      const syncSuccess = await syncWithBackend(userCredential.user);
+      if (!syncSuccess) {
+        await signOut(auth);
+        return { success: false, error: 'Account not found in database. Please register first.' };
+      }
+      
       return { success: true };
     } catch (error: any) {
-      let msg = 'Login failed.';
+      console.error('Firebase Login Error:', error);
+      let msg = error.message || 'Login failed.';
       if (error.code === 'auth/invalid-credential') msg = 'Invalid email or password.';
       return { success: false, error: msg };
     }
   };
 
-  const register = async (name: string, email: string, password: string, role: string) => {
+  const register = async (name: string, email: string, password: string) => {
     try {
       // 1. Create in Firebase
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -116,7 +134,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}` 
         },
-        body: JSON.stringify({ name, email, role, firebaseUid: userCredential.user.uid })
+        body: JSON.stringify({ name, email, firebaseUid: userCredential.user.uid })
       });
 
       if (!response.ok) {
@@ -164,8 +182,61 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers });
   };
 
+  const updateProfile = async (data: any) => {
+    try {
+      const response = await authFetch('/users/profile', {
+        method: 'PUT',
+        body: JSON.stringify(data)
+      });
+      if (response.ok) {
+        const updatedUser = await response.json();
+        setUser(updatedUser);
+        return { success: true };
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        return { success: false, error: errorData.message || 'Failed to update profile' };
+      }
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  const uploadProfilePic = async (uri: string) => {
+    try {
+      if (!firebaseUser) return { success: false, error: 'Not authenticated' };
+      
+      const formData = new FormData();
+      const filename = uri.split('/').pop() || 'profile.jpg';
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : 'image/jpeg';
+      
+      // @ts-ignore - React Native FormData accepts this structure
+      formData.append('image', { uri, name: filename, type });
+      
+      const token = await firebaseUser.getIdToken();
+      
+      // Use direct fetch without Content-Type so RN can add the multipart boundary
+      const response = await fetch(`${API_BASE_URL}/upload/profile-pic`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        await updateProfile({ profilePicUrl: data.url });
+        return { success: true, url: data.url };
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        return { success: false, error: errorData.message || 'Failed to upload image' };
+      }
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, firebaseUser, loading, login, register, logout, resetPassword, authFetch, API_BASE_URL }}>
+    <AuthContext.Provider value={{ user, firebaseUser, loading, login, register, logout, resetPassword, authFetch, updateProfile, uploadProfilePic, API_BASE_URL }}>
       {children}
     </AuthContext.Provider>
   );

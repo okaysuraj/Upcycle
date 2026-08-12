@@ -13,14 +13,17 @@ function RootLayoutNav() {
     if (loading) return;
 
     const inAuthGroup = segments[0] === '(auth)';
+    const isRoot = !segments[0]; // If there are no segments, we are at the root
     
-    if (!user && !inAuthGroup) {
-      // Redirect to login if not authenticated
+    if (!user && !inAuthGroup && !isRoot) {
+      // Redirect to login if not authenticated and trying to access protected routes
       router.replace('/(auth)/login');
-    } else if (user && inAuthGroup) {
-      // Redirect away from login if authenticated
-      if (user.role === 'admin' || user.role === 'staff') {
+    } else if (user && (inAuthGroup || isRoot)) {
+      // Redirect away from login/splash if authenticated
+      if (['PLATFORM_ADMIN', 'CAMPUS_ADMIN', 'WASTE_STAFF', 'ADMIN', 'STAFF'].includes(user.role)) {
         router.replace('/(staff)');
+      } else if (user.role === 'VENDOR') {
+        router.replace('/(vendor)');
       } else {
         router.replace('/(student)');
       }
@@ -41,6 +44,7 @@ function RootLayoutNav() {
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="(staff)" />
       <Stack.Screen name="(student)" />
+      <Stack.Screen name="(vendor)" />
     </Stack>
   );
 }

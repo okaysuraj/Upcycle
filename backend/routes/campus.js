@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { prisma } = require('../config/db');
 const { auth } = require('./auth'); // Reuse auth middleware
+const { requireRole } = require('../middleware/rbac');
 
 // GET /api/campuses
 router.get('/', auth, async (req, res) => {
@@ -39,8 +40,7 @@ router.get('/:id', auth, async (req, res) => {
 });
 
 // POST /api/campuses
-router.post('/', auth, async (req, res) => {
-  // Ideally, check if user is PLATFORM_ADMIN
+router.post('/', auth, requireRole(['PLATFORM_ADMIN']), async (req, res) => {
   try {
     const { name, domain, location } = req.body;
     const campus = await prisma.campus.create({
@@ -59,7 +59,7 @@ router.post('/', auth, async (req, res) => {
 
 // POST /api/campuses/:id/ai-score
 // Mock endpoint for AI calculating the sustainability score based on waste and energy
-router.post('/:id/ai-score', auth, async (req, res) => {
+router.post('/:id/ai-score', auth, requireRole(['PLATFORM_ADMIN', 'CAMPUS_ADMIN']), async (req, res) => {
   try {
     const { id } = req.params;
     

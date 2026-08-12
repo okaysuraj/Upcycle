@@ -7,7 +7,7 @@ const { auth } = require('./auth');
 // Update demographics and privacy settings
 router.put('/profile', auth, async (req, res) => {
   try {
-    const { name, skills, availabilityHours, privacySettings, roleMetadata } = req.body;
+    const { name, skills, availabilityHours, privacySettings, roleMetadata, profilePicUrl } = req.body;
     
     const user = await prisma.user.update({
       where: { id: req.user.id },
@@ -16,7 +16,8 @@ router.put('/profile', auth, async (req, res) => {
         ...(skills && { skills }),
         ...(availabilityHours !== undefined && { availabilityHours }),
         ...(privacySettings && { privacySettings }),
-        ...(roleMetadata && { roleMetadata })
+        ...(roleMetadata && { roleMetadata }),
+        ...(profilePicUrl !== undefined && { profilePicUrl })
       }
     });
 

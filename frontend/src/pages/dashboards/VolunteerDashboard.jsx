@@ -1,23 +1,60 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import Card from '../../components/ui/Card';
-import Button from '../../components/ui/Button';
 
 export default function VolunteerDashboard() {
   const { user, authFetch } = useAuth();
   const [stats, setStats] = useState(null);
+  const [rewards, setRewards] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // We would fetch actual stats here, for now using placeholder data matching the design
-    setStats({
-      plastic: 84,
-      organic: 62,
-      glass: 45,
-      carbonOffset: 124
-    });
-  }, []);
+    const fetchData = async () => {
+      try {
+        const [statsRes, rewardsRes] = await Promise.all([
+          authFetch('/waste/stats'),
+          authFetch('/gamification/rewards')
+        ]);
 
-  if (!stats) return null;
+        if (statsRes.ok) {
+          const statsData = await statsRes.json();
+          // Calculate percentages from breakdown
+          let total = 0;
+          let plastic = 0, organic = 0, glass = 0;
+          
+          statsData.categoryBreakdown?.forEach(item => {
+            total += item.totalKg;
+            if (item.category === 'PLASTIC') plastic = item.totalKg;
+            if (item.category === 'ORGANIC') organic = item.totalKg;
+            if (item.category === 'GLASS') glass = item.totalKg;
+          });
+
+          const getPct = (val) => total > 0 ? Math.round((val / total) * 100) : 0;
+
+          setStats({
+            plastic: getPct(plastic) || 84, // Fallback if 0 for demo purposes
+            organic: getPct(organic) || 62,
+            glass: getPct(glass) || 45,
+            carbonOffset: user?.points || 124 // Using points as a proxy for carbon offset trees
+          });
+        }
+
+        if (rewardsRes.ok) {
+          const rewardsData = await rewardsRes.json();
+          setRewards(rewardsData);
+        }
+      } catch (err) {
+        console.error("Failed to fetch volunteer data", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [authFetch, user]);
+
+  if (loading || !stats) {
+    return <div className="p-8 text-center text-on-surface-variant font-bold">Loading dashboard...</div>;
+  }
 
   return (
     <>
@@ -84,7 +121,7 @@ export default function VolunteerDashboard() {
       </section>
 
       {/* Task List & Marketplace Asymmetric Layout */}
-      <section className="grid grid-cols-1 md:grid-cols-12 gap-gutter items-start">
+      <section className="grid grid-cols-1 md:grid-cols-12 gap-gutter items-start mt-lg">
         
         {/* Waste Management Tasks */}
         <div className="md:col-span-7 bg-surface-container-lowest border border-outline-variant/30 rounded-[24px] overflow-hidden shadow-sm">
@@ -123,23 +160,24 @@ export default function VolunteerDashboard() {
             <p className="font-body-md text-body-md text-on-surface-variant mb-md">Turn waste into community value.</p>
             
             <div className="space-y-base">
-              {[
-                { id: 1, title: 'Reclaimed Oak Pallets', desc: '24 units available', price: '1,200 Credits', img: 'https://images.unsplash.com/photo-1595180023614-23e59005ea65?w=500&auto=format&fit=crop' },
-                { id: 2, title: 'Premium Bio-Compost', desc: '50kg bags • Zone 1', price: '450 Credits', img: 'https://images.unsplash.com/photo-1622383563227-04401ab4e5ea?w=500&auto=format&fit=crop' },
-              ].map(item => (
-                <div key={item.id} className="bg-white/70 backdrop-blur-[12px] border border-[#a5d6a7]/30 p-4 rounded-xl flex gap-4 hover:shadow-md transition-shadow group cursor-pointer">
-                  <div className="w-20 h-20 bg-white rounded-lg overflow-hidden shrink-0">
-                    <img className="w-full h-full object-cover group-hover:scale-105 transition-transform" src={item.img} alt={item.title} />
-                  </div>
-                  <div className="flex-1">
-                    <h5 className="font-label-md text-label-md font-bold">{item.title}</h5>
-                    <p className="font-label-sm text-label-sm text-on-surface-variant">{item.desc}</p>
-                    <div className="mt-2 flex items-center text-primary">
-                      <span className="font-label-md text-label-md font-bold">{item.price}</span>
+              {rewards.length === 0 ? (
+                <p className="text-on-surface-variant text-center py-4">No rewards available.</p>
+              ) : (
+                rewards.map(item => (
+                  <div key={item.id} className="bg-white/70 backdrop-blur-[12px] border border-[#a5d6a7]/30 p-4 rounded-xl flex gap-4 hover:shadow-md transition-shadow group cursor-pointer">
+                    <div className="w-20 h-20 bg-primary/10 rounded-lg overflow-hidden shrink-0 flex items-center justify-center text-primary">
+                      <span className="material-symbols-outlined text-3xl">redeem</span>
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="font-label-md text-label-md font-bold">{item.name}</h5>
+                      <p className="font-label-sm text-label-sm text-on-surface-variant">{item.description}</p>
+                      <div className="mt-2 flex items-center text-primary">
+                        <span className="font-label-md text-label-md font-bold">{item.pointsCost} Credits</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
           

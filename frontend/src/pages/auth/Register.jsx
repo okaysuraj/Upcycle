@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import Card from '../../components/ui/Card';
-import Input from '../../components/ui/Input';
-import Button from '../../components/ui/Button';
 
 export default function Register() {
   const [name, setName] = useState('');
@@ -35,27 +32,47 @@ export default function Register() {
   };
 
   return (
-    <div className="grid grid-cols-12 gap-gutter w-full max-w-5xl">
+    <div className="grid grid-cols-12 gap-6 w-full max-w-5xl">
       {/* Branding & Welcome Card (Visible on Desktop) */}
-      <div className="hidden lg:flex col-span-5 bg-white/70 backdrop-blur-[12px] border border-[#a5d6a7]/30 shadow-sm rounded-[24px] p-lg flex-col justify-between overflow-hidden relative">
+      <div
+        className="hidden lg:flex col-span-5 overflow-hidden relative flex-col justify-between"
+        style={{
+          background: 'rgba(255, 255, 255, 0.7)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(165, 214, 167, 0.3)',
+          borderRadius: '24px',
+          padding: '40px 32px',
+          boxShadow: '0 4px 24px rgba(45, 56, 45, 0.06)',
+        }}
+      >
         <div className="relative z-20">
-          <div className="flex items-center gap-base mb-lg">
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-              <span className="material-symbols-outlined text-white" style={{ fontVariationSettings: "'FILL' 1" }}>eco</span>
+          <div className="flex items-center gap-3 mb-8">
+            <div
+              className="w-11 h-11 flex items-center justify-center"
+              style={{
+                background: 'linear-gradient(135deg, #4f7942 0%, #6a9b5c 100%)',
+                borderRadius: '14px',
+                boxShadow: '0 4px 12px rgba(79, 121, 66, 0.3)',
+              }}
+            >
+              <span className="material-symbols-outlined text-white text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>eco</span>
             </div>
-            <span className="font-display text-headline-md font-bold text-primary tracking-tight">Upcycle</span>
+            <span style={{ fontSize: '1.5rem', fontWeight: 800, color: '#2d382d', letterSpacing: '-0.02em' }}>Upcycle</span>
           </div>
           
-          <h1 className="font-display text-display text-on-background leading-tight mb-md">
-            Join the <br/><span className="text-primary">Sustainability</span> Movement.
+          <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: '#2d382d', lineHeight: 1.15, marginBottom: '16px', letterSpacing: '-0.02em' }}>
+            Join the <br/><span style={{ color: '#4f7942' }}>Sustainability</span> Movement.
           </h1>
-          <p className="font-body-lg text-secondary max-w-xs">
+          <p style={{ fontSize: '1.05rem', color: '#6d766b', lineHeight: 1.6, maxWidth: '300px' }}>
             Create an account to track your carbon footprint, join eco-initiatives, and earn rewards.
           </p>
         </div>
         
-        <div className="relative h-48 mt-xl z-20">
-          <div className="absolute inset-0 rounded-xl overflow-hidden shadow-inner bg-surface-container-low flex items-center justify-center">
+        <div className="relative mt-8 z-20" style={{ height: '180px' }}>
+          <div
+            className="absolute inset-0 overflow-hidden flex items-center justify-center"
+            style={{ borderRadius: '16px', boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.06)' }}
+          >
             <img 
               className="w-full h-full object-cover" 
               src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=2000&auto=format&fit=crop" 
@@ -65,86 +82,340 @@ export default function Register() {
         </div>
         
         {/* Abstract decoration */}
-        <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+        <div
+          className="absolute"
+          style={{
+            bottom: '-40px',
+            right: '-40px',
+            width: '250px',
+            height: '250px',
+            background: 'rgba(79, 121, 66, 0.06)',
+            borderRadius: '50%',
+            filter: 'blur(60px)',
+          }}
+        />
       </div>
 
       {/* Auth Form Card */}
-      <Card className="col-span-12 lg:col-span-7 p-xl lg:p-[64px] flex flex-col">
-        <div className="mb-lg">
-          <h2 className="font-headline-lg text-headline-lg text-on-background mb-xs">Create Account</h2>
-          <p className="font-body-md text-secondary">Sign up to participate in community initiatives.</p>
+      <div
+        className="col-span-12 lg:col-span-7 flex flex-col"
+        style={{
+          background: '#ffffff',
+          borderRadius: '32px',
+          boxShadow: '0 8px 32px rgba(45, 56, 45, 0.08), 0 1px 4px rgba(45, 56, 45, 0.04)',
+          border: '1px solid rgba(220, 224, 217, 0.5)',
+          padding: '48px',
+        }}
+      >
+        <div className="mb-8">
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#2d382d', marginBottom: '6px', letterSpacing: '-0.01em' }}>Create Account</h2>
+          <p style={{ fontSize: '1rem', color: '#6d766b' }}>Sign up to participate in community initiatives.</p>
         </div>
         
         {error && (
-          <div className="bg-error-container text-on-error-container p-sm rounded-xl mb-md text-label-md">
+          <div
+            style={{
+              background: '#fef2f2',
+              color: '#991b1b',
+              padding: '12px 16px',
+              borderRadius: '12px',
+              marginBottom: '20px',
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              border: '1px solid #fecaca',
+            }}
+          >
             {error}
           </div>
         )}
         
         {successMsg ? (
-          <div className="bg-success-container/20 border border-success-container text-on-surface p-md rounded-xl mb-md text-center">
-            <span className="material-symbols-outlined text-[32px] text-primary mb-2">mark_email_read</span>
-            <h3 className="font-headline-md text-primary mb-2">Verify your email</h3>
-            <p className="font-body-md">{successMsg}</p>
-            <div className="mt-6">
-              <Link to="/auth/login">
-                <Button fullWidth>Return to Sign In</Button>
-              </Link>
+          <div
+            style={{
+              background: 'linear-gradient(135deg, rgba(79, 121, 66, 0.06) 0%, rgba(165, 214, 167, 0.1) 100%)',
+              border: '1px solid rgba(79, 121, 66, 0.2)',
+              borderRadius: '16px',
+              padding: '32px 24px',
+              textAlign: 'center',
+            }}
+          >
+            <div
+              className="flex items-center justify-center"
+              style={{
+                width: '56px',
+                height: '56px',
+                background: 'linear-gradient(135deg, #4f7942 0%, #6a9b5c 100%)',
+                borderRadius: '16px',
+                margin: '0 auto 16px',
+                boxShadow: '0 4px 16px rgba(79, 121, 66, 0.25)',
+              }}
+            >
+              <span className="material-symbols-outlined text-white" style={{ fontSize: '28px' }}>mark_email_read</span>
             </div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#4f7942', marginBottom: '8px' }}>Verify your email</h3>
+            <p style={{ fontSize: '0.95rem', color: '#6d766b', lineHeight: 1.6, marginBottom: '24px' }}>{successMsg}</p>
+            <Link to="/login">
+              <button
+                type="button"
+                style={{
+                  width: '100%',
+                  padding: '14px 24px',
+                  background: 'linear-gradient(135deg, #4f7942 0%, #3e5f34 100%)',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '14px',
+                  fontSize: '1rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 16px rgba(79, 121, 66, 0.3)',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(79, 121, 66, 0.4)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(79, 121, 66, 0.3)';
+                }}
+              >
+                <span className="flex items-center justify-center gap-2">
+                  Return to Sign In
+                  <span className="material-symbols-outlined text-xl">arrow_forward</span>
+                </span>
+              </button>
+            </Link>
           </div>
         ) : (
           <>
-            <form className="space-y-md" onSubmit={handleRegister}>
-              <Input 
-                label="Full Name" 
-                id="name"
-                type="text" 
-                icon="person"
-                placeholder="Jane Doe"
-                value={name} 
-                onChange={e => setName(e.target.value)} 
-                required 
-              />
-              
-              <Input 
-                label="Email Address" 
-                id="email"
-                type="email" 
-                icon="mail"
-                placeholder="volunteer@city.eco"
-                value={email} 
-                onChange={e => setEmail(e.target.value)} 
-                required 
-              />
-              
-              <Input 
-                label="Password" 
-                id="password"
-                type="password" 
-                icon="lock"
-                placeholder="••••••••"
-                value={password} 
-                onChange={e => setPassword(e.target.value)} 
-                required 
-              />
+            <form className="flex flex-col gap-5" onSubmit={handleRegister}>
+              {/* Full Name */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="name" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#2d382d' }}>Full Name</label>
+                <div className="relative flex items-center group">
+                  <span
+                    className="material-symbols-outlined absolute"
+                    style={{ left: '14px', color: '#8da388', fontSize: '20px', transition: 'color 0.2s' }}
+                  >
+                    person
+                  </span>
+                  <input
+                    id="name"
+                    type="text"
+                    placeholder="Jane Doe"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '14px 14px 14px 48px',
+                      background: '#f6f7f2',
+                      border: '1.5px solid #dce0d9',
+                      borderRadius: '14px',
+                      fontSize: '0.95rem',
+                      color: '#2d382d',
+                      outline: 'none',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onFocus={e => {
+                      e.target.style.borderColor = '#4f7942';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(79, 121, 66, 0.1)';
+                      e.target.previousElementSibling.style.color = '#4f7942';
+                    }}
+                    onBlur={e => {
+                      e.target.style.borderColor = '#dce0d9';
+                      e.target.style.boxShadow = 'none';
+                      e.target.previousElementSibling.style.color = '#8da388';
+                    }}
+                  />
+                </div>
+              </div>
 
-              <Button type="submit" fullWidth icon="person_add" disabled={loading}>
-                {loading ? 'Creating Account...' : 'Sign Up'}
-              </Button>
+              {/* Email */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="email" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#2d382d' }}>Email Address</label>
+                <div className="relative flex items-center group">
+                  <span
+                    className="material-symbols-outlined absolute"
+                    style={{ left: '14px', color: '#8da388', fontSize: '20px', transition: 'color 0.2s' }}
+                  >
+                    mail
+                  </span>
+                  <input
+                    id="email"
+                    type="email"
+                    placeholder="volunteer@city.eco"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '14px 14px 14px 48px',
+                      background: '#f6f7f2',
+                      border: '1.5px solid #dce0d9',
+                      borderRadius: '14px',
+                      fontSize: '0.95rem',
+                      color: '#2d382d',
+                      outline: 'none',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onFocus={e => {
+                      e.target.style.borderColor = '#4f7942';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(79, 121, 66, 0.1)';
+                      e.target.previousElementSibling.style.color = '#4f7942';
+                    }}
+                    onBlur={e => {
+                      e.target.style.borderColor = '#dce0d9';
+                      e.target.style.boxShadow = 'none';
+                      e.target.previousElementSibling.style.color = '#8da388';
+                    }}
+                  />
+                </div>
+              </div>
+              
+              {/* Password */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="password" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#2d382d' }}>Password</label>
+                <div className="relative flex items-center group">
+                  <span
+                    className="material-symbols-outlined absolute"
+                    style={{ left: '14px', color: '#8da388', fontSize: '20px', transition: 'color 0.2s' }}
+                  >
+                    lock
+                  </span>
+                  <input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '14px 14px 14px 48px',
+                      background: '#f6f7f2',
+                      border: '1.5px solid #dce0d9',
+                      borderRadius: '14px',
+                      fontSize: '0.95rem',
+                      color: '#2d382d',
+                      outline: 'none',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onFocus={e => {
+                      e.target.style.borderColor = '#4f7942';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(79, 121, 66, 0.1)';
+                      e.target.previousElementSibling.style.color = '#4f7942';
+                    }}
+                    onBlur={e => {
+                      e.target.style.borderColor = '#dce0d9';
+                      e.target.style.boxShadow = 'none';
+                      e.target.previousElementSibling.style.color = '#8da388';
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Terms checkbox */}
+              <label className="flex items-start gap-3 cursor-pointer group" style={{ marginTop: '4px' }}>
+                <input
+                  type="checkbox"
+                  required
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    borderRadius: '6px',
+                    border: '1.5px solid #dce0d9',
+                    accentColor: '#4f7942',
+                    marginTop: '2px',
+                    cursor: 'pointer',
+                  }}
+                />
+                <span style={{ fontSize: '0.85rem', color: '#6d766b', lineHeight: 1.5 }}>
+                  I agree to the <a href="#" style={{ color: '#4f7942', fontWeight: 600, textDecoration: 'none' }}>Terms of Service</a> and <a href="#" style={{ color: '#4f7942', fontWeight: 600, textDecoration: 'none' }}>Privacy Policy</a>
+                </span>
+              </label>
+
+              {/* Register Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  width: '100%',
+                  padding: '15px 24px',
+                  background: loading
+                    ? 'linear-gradient(135deg, #8da388 0%, #a5b8a0 100%)'
+                    : 'linear-gradient(135deg, #4f7942 0%, #3e5f34 100%)',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '14px',
+                  fontSize: '1rem',
+                  fontWeight: 700,
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  boxShadow: '0 4px 16px rgba(79, 121, 66, 0.3)',
+                  transition: 'all 0.25s ease',
+                  marginTop: '8px',
+                  letterSpacing: '0.01em',
+                }}
+                onMouseEnter={e => {
+                  if (!loading) {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(79, 121, 66, 0.4)';
+                  }
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(79, 121, 66, 0.3)';
+                }}
+                onMouseDown={e => {
+                  if (!loading) {
+                    e.currentTarget.style.transform = 'translateY(0) scale(0.98)';
+                  }
+                }}
+                onMouseUp={e => {
+                  if (!loading) {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }
+                }}
+              >
+                <span className="flex items-center justify-center gap-2">
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin" style={{ width: '20px', height: '20px' }} viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="31.416" strokeDashoffset="10" strokeLinecap="round" />
+                      </svg>
+                      Creating Account...
+                    </>
+                  ) : (
+                    <>
+                      Sign Up
+                      <span className="material-symbols-outlined text-xl">person_add</span>
+                    </>
+                  )}
+                </span>
+              </button>
             </form>
 
-            <div className="flex items-center my-lg">
-              <div className="flex-grow h-px bg-outline-variant/30"></div>
-              <span className="px-md font-label-sm text-label-sm text-outline uppercase tracking-widest">or continue with</span>
-              <div className="flex-grow h-px bg-outline-variant/30"></div>
+            {/* Divider */}
+            <div className="flex items-center" style={{ margin: '28px 0' }}>
+              <div className="flex-grow" style={{ height: '1px', background: 'linear-gradient(to right, transparent, #dce0d9, transparent)' }} />
+              <span style={{ padding: '0 16px', fontSize: '0.75rem', fontWeight: 600, color: '#8da388', textTransform: 'uppercase', letterSpacing: '0.1em' }}>or continue with</span>
+              <div className="flex-grow" style={{ height: '1px', background: 'linear-gradient(to right, transparent, #dce0d9, transparent)' }} />
             </div>
 
-            <p className="text-center font-body-md text-secondary">
-              Already have an account? <Link to="/auth/login" className="text-primary font-bold hover:underline">Sign In</Link>
+            <p style={{ textAlign: 'center', fontSize: '0.95rem', color: '#6d766b' }}>
+              Already have an account?{' '}
+              <Link
+                to="/login"
+                style={{ color: '#4f7942', fontWeight: 700, textDecoration: 'none', transition: 'color 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'}
+                onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}
+              >
+                Sign In
+              </Link>
             </p>
           </>
         )}
-      </Card>
+      </div>
     </div>
   );
 }

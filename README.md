@@ -2,21 +2,16 @@
 
 **Live Website:** [https://upcycleapp.netlify.app](https://upcycleapp.netlify.app)
 
-Upcycle is a full-stack, cross-platform monorepo designed to track, manage, and gamify campus sustainability efforts. It supports students logging their eco-impact and staff managing campus-wide operations (waste audits, IoT sensors, ESG reporting).
-
 ## 🏗 Architecture
 
 The repository is organized into three major projects, completely synced to the exact same Postgres database.
 
 1. **`backend/`**: Node.js + Express API powered by Prisma ORM and Postgres.
-2. **`frontend/`**: 151-screen React Web Application powered by Vite and React Router DOM.
-3. **`upcycle-mobile/`**: 151-screen React Native Mobile App powered by Expo Router.
+2. **`frontend/`**: React Web Application powered by Vite and React Router DOM.
+3. **`upcycle-mobile/`**: React Native Mobile App powered by Expo Router.
 
 ---
 
-## 🚀 Local Development
-
-To run the full stack locally, you need three separate terminal windows.
 
 ### 1. Database & Backend
 ```bash
@@ -46,10 +41,6 @@ npx expo start
 *(Scans QR code to run on iOS/Android device or simulator)*
 
 ---
-
-## 🌍 Production Deployment Guide
-
-This project is configured and ready to be deployed to **Render** (Backend) and **Netlify** (Frontend).
 
 ### 1. Deploying the Backend (Render)
 Create a new Web Service on Render pointing to the `backend/` directory of your repository.

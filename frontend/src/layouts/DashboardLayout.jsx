@@ -1,22 +1,46 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function DashboardLayout() {
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth/login');
+    }
+  }, [user, loading, navigate]);
 
   const handleLogout = async () => {
     await logout();
     navigate('/auth/login');
   };
 
-  const navItems = [
-    { name: 'Dashboard', icon: 'dashboard', path: `/${user?.role?.toLowerCase() || 'student'}` },
-    { name: 'Sustainability', icon: 'analytics', path: '/sustainability' },
-    { name: 'Community', icon: 'group', path: '/community' },
-    { name: 'Notifications', icon: 'notifications', path: '/notifications' },
-  ];
+  if (loading) return null;
+  if (!user) return null;
+
+  let navItems = [];
+  if (user?.role === 'STUDENT' || user?.role === 'VOLUNTEER' || !user?.role) {
+    navItems = [
+      { name: 'Dashboard', icon: 'dashboard', path: `/${user?.role?.toLowerCase() || 'student'}` },
+      { name: 'My Impact', icon: 'workspace_premium', path: '/student/impact' },
+      { name: 'Events', icon: 'event', path: '/student/events' },
+      { name: 'Clubs', icon: 'groups', path: '/student/organizations' },
+      { name: 'Volunteer', icon: 'volunteer_activism', path: '/student/volunteer-portal' },
+      { name: 'Waste Log', icon: 'recycling', path: '/student/waste-logger' },
+    ];
+  } else {
+    navItems = [
+      { name: 'Dashboard', icon: 'dashboard', path: `/${user?.role?.toLowerCase()}` },
+      { name: 'Sensors', icon: 'sensors', path: '/staff/sensors' },
+      { name: 'Tasks', icon: 'task', path: '/staff/tasks' },
+      { name: 'Tickets', icon: 'support_agent', path: '/staff/tickets' },
+      { name: 'Workforce', icon: 'contacts', path: '/staff/directory' },
+      { name: 'Logistics', icon: 'local_shipping', path: '/staff/logistics' },
+      { name: 'Vendors', icon: 'handshake', path: '/staff/vendors' },
+    ];
+  }
 
   return (
     <div className="bg-background text-on-background min-h-screen flex overflow-hidden">

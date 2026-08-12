@@ -3,17 +3,33 @@ import { View, Text, ScrollView, TouchableOpacity, Image, Platform } from 'react
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useAuth } from '../../context/AuthContext';
 
 export default function DashboardShellMobile() {
   const router = useRouter();
-  const [greeting, setGreeting] = useState('Hello, Alex');
+  const { user } = useAuth();
+  const userName = user?.name || 'there';
+  const [greeting, setGreeting] = useState(`Hello, ${userName}`);
+  const { authFetch } = useAuth();
+  const [stats, setStats] = useState({ totalWasteKg: 0, carbonOffset: 0, goalProgress: 0, badges: 0 });
+
+  useEffect(() => {
+    authFetch('/analytics/dashboard/student')
+      .then(res => res.json())
+      .then(data => {
+        if (data && typeof data.totalWasteKg !== 'undefined') {
+          setStats(data);
+        }
+      })
+      .catch(console.error);
+  }, [authFetch]);
 
   useEffect(() => {
     const hour = new Date().getHours();
-    if (hour < 12) setGreeting('Good Morning, Alex');
-    else if (hour < 18) setGreeting('Good Afternoon, Alex');
-    else setGreeting('Good Evening, Alex');
-  }, []);
+    if (hour < 12) setGreeting(`Good Morning, ${userName}`);
+    else if (hour < 18) setGreeting(`Good Afternoon, ${userName}`);
+    else setGreeting(`Good Evening, ${userName}`);
+  }, [userName]);
 
   return (
     <SafeAreaView className="flex-1 bg-[#f4faff]">
@@ -46,7 +62,7 @@ export default function DashboardShellMobile() {
         <View className="mb-10">
           <Text className="text-2xl font-bold text-[#0d1e25] mb-2">{greeting}</Text>
           <Text className="text-base text-[#3d4a40] leading-relaxed">
-            You've reached <Text className="font-bold text-[#006d3e]">85%</Text> of your monthly sustainability goal. Here's your impact overview for today.
+            You've reached <Text className="font-bold text-[#006d3e]">{stats.goalProgress}%</Text> of your monthly sustainability goal. Here's your impact overview for today.
           </Text>
         </View>
 
@@ -59,11 +75,11 @@ export default function DashboardShellMobile() {
             </View>
             <View className="gap-8">
               <View>
-                <Text className="text-5xl font-bold text-white mb-1 tracking-tight">1,240 <Text className="text-2xl text-[#7afbae]">kg</Text></Text>
+                <Text className="text-5xl font-bold text-white mb-1 tracking-tight">{stats.totalWasteKg} <Text className="text-2xl text-[#7afbae]">kg</Text></Text>
                 <Text className="text-base text-[#7afbae]/90">Total Waste Recycled</Text>
               </View>
               <View>
-                <Text className="text-5xl font-bold text-white mb-1 tracking-tight">45.2 <Text className="text-2xl text-[#7afbae]">m³</Text></Text>
+                <Text className="text-5xl font-bold text-white mb-1 tracking-tight">{stats.carbonOffset} <Text className="text-2xl text-[#7afbae]">m³</Text></Text>
                 <Text className="text-base text-[#7afbae]/90">Carbon Footprint Reduced</Text>
               </View>
             </View>
@@ -72,10 +88,10 @@ export default function DashboardShellMobile() {
           <View className="mt-10 relative z-10">
             <View className="flex-row justify-between items-end mb-2">
               <Text className="text-sm font-medium text-white">Monthly Progress</Text>
-              <Text className="text-2xl font-bold text-[#7afbae]">85%</Text>
+              <Text className="text-2xl font-bold text-[#7afbae]">{stats.goalProgress}%</Text>
             </View>
             <View className="h-3 w-full bg-white/20 rounded-full overflow-hidden">
-              <View className="h-full bg-[#7afbae] w-[85%] rounded-full shadow-[0_0_12px_rgba(122,251,174,0.4)]" />
+              <View className="h-full bg-[#7afbae] rounded-full shadow-[0_0_12px_rgba(122,251,174,0.4)]" style={{ width: `${stats.goalProgress}%` }} />
             </View>
           </View>
 
@@ -222,29 +238,9 @@ export default function DashboardShellMobile() {
       </ScrollView>
 
       {/* FAB */}
-      <TouchableOpacity className="absolute bottom-24 right-6 w-14 h-14 bg-[#006d3e] rounded-2xl shadow-lg items-center justify-center active:scale-95 z-40">
+      <TouchableOpacity className="absolute bottom-6 right-6 w-14 h-14 bg-[#006d3e] rounded-2xl shadow-lg items-center justify-center active:scale-95 z-40">
         <MaterialIcons name="add" size={32} color="white" />
       </TouchableOpacity>
-
-      {/* Bottom Nav */}
-      <View className="absolute bottom-0 left-0 w-full flex-row justify-around items-center px-4 py-2 border-t border-[#bccabd]/30 bg-[#f4faff] h-16 z-50 md:hidden">
-        <TouchableOpacity className="items-center bg-[#2eb872] rounded-full px-4 py-1 active:scale-90">
-          <MaterialIcons name="home" size={24} color="#004224" />
-          <Text className="text-[10px] text-[#004224]">Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="items-center p-2 active:scale-90">
-          <MaterialIcons name="eco" size={24} color="#3d4a40" />
-          <Text className="text-[10px] text-[#3d4a40]">Impact</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="items-center p-2 active:scale-90">
-          <MaterialIcons name="search" size={24} color="#3d4a40" />
-          <Text className="text-[10px] text-[#3d4a40]">Search</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="items-center p-2 active:scale-90">
-          <MaterialIcons name="settings" size={24} color="#3d4a40" />
-          <Text className="text-[10px] text-[#3d4a40]">Settings</Text>
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 }

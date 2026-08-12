@@ -27,10 +27,7 @@ export default function SignupScreen() {
     setError('');
     setSuccessMsg('');
     
-    // Automatically derive role for demo purposes
-    const role = email.includes('staff') ? 'PLATFORM_ADMIN' : 'VOLUNTEER';
-    
-    const result = await register(name, email, password, role);
+    const result = await register(name, email, password);
     
     if (result.success) {
       setSuccessMsg('A verification link has been sent to your email. Please click the link to verify your account before logging in.');

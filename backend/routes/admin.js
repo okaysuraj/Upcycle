@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const { prisma } = require('../config/db');
 const { auth } = require('./auth');
+const { requireRole } = require('../middleware/rbac');
 
 // GET /api/admin/system-health
-router.get('/system-health', auth, async (req, res) => {
+router.get('/system-health', auth, requireRole(['PLATFORM_ADMIN', 'ADMIN']), async (req, res) => {
   try {
     const userCount = await prisma.user.count();
     const campusCount = await prisma.campus.count();
@@ -22,7 +23,7 @@ router.get('/system-health', auth, async (req, res) => {
 });
 
 // GET /api/admin/audit-logs
-router.get('/audit-logs', auth, async (req, res) => {
+router.get('/audit-logs', auth, requireRole(['PLATFORM_ADMIN', 'ADMIN']), async (req, res) => {
   try {
     const logs = await prisma.auditLog.findMany({
       orderBy: { timestamp: 'desc' },
@@ -36,7 +37,7 @@ router.get('/audit-logs', auth, async (req, res) => {
 });
 
 // GET /api/admin/moderation-queue
-router.get('/moderation-queue', auth, async (req, res) => {
+router.get('/moderation-queue', auth, requireRole(['PLATFORM_ADMIN', 'ADMIN']), async (req, res) => {
   try {
     const queue = await prisma.contentModeration.findMany({
       where: { status: 'PENDING' },
@@ -52,7 +53,7 @@ router.get('/moderation-queue', auth, async (req, res) => {
 });
 
 // PUT /api/admin/moderation/:id
-router.put('/moderation/:id', auth, async (req, res) => {
+router.put('/moderation/:id', auth, requireRole(['PLATFORM_ADMIN', 'ADMIN']), async (req, res) => {
   try {
     const { id } = req.params;
     const { status, action } = req.body; // status: RESOLVED, action: DELETE_POST / IGNORE
@@ -84,7 +85,7 @@ router.put('/moderation/:id', auth, async (req, res) => {
 });
 
 // GET /api/admin/feature-flags
-router.get('/feature-flags', auth, async (req, res) => {
+router.get('/feature-flags', auth, requireRole(['PLATFORM_ADMIN', 'ADMIN']), async (req, res) => {
   try {
     const flags = await prisma.featureFlag.findMany();
     res.json(flags);
@@ -94,7 +95,7 @@ router.get('/feature-flags', auth, async (req, res) => {
 });
 
 // PUT /api/admin/feature-flags/:name
-router.put('/feature-flags/:name', auth, async (req, res) => {
+router.put('/feature-flags/:name', auth, requireRole(['PLATFORM_ADMIN', 'ADMIN']), async (req, res) => {
   try {
     const { name } = req.params;
     const { isEnabled } = req.body;
