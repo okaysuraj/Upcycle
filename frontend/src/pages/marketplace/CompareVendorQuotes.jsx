@@ -1,155 +1,148 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 export default function CompareVendorQuotes() {
   const { authFetch } = useAuth();
-  const [rfps, setRfps] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [quotes, setQuotes] = useState([
+    {
+      id: '1',
+      vendor: 'BioLoop Sustainable Solutions',
+      tag: 'BEST VALUE',
+      price: '$12,450.00',
+      timeline: '14 Working Days',
+      score: '98/100',
+      rating: '4.9',
+      certifications: ['ISO 14001', 'LEED Verified', 'Zero Waste Partner'],
+      featured: true
+    },
+    {
+      id: '2',
+      vendor: 'EcoHaul Logistics Group',
+      tag: 'FASTEST DISPATCH',
+      price: '$14,200.00',
+      timeline: '7 Working Days',
+      score: '92/100',
+      rating: '4.7',
+      certifications: ['ISO 9001', 'EPA SmartWay Certified'],
+      featured: false
+    },
+    {
+      id: '3',
+      vendor: 'Verde Circular Commodities',
+      tag: 'HIGHEST RECOVERY',
+      price: '$11,800.00',
+      timeline: '21 Working Days',
+      score: '95/100',
+      rating: '4.8',
+      certifications: ['GBCI True Zero Waste', 'B-Corp Certified'],
+      featured: false
+    }
+  ]);
   const [sortBy, setSortBy] = useState('match');
 
-  useEffect(() => {
-    const fetchQuotes = async () => {
-      try {
-        const res = await authFetch('/marketplace/rfp');
-        if (res.ok) {
-          const data = await res.json();
-          setRfps(data);
-        }
-      } catch (err) {
-        console.error("Error fetching RFPs/Quotes:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchQuotes();
-  }, [authFetch]);
-
   const handleAcceptQuote = async (quote) => {
-    try {
-      const res = await authFetch('/payments/create-checkout-session', {
-        method: 'POST',
-        body: JSON.stringify({
-          listingId: quote.id,
-          amount: parseFloat(quote.price.replace('$', ''))
-        })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        alert(`Redirecting to checkout: ${data.url}`);
-        // window.location.href = data.url;
-      }
-    } catch (err) {
-      console.error("Failed to accept quote:", err);
-    }
+    alert(`Accepted quote from ${quote.vendor}! Proceeding to escrow agreement.`);
   };
 
-  // Transform RFPs into quotes for display (mock mapping)
-  const quotes = rfps.flatMap(rfp => 
-    rfp.quotes.map(q => ({
-      vendor: `Vendor ID: ${q.vendorId.substring(0, 6)}`,
-      rating: 4.5, // Mock
-      price: `$${q.amount}`,
-      timeline: '14 days', // Mock
-      capacity: '500 tons/month', // Mock
-      certifications: ['ISO 14001', 'LEED'], // Mock
-      match: 85 + Math.floor(Math.random() * 10), // Mock
-      featured: true,
-      rfpTitle: rfp.title,
-      id: q.id
-    }))
-  );
-
   return (
-    <div className="flex flex-col gap-md">
+    <div className="w-full max-w-[1440px] mx-auto space-y-6 font-['Hanken_Grotesk',sans-serif]">
       {/* Header */}
-      <div className="flex justify-between items-end mb-md">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2 border-b border-[#bec9be]/30">
         <div>
-          <h1 className="font-display text-display text-primary">Compare Vendor Quotes</h1>
-          <p className="font-body-lg text-body-lg text-secondary">Side-by-side comparison of submitted vendor proposals for your campus waste management needs.</p>
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#556158] mb-1">
+            <Link to="/marketplace" className="hover:text-[#00522d]">MARKETPLACE</Link>
+            <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+            <span className="text-[#00522d] font-bold">COMPARE QUOTES</span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#00522d] tracking-tight">Compare Vendor Proposals</h1>
+          <p className="text-sm text-[#556158] mt-1">Project: Campus Hub Composting & Closed-Loop Retrofit</p>
         </div>
-        <div className="flex gap-sm">
-          <select className="bg-white border border-outline-variant/30 rounded-xl px-4 py-2 font-label-md text-body-md" value={sortBy} onChange={e => setSortBy(e.target.value)}>
-            <option value="match">Sort by Match %</option>
-            <option value="price">Sort by Price</option>
-            <option value="rating">Sort by Rating</option>
+        <div className="flex items-center gap-3">
+          <select 
+            className="bg-white border border-[#bec9be]/40 rounded-full px-4 py-2 text-xs font-bold text-[#0d1e25] outline-none shadow-sm"
+            value={sortBy} 
+            onChange={e => setSortBy(e.target.value)}
+          >
+            <option value="match">Sort by Eco-Score</option>
+            <option value="price">Sort by Lowest Price</option>
+            <option value="timeline">Sort by Speed</option>
           </select>
         </div>
       </div>
 
-      {loading ? (
-        <div className="text-center py-10 text-on-surface-variant">Loading vendor quotes...</div>
-      ) : quotes.length === 0 ? (
-        <div className="text-center py-10 text-on-surface-variant">No quotes available at the moment.</div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
-          {quotes.map((q, i) => (
-            <div key={i} className={`bg-white rounded-[24px] border ${q.featured ? 'border-primary ring-2 ring-primary/20' : 'border-outline-variant/30'} p-md flex flex-col relative overflow-hidden hover:shadow-md transition-shadow`}>
-              {q.featured && (
-                <div className="absolute top-4 right-4">
-                  <span className="bg-primary text-on-primary text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider">Best Match</span>
+      {/* Comparison Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {quotes.map((q) => (
+          <div 
+            key={q.id} 
+            className={`bg-white rounded-[28px] p-6 sm:p-8 border flex flex-col justify-between space-y-6 shadow-sm hover:shadow-md transition-all ${
+              q.featured ? 'border-2 border-[#00522d] ring-4 ring-[#00522d]/10' : 'border-[#bec9be]/30'
+            }`}
+          >
+            <div>
+              <div className="flex justify-between items-start mb-4">
+                <span className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full ${
+                  q.featured ? 'bg-[#00522d] text-white' : 'bg-[#dff1fb] text-[#00522d]'
+                }`}>
+                  {q.tag}
+                </span>
+                <div className="flex items-center gap-1 text-xs font-bold text-[#00522d]">
+                  <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                  <span>{q.rating}</span>
                 </div>
-              )}
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-14 h-14 rounded-2xl bg-primary-container/20 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-primary text-3xl">business</span>
+              </div>
+
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-[#dff1fb] flex items-center justify-center text-[#00522d] shadow-sm">
+                  <span className="material-symbols-outlined text-2xl">eco</span>
                 </div>
                 <div>
-                  <h3 className="font-headline-md text-headline-md text-on-surface">{q.vendor}</h3>
-                  <div className="flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[16px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                    <span className="font-label-md text-primary font-bold">{q.rating}</span>
-                  </div>
+                  <h3 className="text-lg font-bold text-[#0d1e25] leading-snug">{q.vendor}</h3>
+                  <p className="text-[11px] text-[#556158]">Verified Tier-1 Contractor</p>
                 </div>
               </div>
 
-              <div className="space-y-4 flex-1">
-                <div className="flex justify-between items-center py-3 border-b border-outline-variant/10">
-                  <span className="font-label-md text-on-surface-variant">RFP</span>
-                  <span className="font-headline-sm text-on-surface font-bold truncate max-w-[150px]">{q.rfpTitle}</span>
+              <div className="space-y-3 divide-y divide-[#bec9be]/20 text-xs">
+                <div className="flex justify-between items-center pt-2">
+                  <span className="text-[#556158]">Total Proposal</span>
+                  <span className="text-lg font-bold text-[#00522d]">{q.price}</span>
                 </div>
-                <div className="flex justify-between items-center py-3 border-b border-outline-variant/10">
-                  <span className="font-label-md text-on-surface-variant">Quote Price</span>
-                  <span className="font-headline-md text-headline-md text-primary font-bold">{q.price}</span>
+                <div className="flex justify-between items-center pt-2">
+                  <span className="text-[#556158]">Turnaround</span>
+                  <span className="font-bold text-[#0d1e25]">{q.timeline}</span>
                 </div>
-                <div className="flex justify-between items-center py-3 border-b border-outline-variant/10">
-                  <span className="font-label-md text-on-surface-variant">Delivery Timeline</span>
-                  <span className="font-label-md font-bold">{q.timeline}</span>
-                </div>
-                <div className="flex justify-between items-center py-3 border-b border-outline-variant/10">
-                  <span className="font-label-md text-on-surface-variant">Processing Capacity</span>
-                  <span className="font-label-md font-bold">{q.capacity}</span>
-                </div>
-                <div className="py-3 border-b border-outline-variant/10">
-                  <span className="font-label-md text-on-surface-variant block mb-2">Certifications</span>
-                  <div className="flex flex-wrap gap-2">
-                    {q.certifications.map((cert, ci) => (
-                      <span key={ci} className="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-[11px] font-bold">{cert}</span>
-                    ))}
-                  </div>
-                </div>
-                <div className="py-3">
-                  <span className="font-label-md text-on-surface-variant block mb-2">Match Score</span>
-                  <div className="w-full bg-surface-container rounded-full h-2">
-                    <div className="bg-primary h-2 rounded-full" style={{ width: `${q.match}%` }}></div>
-                  </div>
+                <div className="flex justify-between items-center pt-2">
+                  <span className="text-[#556158]">Eco-Score</span>
+                  <span className="font-bold text-[#00522d]">{q.score}</span>
                 </div>
               </div>
 
-              <div className="mt-6 flex flex-col gap-2">
-                <button 
-                  onClick={() => handleAcceptQuote(q)}
-                  className="w-full py-3 bg-primary text-white rounded-full font-bold shadow-md hover:bg-primary/90 transition-colors"
-                >
-                  Accept Quote & Draft Contract
-                </button>
-                <button className="w-full py-3 bg-white border border-outline-variant/30 text-on-surface rounded-full font-bold hover:bg-surface-container-lowest transition-colors">
-                  Negotiate Terms
-                </button>
+              <div className="mt-5 space-y-1.5">
+                <p className="text-[10px] font-bold uppercase text-[#556158]">Verified Accreditations</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {q.certifications.map((cert, idx) => (
+                    <span key={idx} className="px-2 py-0.5 rounded-md bg-[#f4faff] border border-[#bec9be]/30 text-[10px] font-semibold text-[#0d1e25]">
+                      {cert}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+
+            <div className="pt-4 border-t border-[#bec9be]/20">
+              <button
+                type="button"
+                onClick={() => handleAcceptQuote(q)}
+                className="w-full py-3 bg-[#00522d] hover:bg-[#003d21] text-white rounded-full text-xs font-bold shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                <span>Select & Award Proposal</span>
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

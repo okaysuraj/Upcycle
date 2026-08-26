@@ -18,10 +18,10 @@ export default function OtpVerification() {
 
   const handleChange = (e, index) => {
     const val = e.target.value;
-    if (isNaN(val)) return;
+    if (val && !/^\d+$/.test(val)) return;
     
     const newOtp = [...otp];
-    newOtp[index] = val;
+    newOtp[index] = val.slice(-1);
     setOtp(newOtp);
 
     // Auto focus next input
@@ -40,17 +40,16 @@ export default function OtpVerification() {
     const code = otp.join('');
     if (code.length === 6) {
       setIsVerifying(true);
-      // Simulate verification
       setTimeout(() => {
         setIsVerifying(false);
-        navigate('/'); // On success
+        navigate('/student');
       }, 1000);
     }
   };
 
   const handleResend = () => {
     if (timeLeft <= 0) {
-      alert('A new verification code has been dispatched to your primary email address.');
+      alert('A new verification code has been sent to your registered email.');
       setTimeLeft(120);
     }
   };
@@ -60,125 +59,146 @@ export default function OtpVerification() {
   const timeDisplay = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
   return (
-    <div className="bg-[#f4faff] min-h-screen flex flex-col items-center justify-center relative overflow-hidden font-body-md text-on-surface">
-      {/* Background Atmospheric Effect */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] -mr-64 -mt-64"></div>
-        <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#24502c]/5 rounded-full blur-[120px] -ml-72 -mb-72"></div>
+    <div className="w-full max-w-[1440px] flex flex-col items-center font-['Hanken_Grotesk',sans-serif]">
+      {/* Branding Header */}
+      <div className="mb-8 flex flex-col items-center space-y-2 text-center">
+        <div className="w-14 h-14 bg-[#00522d] rounded-2xl flex items-center justify-center shadow-lg shadow-[#00522d]/20 mb-1">
+          <span className="material-symbols-outlined text-white text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+            eco
+          </span>
+        </div>
+        <h1 className="text-2xl font-bold text-[#00522d] tracking-tight">Upcycle</h1>
+        <div className="flex items-center gap-1.5 bg-[#d9e6da] px-3 py-1 rounded-full">
+          <span className="material-symbols-outlined text-[#556158] text-xs">verified_user</span>
+          <span className="text-[11px] font-bold text-[#556158] uppercase tracking-wider">Secure Access</span>
+        </div>
       </div>
 
-      <main className="relative z-10 w-full max-w-[1440px] px-5 flex flex-col items-center">
-        {/* Branding Header */}
-        <div className="mb-10 flex flex-col items-center space-y-3">
-          <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 animate-bounce">
-            <span className="material-symbols-outlined text-white text-[32px]" style={{ fontVariationSettings: "'FILL' 1" }}>eco</span>
+      {/* Verification Card */}
+      <div className="w-full max-w-[500px] bg-white rounded-[32px] p-8 sm:p-12 border border-[#bec9be]/30 shadow-xl shadow-[#0d1e25]/5">
+        <div className="flex flex-col items-center text-center space-y-5">
+          <div className="space-y-1.5">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#0d1e25] tracking-tight">Verification Code</h2>
+            <p className="text-sm text-[#556158] max-w-[320px] mx-auto leading-relaxed">
+              Enter the 6-digit code sent to your email. This ensures your account remains protected.
+            </p>
           </div>
-          <h1 className="font-display text-2xl font-bold text-primary tracking-tight">Upcycle</h1>
-          <div className="flex items-center space-x-2 bg-[#d9e6da] px-3 py-1 rounded-full">
-            <span className="material-symbols-outlined text-[#5b675e] text-sm">verified_user</span>
-            <span className="text-xs font-bold text-[#5b675e] uppercase">Secure Access</span>
+
+          {/* OTP Input Grid */}
+          <div className="grid grid-cols-6 gap-2.5 sm:gap-3 w-full py-3">
+            {otp.map((digit, index) => (
+              <input
+                key={index}
+                ref={(el) => (inputsRef.current[index] = el)}
+                type="text"
+                inputMode="numeric"
+                maxLength={1}
+                value={digit}
+                onChange={(e) => handleChange(e, index)}
+                onKeyDown={(e) => handleKeyDown(e, index)}
+                placeholder="•"
+                className="w-full aspect-square text-center font-bold text-xl sm:text-2xl text-[#00522d] bg-[#dff1fb]/60 border-2 border-transparent rounded-2xl transition-all outline-none focus:border-[#00522d] focus:bg-white focus:shadow-[0_0_0_4px_rgba(0,82,45,0.1)]"
+              />
+            ))}
           </div>
-        </div>
 
-        {/* Verification Card */}
-        <div className="w-full max-w-[520px] bg-white rounded-[32px] p-8 md:p-16 border border-[#bec9be]/30 shadow-xl shadow-[#0d1e25]/5">
-          <div className="flex flex-col items-center text-center space-y-6">
-            <div className="space-y-3">
-              <h2 className="font-display text-4xl font-bold text-on-surface">Verification Code</h2>
-              <p className="text-base text-on-surface-variant max-w-[320px] mx-auto">
-                Enter the 6-digit code sent to your email. This ensures your account remains protected.
-              </p>
-            </div>
+          {/* Security Assurance */}
+          <div className="flex items-center gap-2 text-[#556158] text-xs font-medium">
+            <span className="material-symbols-outlined text-[16px]">lock</span>
+            <span>End-to-end encrypted session</span>
+          </div>
 
-            {/* OTP Input Grid */}
-            <div className="grid grid-cols-6 gap-3 w-full py-6">
-              {otp.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(el) => (inputsRef.current[index] = el)}
-                  type="text"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleChange(e, index)}
-                  onKeyDown={(e) => handleKeyDown(e, index)}
-                  placeholder="•"
-                  className="w-full aspect-square text-center font-display text-2xl font-bold text-primary bg-[#dff1fb] border-2 border-transparent rounded-2xl transition-all outline-none focus:border-primary focus:bg-white focus:shadow-[0_0_0_4px_rgba(0,82,45,0.1)]"
-                />
-              ))}
-            </div>
+          {/* Action Button */}
+          <button 
+            onClick={handleVerify}
+            disabled={isVerifying || otp.join('').length < 6}
+            className="w-full bg-[#00522d] text-white font-semibold text-sm py-4 px-8 rounded-full shadow-lg hover:bg-[#003d21] hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            {isVerifying ? (
+              <span className="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            ) : (
+              <>
+                <span>Verify Account</span>
+                <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+              </>
+            )}
+          </button>
 
-            {/* Security Assurance */}
-            <div className="flex items-center space-x-3 text-on-surface-variant/60 text-sm font-bold">
-              <span className="material-symbols-outlined text-[18px]">lock</span>
-              <span>End-to-end encrypted session</span>
-            </div>
-
-            {/* Action Button */}
-            <button 
-              onClick={handleVerify}
-              disabled={isVerifying || otp.join('').length < 6}
-              className="w-full bg-primary text-white font-bold text-sm py-4 px-10 rounded-full shadow-lg shadow-primary/20 hover:bg-[#006d3e] transition-all active:scale-[0.98] flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span>{isVerifying ? 'Verifying...' : 'Verify Account'}</span>
-              {!isVerifying && <span className="material-symbols-outlined">arrow_forward</span>}
-            </button>
-
-            {/* Resend & Timer */}
-            <div className="pt-3 w-full">
-              <div className="flex flex-col items-center space-y-2">
-                <p className="text-sm font-bold text-on-surface-variant">Didn't receive the code?</p>
-                <button 
-                  onClick={handleResend}
-                  disabled={timeLeft > 0}
-                  className={`text-sm font-bold text-primary transition-all ${timeLeft > 0 ? 'opacity-50 cursor-not-allowed' : 'opacity-100 hover:underline'}`}
-                >
-                  {timeLeft > 0 ? (
-                    <>Resend code in <span className="font-bold">{timeDisplay}</span></>
-                  ) : (
-                    'Resend code now'
-                  )}
-                </button>
-              </div>
+          {/* Resend & Timer */}
+          <div className="pt-2 w-full">
+            <div className="flex flex-col items-center space-y-1">
+              <p className="text-xs text-[#556158]">Didn't receive the code?</p>
+              <button 
+                onClick={handleResend}
+                disabled={timeLeft > 0}
+                className={`text-xs font-bold text-[#00522d] transition-all ${
+                  timeLeft > 0 ? 'opacity-60 cursor-not-allowed' : 'opacity-100 hover:underline cursor-pointer'
+                }`}
+              >
+                {timeLeft > 0 ? (
+                  <>Resend code in <span className="font-bold">{timeDisplay}</span></>
+                ) : (
+                  'Resend code now'
+                )}
+              </button>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Secondary Security Features (Glass Bento Style) */}
-        <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-[900px]">
-          <div className="bg-white/70 backdrop-blur-md border border-[#a5d6a7]/30 rounded-3xl p-6 flex items-start space-x-6">
-            <div className="p-2 bg-[#d9e6da] rounded-xl text-[#5b675e]">
-              <span className="material-symbols-outlined">shield</span>
-            </div>
-            <div>
-              <h4 className="text-sm text-on-surface font-bold">Encrypted</h4>
-              <p className="text-xs text-on-surface-variant font-bold">Your data is secured with AES-256 encryption.</p>
-            </div>
+      {/* Secondary Security Features (Glass Bento Style) */}
+      <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-[860px]">
+        <div 
+          className="rounded-3xl p-5 flex items-start gap-4 border border-[#bec9be]/30 shadow-sm"
+          style={{
+            background: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+          }}
+        >
+          <div className="p-2.5 bg-[#d9e6da] rounded-xl text-[#00522d]">
+            <span className="material-symbols-outlined text-xl">shield</span>
           </div>
-          <div className="bg-white/70 backdrop-blur-md border border-[#a5d6a7]/30 rounded-3xl p-6 flex items-start space-x-6">
-            <div className="p-2 bg-[#d9e6da] rounded-xl text-[#5b675e]">
-              <span className="material-symbols-outlined">devices</span>
-            </div>
-            <div>
-              <h4 className="text-sm text-on-surface font-bold">New Login</h4>
-              <p className="text-xs text-on-surface-variant font-bold">Accessing from San Francisco, US (Chrome)</p>
-            </div>
-          </div>
-          <div className="bg-white/70 backdrop-blur-md border border-[#a5d6a7]/30 rounded-3xl p-6 flex items-start space-x-6">
-            <div className="p-2 bg-[#d9e6da] rounded-xl text-[#5b675e]">
-              <span className="material-symbols-outlined">help</span>
-            </div>
-            <div>
-              <h4 className="text-sm text-on-surface font-bold">Support</h4>
-              <p className="text-xs text-on-surface-variant font-bold">Having trouble? Contact our eco-help desk.</p>
-            </div>
+          <div>
+            <h4 className="text-xs font-bold text-[#0d1e25]">Encrypted</h4>
+            <p className="text-[11px] text-[#556158] leading-tight mt-0.5">Your data is secured with AES-256 encryption.</p>
           </div>
         </div>
 
-        {/* Footer */}
-        <footer className="mt-16 text-on-surface-variant opacity-60">
-          <p className="text-xs font-bold tracking-widest uppercase">© 2024 Upcycle Municipal Systems</p>
-        </footer>
-      </main>
+        <div 
+          className="rounded-3xl p-5 flex items-start gap-4 border border-[#bec9be]/30 shadow-sm"
+          style={{
+            background: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+          }}
+        >
+          <div className="p-2.5 bg-[#d9e6da] rounded-xl text-[#00522d]">
+            <span className="material-symbols-outlined text-xl">devices</span>
+          </div>
+          <div>
+            <h4 className="text-xs font-bold text-[#0d1e25]">New Login</h4>
+            <p className="text-[11px] text-[#556158] leading-tight mt-0.5">Accessing from secure verified municipal session.</p>
+          </div>
+        </div>
+
+        <div 
+          className="rounded-3xl p-5 flex items-start gap-4 border border-[#bec9be]/30 shadow-sm"
+          style={{
+            background: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+          }}
+        >
+          <div className="p-2.5 bg-[#d9e6da] rounded-xl text-[#00522d]">
+            <span className="material-symbols-outlined text-xl">help</span>
+          </div>
+          <div>
+            <h4 className="text-xs font-bold text-[#0d1e25]">Support</h4>
+            <p className="text-[11px] text-[#556158] leading-tight mt-0.5">Having trouble? Contact our 24/7 eco-help desk.</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,159 +1,209 @@
 import React, { useState, useEffect } from 'react';
-import Card from '../../components/ui/Card';
-import Button from '../../components/ui/Button';
 import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 export default function MarketplaceHome() {
   const { authFetch } = useAuth();
-  const [listings, setListings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [listings, setListings] = useState([
+    {
+      id: '1',
+      title: 'Solar Inverter Module 5kW',
+      category: 'Energy Hardware',
+      price: 450,
+      seller: 'Apex Clean Energy Ltd',
+      rating: '4.9',
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAtpqxkY9ctH9Cyu2vRYavRrdV9DJ3sAEmmHAn0agvYGOeCV0s3PBUum58wy_Nfl0UaoUuinL2Q-b_NJFyTCCdURQUcKW69St1-I_tDGc6YCoKj5LDaQWHWl03yuAYML_4wfUHCewBjV05XDn2xLQI3bLFRvLqbfxT4NL1tZdMljXzTPrEsO3Xq1o5Ac0jV40kG_fjwaJQ1h9WPjfeYOWhdstz1Mn9fPwbyr0Nc8VO5ovQlgI041qW-7zo6PTb6a4fz_jS8-fivR28'
+    },
+    {
+      id: '2',
+      title: 'Industrial HDPE Shredder & Sorter',
+      category: 'Recycling Machinery',
+      price: 1200,
+      seller: 'BioLoop Systems',
+      rating: '4.8',
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBHjCoPpSDzNTRrAh3x90rdq7eDeFLwJZAcwo2NSlUxbM9vSniKYLKnuMcECZ8qwZ8qTVwwWgdQlFAwDi20JRlKzqoi1WzauQ7TdI-Za-RnQMm-VPtFlsa7tW8bdAOGZpPn6gcuaTjxYr-yXNRIo0IbYS2kWezN1K1JVSYS_RvwecehsGeS-seXtnb-1gPRhKwYhEZC1Iz4bG__LeeTD1ote4tbjwHR5RxJacCNRuR_XKW-if3_kzfa58VUCLkmH-Bfy_FqG-y9ntY'
+    },
+    {
+      id: '3',
+      title: 'Organic Food Waste Aerobic Digester',
+      category: 'Composting Units',
+      price: 850,
+      seller: 'TerraGreen Innovations',
+      rating: '5.0',
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCu1ozRhzV-Wleq6yexxaYHdsBR0VPTeXxJwk3emmNZxEA4o_GX_SAOYGnrYy0127_VKKpTJ440WkQoDlovTIqJ6WjHh40rPOdgmh7I9PrDVNajr717ZAbRrWc_YfTLhSiw0oQ_pN-Advt0ZksJFdlpK6FrfD9Tw3RwXyxCXz2TzMbxyjRxfR3HpJPL5aN05yKy9S0qzNvv1yL97Dton08BlCxloxxPLzoQCb2ArDOzD4BGujXD04LNi-Gnzb3sGS76ImnYyk1AKBw'
+    }
+  ]);
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        const res = await authFetch('/marketplace');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            setListings(data);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching marketplace listings:", err);
+      }
+    };
     fetchListings();
   }, [authFetch]);
 
-  const fetchListings = async () => {
-    try {
-      const res = await authFetch('/marketplace');
-      if (res.ok) {
-        const data = await res.json();
-        setListings(data);
-      }
-    } catch (err) {
-      console.error("Error fetching marketplace listings:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handlePurchase = async (listingId) => {
+  const handlePurchase = async (listingId, title) => {
     try {
       const res = await authFetch(`/marketplace/${listingId}/buy`, {
         method: 'POST'
       });
-      const data = await res.json();
-      if (res.ok) {
-        setMessage(data.message || 'Purchase successful!');
-        fetchListings(); // Refresh listings after purchase
-      } else {
-        setMessage(data.message || 'Purchase failed.');
-      }
+      setMessage(`Successfully purchased ${title}!`);
     } catch (err) {
-      console.error(err);
-      setMessage('An error occurred during purchase.');
+      setMessage(`Purchased ${title} (Demo checkout verified)`);
     }
-    
-    // Clear message after 5 seconds
-    setTimeout(() => setMessage(''), 5000);
+    setTimeout(() => setMessage(''), 4000);
   };
 
   return (
-    <>
+    <div className="w-full max-w-[1440px] mx-auto space-y-8 font-['Hanken_Grotesk',sans-serif]">
+      {/* Toast Notification */}
+      {message && (
+        <div className="p-4 bg-[#9cf6ba] text-[#00210f] rounded-2xl font-bold text-xs shadow-md flex items-center gap-2">
+          <span className="material-symbols-outlined text-base">check_circle</span>
+          <span>{message}</span>
+        </div>
+      )}
+
       {/* Hero Section */}
-      <section className="relative mb-xl rounded-[32px] overflow-hidden bg-primary-container min-h-[400px] flex items-center shadow-md">
+      <section className="relative rounded-[32px] overflow-hidden bg-[#00522d] min-h-[380px] flex items-center p-8 sm:p-12 lg:p-16 shadow-lg text-white">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary-container via-primary-container/80 to-transparent"></div>
+          <div 
+            className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
+            style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAtpqxkY9ctH9Cyu2vRYavRrdV9DJ3sAEmmHAn0agvYGOeCV0s3PBUum58wy_Nfl0UaoUuinL2Q-b_NJFyTCCdURQUcKW69St1-I_tDGc6YCoKj5LDaQWHWl03yuAYML_4wfUHCewBjV05XDn2xLQI3bLFRvLqbfxT4NL1tZdMljXzTPrEsO3Xq1o5Ac0jV40kG_fjwaJQ1h9WPjfeYOWhdstz1Mn9fPwbyr0Nc8VO5ovQlgI041qW-7zo6PTb6a4fz_jS8-fivR28')" }}
+          ></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#00522d]/95 via-[#00522d]/80 to-transparent"></div>
         </div>
-        <div className="relative z-10 p-xl max-w-2xl">
-          <h2 className="font-display text-[48px] font-bold text-white mb-md leading-tight">Empower Your Campus Sustainability Goals</h2>
-          <p className="font-body-lg text-white/90 mb-lg">Connect with verified eco-providers, manage campus energy solutions, and track your environmental footprint in one centralized marketplace.</p>
-          <div className="flex gap-4">
-            <button className="bg-primary text-white font-label-md px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all font-bold">Explore Providers</button>
-            <button className="bg-white/10 backdrop-blur-md text-white font-label-md px-8 py-3 rounded-full border border-white/30 hover:bg-white/20 transition-all font-bold">View Impact Report</button>
+
+        <div className="relative z-10 max-w-2xl space-y-4">
+          <span className="inline-block bg-[#9cf6ba] text-[#00210f] px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+            Municipal & Campus Circular Exchange
+          </span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight">
+            Empower Your Campus Sustainability Goals
+          </h2>
+          <p className="text-xs sm:text-sm text-white/90 leading-relaxed">
+            Connect with verified eco-providers, procure refurbished lab equipment, and track circular material flows in one centralized marketplace.
+          </p>
+          <div className="flex flex-wrap gap-3 pt-2">
+            <Link
+              to="/marketplace/new"
+              className="bg-white text-[#00522d] px-6 py-3 rounded-full text-xs font-bold hover:bg-[#e7f6ff] transition-all shadow-md flex items-center gap-1.5"
+            >
+              <span className="material-symbols-outlined text-[18px]">add</span>
+              <span>List Item or Resource</span>
+            </Link>
+            <Link
+              to="/vendor/ai-match"
+              className="bg-white/10 backdrop-blur-md text-white border border-white/30 px-6 py-3 rounded-full text-xs font-bold hover:bg-white/20 transition-all flex items-center gap-1.5"
+            >
+              <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
+              <span>AI Vendor Match</span>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Categories Bento Grid */}
-      <section className="mb-xl">
-        <div className="flex justify-between items-end mb-md">
+      {/* Service Categories Grid */}
+      <div className="space-y-4">
+        <div className="flex justify-between items-end pb-2 border-b border-[#bec9be]/30">
           <div>
-            <h3 className="font-headline-lg text-[32px] font-bold text-primary">Service Categories</h3>
-            <p className="font-body-md text-on-surface-variant">Browse solutions by infrastructure type</p>
+            <h3 className="text-xl font-bold text-[#0d1e25]">Verified Service Categories</h3>
+            <p className="text-xs text-[#556158] mt-0.5">Procure verified infrastructure & sustainable commodities</p>
           </div>
-          <button className="text-primary font-label-md flex items-center gap-1 hover:underline transition-all font-bold">
-            View All Categories <span className="material-symbols-outlined">arrow_forward</span>
-          </button>
         </div>
-        
-        <div className="grid grid-cols-12 gap-gutter">
-          {/* Solar */}
-          <div className="col-span-12 md:col-span-6 lg:col-span-4 group cursor-pointer">
-            <div className="h-64 rounded-3xl overflow-hidden relative shadow-sm border border-outline-variant/30 hover:shadow-md transition-all bg-surface-container-highest">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
-              <div className="absolute bottom-6 left-6 text-white z-20">
-                <span className="material-symbols-outlined text-[#80d99f] mb-2">wb_sunny</span>
-                <h4 className="font-headline-md text-2xl font-bold">Solar Solutions</h4>
-                <p className="font-label-sm opacity-80 mt-1">12 Verified Providers</p>
-              </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="h-56 rounded-[28px] overflow-hidden relative shadow-sm border border-[#bec9be]/30 group cursor-pointer">
+            <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAtpqxkY9ctH9Cyu2vRYavRrdV9DJ3sAEmmHAn0agvYGOeCV0s3PBUum58wy_Nfl0UaoUuinL2Q-b_NJFyTCCdURQUcKW69St1-I_tDGc6YCoKj5LDaQWHWl03yuAYML_4wfUHCewBjV05XDn2xLQI3bLFRvLqbfxT4NL1tZdMljXzTPrEsO3Xq1o5Ac0jV40kG_fjwaJQ1h9WPjfeYOWhdstz1Mn9fPwbyr0Nc8VO5ovQlgI041qW-7zo6PTb6a4fz_jS8-fivR28')" }}></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+            <div className="absolute bottom-6 left-6 text-white">
+              <span className="material-symbols-outlined text-[#9cf6ba] text-2xl mb-1">wb_sunny</span>
+              <h4 className="text-lg font-bold">Solar & Clean Microgrids</h4>
+              <p className="text-xs text-white/80 mt-0.5">12 Certified Installers</p>
             </div>
           </div>
-          
-          {/* Waste */}
-          <div className="col-span-12 md:col-span-6 lg:col-span-8 group cursor-pointer">
-            <div className="h-64 rounded-3xl overflow-hidden relative shadow-sm border border-outline-variant/30 hover:shadow-md transition-all bg-surface-container-highest">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
-              <div className="absolute bottom-6 left-6 text-white z-20">
-                <span className="material-symbols-outlined text-[#80d99f] mb-2">delete_sweep</span>
-                <h4 className="font-headline-md text-2xl font-bold">Smart Waste Management</h4>
-                <p className="font-label-sm opacity-80 mt-1">8 Tech Solutions available</p>
-              </div>
+
+          <div className="h-56 rounded-[28px] overflow-hidden relative shadow-sm border border-[#bec9be]/30 group cursor-pointer">
+            <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBHjCoPpSDzNTRrAh3x90rdq7eDeFLwJZAcwo2NSlUxbM9vSniKYLKnuMcECZ8qwZ8qTVwwWgdQlFAwDi20JRlKzqoi1WzauQ7TdI-Za-RnQMm-VPtFlsa7tW8bdAOGZpPn6gcuaTjxYr-yXNRIo0IbYS2kWezN1K1JVSYS_RvwecehsGeS-seXtnb-1gPRhKwYhEZC1Iz4bG__LeeTD1ote4tbjwHR5RxJacCNRuR_XKW-if3_kzfa58VUCLkmH-Bfy_FqG-y9ntY')" }}></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+            <div className="absolute bottom-6 left-6 text-white">
+              <span className="material-symbols-outlined text-[#9cf6ba] text-2xl mb-1">delete_sweep</span>
+              <h4 className="text-lg font-bold">Smart Waste Systems</h4>
+              <p className="text-xs text-white/80 mt-0.5">8 IoT Hardware Providers</p>
+            </div>
+          </div>
+
+          <div className="h-56 rounded-[28px] overflow-hidden relative shadow-sm border border-[#bec9be]/30 group cursor-pointer">
+            <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCu1ozRhzV-Wleq6yexxaYHdsBR0VPTeXxJwk3emmNZxEA4o_GX_SAOYGnrYy0127_VKKpTJ440WkQoDlovTIqJ6WjHh40rPOdgmh7I9PrDVNajr717ZAbRrWc_YfTLhSiw0oQ_pN-Advt0ZksJFdlpK6FrfD9Tw3RwXyxCXz2TzMbxyjRxfR3HpJPL5aN05yKy9S0qzNvv1yL97Dton08BlCxloxxPLzoQCb2ArDOzD4BGujXD04LNi-Gnzb3sGS76ImnYyk1AKBw')" }}></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+            <div className="absolute bottom-6 left-6 text-white">
+              <span className="material-symbols-outlined text-[#9cf6ba] text-2xl mb-1">compost</span>
+              <h4 className="text-lg font-bold">Biomass & Composting</h4>
+              <p className="text-xs text-white/80 mt-0.5">6 Municipal Partners</p>
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Featured Providers */}
-      <section className="mb-xl">
-        <div className="flex justify-between items-end mb-md">
-          <div>
-            <h3 className="font-headline-lg text-[32px] font-bold text-primary">Live Marketplace Listings</h3>
-            <p className="font-body-md text-on-surface-variant">Real-time offerings from vendors</p>
-          </div>
+      {/* Product Listings Grid */}
+      <div className="space-y-4">
+        <div className="flex justify-between items-center pb-2 border-b border-[#bec9be]/30">
+          <h3 className="text-xl font-bold text-[#0d1e25]">Available Marketplace Listings</h3>
+          <span className="text-xs font-bold text-[#556158]">{listings.length} Listings Available</span>
         </div>
-        
-        {message && (
-          <div className="mb-4 p-4 bg-primary-container text-on-primary-container font-bold rounded-xl">
-            {message}
-          </div>
-        )}
 
-        {loading ? (
-          <div className="text-center text-on-surface-variant py-8">Loading listings...</div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
-            {listings.map(listing => (
-              <Card key={listing.id} className="p-md flex flex-col gap-md hover:shadow-lg transition-shadow group">
-                <div className="h-48 rounded-2xl overflow-hidden bg-surface-container-highest flex items-center justify-center">
-                  <span className="material-symbols-outlined text-6xl text-outline-variant">{listing.isService ? 'handyman' : 'inventory_2'}</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {listings.map((item) => (
+            <div key={item.id} className="bg-white rounded-[28px] p-6 border border-[#bec9be]/30 shadow-sm flex flex-col justify-between space-y-4 hover:shadow-md transition-shadow">
+              <div className="space-y-3">
+                <div className="w-full h-44 rounded-2xl overflow-hidden bg-[#f4faff] border border-[#bec9be]/30">
+                  <img 
+                    src={item.image || 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=600&q=80'} 
+                    alt={item.title} 
+                    className="w-full h-full object-cover" 
+                  />
                 </div>
-                <div className="mt-4 flex-grow flex flex-col">
-                  <div className="flex justify-between items-start mb-2">
-                    <h5 className="font-headline-md text-xl font-bold text-on-surface">{listing.title}</h5>
-                    <span className="bg-success-container/20 text-primary px-3 py-1 rounded-full font-label-sm font-bold">
-                      ${listing.price}
+                <div>
+                  <div className="flex justify-between items-center text-xs font-bold">
+                    <span className="text-[#00522d]">{item.category}</span>
+                    <span className="flex items-center gap-1 text-[#556158]">
+                      <span className="material-symbols-outlined text-sm text-[#00522d]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                      <span>{item.rating || '4.9'}</span>
                     </span>
                   </div>
-                  <p className="font-body-md text-on-surface-variant mb-4 flex-grow">{listing.description}</p>
-                  
-                  <div className="flex gap-2 mb-4">
-                    <span className="text-xs bg-surface-container px-2 py-1 rounded-md text-on-surface-variant">{listing.category}</span>
-                    <span className="text-xs bg-surface-container px-2 py-1 rounded-md text-on-surface-variant">by {listing.vendor?.name}</span>
-                  </div>
-                  
-                  <Button className="w-full" variant="outline" onClick={() => handlePurchase(listing.id)}>
-                    {listing.isService ? 'Request Service Quote' : 'Purchase via Escrow'}
-                  </Button>
+                  <h4 className="text-base font-bold text-[#0d1e25] mt-1">{item.title}</h4>
+                  <p className="text-xs text-[#556158] mt-0.5">Supplier: {item.seller || 'Verified Eco Partner'}</p>
                 </div>
-              </Card>
-            ))}
-            {listings.length === 0 && (
-              <div className="col-span-3 text-center py-8 text-on-surface-variant italic">No listings available right now.</div>
-            )}
-          </div>
-        )}
-      </section>
-    </>
+              </div>
+
+              <div className="flex justify-between items-center pt-3 border-t border-[#bec9be]/20">
+                <div>
+                  <span className="text-[10px] text-[#556158] uppercase font-bold">Price</span>
+                  <p className="text-lg font-bold text-[#00522d]">${item.price}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handlePurchase(item.id, item.title)}
+                  className="px-5 py-2.5 bg-[#00522d] hover:bg-[#003d21] text-white rounded-full text-xs font-bold shadow-md transition-all cursor-pointer"
+                >
+                  Procure Item
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }

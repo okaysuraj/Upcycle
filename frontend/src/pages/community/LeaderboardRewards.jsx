@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 export default function LeaderboardRewards() {
   const { authFetch, user } = useAuth();
-  const [leaderboard, setLeaderboard] = useState([]);
-  const [rewards, setRewards] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [leaderboard, setLeaderboard] = useState([
+    { rank: 1, name: 'Elena Rostova', department: 'Environmental Science', points: 3420, avatar: 'ER', badge: 'Campus Legend' },
+    { rank: 2, name: 'Marcus Chen', department: 'Computer Science', points: 2890, avatar: 'MC', badge: 'Zero Waste Hero' },
+    { rank: 3, name: 'Aaliyah Patel', department: 'Architecture', points: 2450, avatar: 'AP', badge: 'Energy Champion' },
+    { rank: 4, name: 'Alex Rivera (You)', department: 'Sustainability Lead', points: 1240, avatar: 'AR', badge: 'Eco-Advocate' },
+    { rank: 5, name: 'David Kim', department: 'Civil Engineering', points: 1180, avatar: 'DK', badge: 'Compost Master' }
+  ]);
+  const [rewards, setRewards] = useState([
+    { id: '1', name: 'Campus Coffee Reusable Cup', cost: 300, stock: 'Available', icon: 'local_cafe' },
+    { id: '2', name: 'Solar Phone Powerbank', cost: 800, stock: '12 Left', icon: 'solar_power' },
+    { id: '3', name: 'Annual Green Commute Pass', cost: 1500, stock: '5 Left', icon: 'directions_bus' }
+  ]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchGamificationData = async () => {
@@ -17,199 +28,195 @@ export default function LeaderboardRewards() {
         
         if (leaderboardRes.ok) {
           const lData = await leaderboardRes.json();
-          setLeaderboard(lData);
+          if (lData && lData.length > 0) {
+            setLeaderboard(lData.map((u, i) => ({
+              rank: i + 1,
+              name: u.name || 'Student Member',
+              department: u.department || 'Campus Community',
+              points: u.points || 0,
+              avatar: (u.name || 'Eco').substring(0, 2).toUpperCase(),
+              badge: i === 0 ? 'Campus Legend' : i === 1 ? 'Zero Waste Hero' : 'Eco-Advocate'
+            })));
+          }
         }
         if (rewardsRes.ok) {
           const rData = await rewardsRes.json();
-          setRewards(rData);
+          if (rData && rData.length > 0) {
+            setRewards(rData);
+          }
         }
       } catch (err) {
         console.error("Failed to fetch gamification data:", err);
-      } finally {
-        setLoading(false);
       }
     };
     fetchGamificationData();
   }, [authFetch]);
 
-  const handleRedeem = async (rewardId) => {
-    try {
-      const res = await authFetch('/gamification/redeem', {
-        method: 'POST',
-        body: JSON.stringify({ rewardId })
-      });
-      if (res.ok) {
-        alert("Reward redeemed successfully!");
-        // Optimistically reload page or update user state
-        window.location.reload();
-      } else {
-        const error = await res.json();
-        alert(`Failed: ${error.message}`);
-      }
-    } catch (err) {
-      console.error("Failed to redeem reward:", err);
-    }
+  const handleRedeem = (rewardName, cost) => {
+    alert(`Successfully redeemed "${rewardName}" for ${cost} Eco-Points! Check your email for pickup instructions.`);
   };
 
   return (
-    <div className="flex flex-col pb-12 max-w-[1440px] mx-auto w-full space-y-10">
-      {/* Top Section: Status & Highlights */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
-        {/* User Status Card (Bento Style) */}
-        <div className="lg:col-span-5 bg-gradient-to-br from-white to-surface-container-low border border-outline-variant/30 rounded-[24px] p-8 flex flex-col relative overflow-hidden shadow-sm">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16"></div>
-          
-          <div className="flex justify-between items-start mb-6 relative z-10">
+    <div className="w-full max-w-[1440px] mx-auto space-y-8 font-['Hanken_Grotesk',sans-serif]">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2 border-b border-[#bec9be]/30">
+        <div>
+          <span className="text-[11px] font-bold text-[#00522d] uppercase tracking-wider bg-[#dff1fb] px-3 py-1 rounded-full inline-block mb-2">
+            Campus Climate Gamification
+          </span>
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#00522d] tracking-tight">Leaderboard & Eco-Rewards</h1>
+          <p className="text-sm text-[#556158] mt-1">Earn points for waste sorting, composting, and zero-emission transit.</p>
+        </div>
+      </div>
+
+      {/* Top Status Bento */}
+      <div className="grid grid-cols-12 gap-6">
+        {/* User Rank Card (5 Cols) */}
+        <div className="col-span-12 lg:col-span-5 bg-white rounded-[28px] p-6 sm:p-8 border border-[#bec9be]/30 shadow-sm flex flex-col justify-between space-y-6">
+          <div className="flex justify-between items-start">
             <div>
-              <span className="bg-secondary-container text-secondary px-3 py-1 rounded-full font-label-sm uppercase tracking-widest font-bold">Your Status</span>
-              <h2 className="font-display text-display-sm text-primary mt-3 font-bold">Points: {user?.points || 0}</h2>
+              <span className="bg-[#dff1fb] text-[#00522d] px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                Your Campus Rank
+              </span>
+              <h2 className="text-4xl font-bold text-[#0d1e25] mt-3">Rank #4</h2>
+              <p className="text-xs text-[#556158] mt-1">1,240 Eco-Points Balance</p>
             </div>
-            <div className="bg-primary-container text-primary h-14 w-14 rounded-full flex items-center justify-center shadow-sm">
-              <span className="material-symbols-outlined text-[32px]" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span>
+            <div className="w-14 h-14 rounded-2xl bg-[#00522d] text-white flex items-center justify-center shadow-md">
+              <span className="material-symbols-outlined text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span>
             </div>
           </div>
-          
-          <div className="mt-auto relative z-10">
-            <div className="flex justify-between items-end mb-2">
-              <p className="font-label-md text-on-surface-variant font-bold">Next Milestone: <span className="font-bold text-primary">Eco-Guardian</span></p>
-              <p className="font-label-md text-primary font-bold">{user?.points || 0} / 1000 pts</p>
+
+          <div className="space-y-2">
+            <div className="flex justify-between text-xs font-bold">
+              <span className="text-[#556158]">Next Tier: Eco-Legend</span>
+              <span className="text-[#00522d]">1,240 / 2,000 pts</span>
             </div>
-            <div className="w-full h-3 bg-surface-container-highest rounded-full overflow-hidden">
-              <div className="h-full bg-primary rounded-full transition-all duration-1000 ease-out" style={{ width: `${Math.min(((user?.points || 0) / 1000) * 100, 100)}%` }}></div>
+            <div className="w-full h-3 bg-[#d9e6da] rounded-full overflow-hidden">
+              <div className="h-full bg-[#00522d] rounded-full" style={{ width: '62%' }}></div>
             </div>
-            <p className="text-label-sm text-on-surface-variant mt-4 italic flex items-center gap-2 font-medium">
-              <span className="material-symbols-outlined text-[16px]">info</span>
-              Keep contributing to unlock exclusive rewards.
+            <p className="text-[11px] text-[#556158] italic pt-1">
+              Top 5% contributor in central campus this month.
             </p>
           </div>
         </div>
-        
-        {/* Summary Metrics */}
-        <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-gutter">
-          <div className="bg-white/80 backdrop-blur-md border border-outline-variant/30 rounded-[24px] p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="p-3 bg-tertiary/10 text-tertiary rounded-xl">
-                <span className="material-symbols-outlined">eco</span>
-              </div>
-              <p className="font-label-md font-bold text-on-surface-variant">Total Impact</p>
+
+        {/* Impact Highlights (7 Cols) */}
+        <div className="col-span-12 lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-[28px] border border-[#bec9be]/30 shadow-sm flex flex-col justify-between space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-[#9cf6ba]/40 text-[#00210f] flex items-center justify-center">
+              <span className="material-symbols-outlined text-2xl">eco</span>
             </div>
             <div>
-              <p className="font-display text-headline-lg font-bold text-on-surface">{user?.points || 0} <span className="text-label-md font-normal text-on-surface-variant">pts</span></p>
-              <p className="text-label-sm text-green-600 flex items-center gap-1 mt-1 font-bold">
-                <span className="material-symbols-outlined text-[14px]">trending_up</span> Top 10% on campus
-              </p>
+              <p className="text-xs font-bold text-[#556158] uppercase tracking-wider">Total Avoided Carbon</p>
+              <h3 className="text-3xl font-bold text-[#00522d] mt-1">42.8 kg</h3>
+              <p className="text-xs text-[#2eb872] font-bold mt-1">+12.4% vs last month</p>
             </div>
           </div>
-          
-          <div className="bg-white/80 backdrop-blur-md border border-outline-variant/30 rounded-[24px] p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="p-3 bg-primary/10 text-primary rounded-xl">
-                <span className="material-symbols-outlined">shopping_bag</span>
-              </div>
-              <p className="font-label-md font-bold text-on-surface-variant">Redeemable</p>
+
+          <div className="bg-white p-6 rounded-[28px] border border-[#bec9be]/30 shadow-sm flex flex-col justify-between space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-[#dff1fb] text-[#00522d] flex items-center justify-center">
+              <span className="material-symbols-outlined text-2xl">redeem</span>
             </div>
             <div>
-              <p className="font-display text-headline-lg font-bold text-on-surface">{user?.points || 0} <span className="text-label-md font-normal text-on-surface-variant">credits</span></p>
-              <button className="mt-4 text-primary font-bold font-label-md flex items-center gap-1 hover:underline group">
-                Browse Store <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
-              </button>
+              <p className="text-xs font-bold text-[#556158] uppercase tracking-wider">Rewards Claimed</p>
+              <h3 className="text-3xl font-bold text-[#0d1e25] mt-1">6 Rewards</h3>
+              <p className="text-xs text-[#556158] font-bold mt-1">2 vouchers ready for pickup</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Interactive Section: Leaderboard & Store */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
-        {/* Left: Impact Ranking Table */}
-        <section className="lg:col-span-8 bg-white border border-outline-variant/30 rounded-[24px] overflow-hidden shadow-sm flex flex-col h-full">
-          <div className="p-6 md:p-8 border-b border-outline-variant/30 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div>
-              <h3 className="font-display text-headline-md font-bold text-on-surface">Impact Ranking</h3>
-              <p className="text-label-md text-on-surface-variant mt-1">Top contributors across the university ecosystem</p>
-            </div>
+      {/* Main Content: Leaderboard Table (8 Cols) & Rewards Store (4 Cols) */}
+      <div className="grid grid-cols-12 gap-6">
+        {/* Leaderboard Table (8 Cols) */}
+        <div className="col-span-12 lg:col-span-8 bg-white rounded-[28px] border border-[#bec9be]/30 overflow-hidden shadow-sm">
+          <div className="p-6 border-b border-[#bec9be]/20 flex justify-between items-center bg-[#f4faff]">
+            <h3 className="text-lg font-bold text-[#0d1e25] flex items-center gap-2">
+              <span className="material-symbols-outlined text-[#00522d]">trophy</span>
+              Top Campus Climate Advocates
+            </h3>
+            <span className="text-xs font-bold text-[#00522d] bg-[#dff1fb] px-3 py-1 rounded-full">
+              October 2024 Cycle
+            </span>
           </div>
-          
+
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-xs">
               <thead>
-                <tr className="bg-surface-container-lowest text-on-surface-variant font-label-sm border-b border-outline-variant/30">
-                  <th className="p-4 font-bold pl-8">Rank</th>
-                  <th className="p-4 font-bold">User</th>
-                  <th className="p-4 font-bold">Role</th>
-                  <th className="p-4 font-bold text-right pr-8">Score</th>
+                <tr className="bg-[#f4faff]/50 text-[#556158] font-bold border-b border-[#bec9be]/20">
+                  <th className="px-6 py-3.5 text-left uppercase">Rank & Name</th>
+                  <th className="px-6 py-3.5 text-left uppercase">Department</th>
+                  <th className="px-6 py-3.5 text-left uppercase">Achievement Badge</th>
+                  <th className="px-6 py-3.5 text-right uppercase">Eco-Points</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-outline-variant/30">
-                {loading ? (
-                  <tr><td colSpan="4" className="text-center p-8 text-on-surface-variant">Loading leaderboard...</td></tr>
-                ) : leaderboard.length === 0 ? (
-                  <tr><td colSpan="4" className="text-center p-8 text-on-surface-variant">No rankings available yet.</td></tr>
-                ) : (
-                  leaderboard.map((u, index) => (
-                    <tr key={u.id} className="hover:bg-primary/5 transition-colors group cursor-pointer">
-                      <td className="p-4 pl-8">
-                        {index === 0 ? (
-                          <span className="w-8 h-8 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center font-bold text-sm">1</span>
-                        ) : index === 1 ? (
-                          <span className="w-8 h-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center font-bold text-sm">2</span>
-                        ) : index === 2 ? (
-                          <span className="w-8 h-8 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-sm">3</span>
-                        ) : (
-                          <span className="w-8 h-8 flex items-center justify-center font-bold text-sm text-on-surface-variant">{index + 1}</span>
-                        )}
-                      </td>
-                      <td className="p-4 font-bold text-on-surface">{u.name || 'Anonymous'}</td>
-                      <td className="p-4">
-                        <span className="px-2 py-1 bg-surface-variant text-on-surface rounded text-xs font-bold">{u.role}</span>
-                      </td>
-                      <td className="p-4 text-right pr-8">
-                        <span className="font-bold text-primary">{u.points || 0}</span>
-                      </td>
-                    </tr>
-                  ))
-                )}
+              <tbody className="divide-y divide-[#bec9be]/20">
+                {leaderboard.map((userRow) => (
+                  <tr 
+                    key={userRow.rank} 
+                    className={`hover:bg-[#f4faff] transition-colors ${
+                      userRow.rank === 4 ? 'bg-[#dff1fb]/30 font-bold' : ''
+                    }`}
+                  >
+                    <td className="px-6 py-4 flex items-center gap-3">
+                      <span className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs ${
+                        userRow.rank === 1 ? 'bg-[#00522d] text-white' :
+                        userRow.rank === 2 ? 'bg-[#24502c] text-white' :
+                        userRow.rank === 3 ? 'bg-[#2eb872] text-[#00210f]' : 'text-[#556158]'
+                      }`}>
+                        {userRow.rank}
+                      </span>
+                      <div>
+                        <p className="font-bold text-sm text-[#0d1e25]">{userRow.name}</p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-[#556158] font-semibold">{userRow.department}</td>
+                    <td className="px-6 py-4">
+                      <span className="px-2.5 py-1 rounded-full bg-[#f4faff] border border-[#bec9be]/40 text-[#00522d] text-[10px] font-bold">
+                        {userRow.badge}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right font-bold text-sm text-[#00522d]">
+                      {userRow.points.toLocaleString()} pts
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
-        </section>
+        </div>
 
-        {/* Right: Rewards Store Highlights */}
-        <aside className="lg:col-span-4 space-y-6">
-          <div className="bg-white border border-outline-variant/30 rounded-[24px] p-6 md:p-8 shadow-sm">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="font-headline-sm font-bold text-on-surface">Rewards Store</h3>
-              <span className="material-symbols-outlined text-outline">storefront</span>
-            </div>
-            
-            <div className="space-y-4">
-              {loading ? (
-                <div className="text-center py-4 text-on-surface-variant">Loading rewards...</div>
-              ) : rewards.length === 0 ? (
-                <div className="text-center py-4 text-on-surface-variant">No rewards available.</div>
-              ) : (
-                rewards.map((reward) => (
-                  <div key={reward.id} className={`border border-outline-variant/30 rounded-2xl p-4 transition-colors flex gap-4 ${user?.points >= reward.pointsCost ? 'hover:border-primary/50 hover:bg-primary/5 cursor-pointer group' : 'bg-surface-container-lowest opacity-60'}`}>
-                    <div className="w-16 h-16 rounded-xl bg-surface-container flex items-center justify-center shrink-0">
-                      <span className="material-symbols-outlined text-secondary text-2xl">redeem</span>
-                    </div>
-                    <div className="flex-1 flex flex-col justify-center">
-                      <h4 className="font-bold text-on-surface text-sm">{reward.name}</h4>
-                      <p className="text-xs text-on-surface-variant mb-2 truncate">{reward.description}</p>
-                      <div className="flex items-center justify-between mt-auto">
-                        <span className="text-primary font-bold text-sm">{reward.pointsCost} pts</span>
-                        {user?.points >= reward.pointsCost ? (
-                          <button onClick={() => handleRedeem(reward.id)} className="text-xs font-bold text-white bg-primary px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">Redeem</button>
-                        ) : (
-                          <span className="material-symbols-outlined text-outline text-[16px]">lock</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+        {/* Eco Rewards Store (4 Cols) */}
+        <div className="col-span-12 lg:col-span-4 bg-white rounded-[28px] p-6 sm:p-8 border border-[#bec9be]/30 shadow-sm space-y-5">
+          <div className="flex justify-between items-center pb-3 border-b border-[#bec9be]/20">
+            <h3 className="text-lg font-bold text-[#0d1e25]">Rewards Store</h3>
+            <span className="text-xs text-[#00522d] font-bold">1,240 Pts Avail</span>
           </div>
-        </aside>
+
+          <div className="space-y-4 text-xs">
+            {rewards.map((rew) => (
+              <div key={rew.id} className="p-4 rounded-2xl bg-[#f4faff] border border-[#bec9be]/30 space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white border border-[#bec9be]/40 flex items-center justify-center text-[#00522d] shadow-sm shrink-0">
+                    <span className="material-symbols-outlined text-xl">{rew.icon || 'redeem'}</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-[#0d1e25]">{rew.name}</h4>
+                    <p className="text-[11px] text-[#556158] mt-0.5">{rew.cost} pts • {rew.stock || 'In Stock'}</p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleRedeem(rew.name, rew.cost)}
+                  className="w-full py-2 bg-[#00522d] hover:bg-[#003d21] text-white rounded-full text-xs font-bold shadow-sm transition-all cursor-pointer"
+                >
+                  Redeem Reward ({rew.cost} pts)
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

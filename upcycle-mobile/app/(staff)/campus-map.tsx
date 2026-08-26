@@ -1,154 +1,163 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ImageBackground, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
 export default function CampusMapMobile() {
   const router = useRouter();
-  const [activeCallout, setActiveCallout] = useState<string | null>(null);
+  const [selectedBuilding, setSelectedBuilding] = useState<string | null>('Science Quad B');
+  const [activeLayer, setActiveLayer] = useState<'all' | 'waste' | 'energy'>('waste');
 
-  const toggleCallout = (id: string) => {
-    setActiveCallout(activeCallout === id ? null : id);
-  };
+  const buildings = [
+    { id: '1', name: 'Science Quad B', type: 'Smart Bin Cluster', fill: 94, status: 'Critical Overflow', energy: '42 kW', coords: 'Zone 4' },
+    { id: '2', name: 'Engineering Lab 4', type: 'Microgrid & Waste Dock', fill: 88, status: 'Pickup Scheduled', energy: '68 kW', coords: 'Zone 2' },
+    { id: '3', name: 'Student Union Atrium', type: 'Public Recycling Hub', fill: 45, status: 'Normal Operations', energy: '31 kW', coords: 'Zone 1' },
+    { id: '4', name: 'Dining Commons Rear', type: 'Compost Organics Dock', fill: 82, status: 'High Volume', energy: '55 kW', coords: 'Zone 3' },
+  ];
 
   return (
     <SafeAreaView className="flex-1 bg-[#f4faff]">
-      {/* Header */}
-      <View className="flex-row justify-between items-center px-5 h-16 bg-white/70 border-b border-[#bec9be]/30 z-50 absolute top-0 w-full mt-10">
+      {/* Top Bar */}
+      <View className="flex-row items-center justify-between px-5 h-16 border-b border-[#bec9be]/30 bg-[#f4faff]">
         <View className="flex-row items-center gap-3">
-          <View className="w-10 h-10 rounded-full bg-[#d9ebf5] overflow-hidden items-center justify-center">
-            <Image 
-              source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC7WHYCGcv-x40M3yKNsRI_w6sqdg1UY_WehhmzVUePotVsVDp__hjAL86GBGQGbpuNSwqlpwXAlbZRFZ1io2VN2AhhyZnxnzz2LMClxIYW1Lzw6dyv8-rfAGtKtqgGcU173_ddrg2I100Ric9pavoWMKbpPOvak2O_PqB2iHYBAMs1RWMr9qtgdj8_9GXMs_DfFo7oo7twFwCUWNbWJlMwuyud4-HwB9AtglxHXks7WnQKp2EPUykEqlwbjpB5KSt93ISVHe5ivlQ' }}
-              className="w-full h-full"
-            />
-          </View>
-          <Text className="text-2xl font-bold text-[#00522d]">EcoCampus Admin</Text>
+          <TouchableOpacity onPress={() => router.back()} className="p-2 rounded-full active:bg-[#dff1fb]">
+            <MaterialIcons name="arrow-back" size={24} color="#00522d" />
+          </TouchableOpacity>
+          <Text className="text-lg font-bold text-[#00522d]">Campus Map Visualizer</Text>
         </View>
-        <TouchableOpacity className="w-10 h-10 items-center justify-center rounded-full active:bg-[#d9ebf5]">
-          <MaterialIcons name="notifications" size={24} color="#00522d" />
-        </TouchableOpacity>
+        <View className="flex-row gap-1 bg-[#dff1fb] p-1 rounded-full">
+          <TouchableOpacity 
+            onPress={() => setActiveLayer('waste')}
+            className={`px-3 py-1 rounded-full ${activeLayer === 'waste' ? 'bg-[#00522d]' : 'bg-transparent'}`}
+          >
+            <Text className={`text-[10px] font-bold ${activeLayer === 'waste' ? 'text-white' : 'text-[#00522d]'}`}>Waste</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => setActiveLayer('energy')}
+            className={`px-3 py-1 rounded-full ${activeLayer === 'energy' ? 'bg-[#00522d]' : 'bg-transparent'}`}
+          >
+            <Text className={`text-[10px] font-bold ${activeLayer === 'energy' ? 'text-white' : 'text-[#00522d]'}`}>Energy</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      {/* Main Map */}
-      <View className="flex-1 relative pt-24 overflow-hidden">
-        <ImageBackground 
-          source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAgsrHQ2yFgldLT0X27Lp94SVytmYhqms45nhKqNpIxH_ygVBb6uVazyU_BE1XeAJZqkcXRUBlxf1TZMHE4PEiF49xYpux37dy9yFjB7-wuSTDgbF1A50-5D1Bf5osWsBGMalqb8PvaxZKhweABgD6ZkDwz4S6ERqRxDViWhkE23IwQ3fE6qPO-xBnYCOKn-3VTtLig7JdoeKndwenEL6MSwfZgfj8AVsHnYBHXH468_rA43RyT3R5iMEfgIuyNAXYkSeE9gITS8O0' }}
-          className="absolute inset-0 w-full h-full bg-[#cbdde7]"
-        />
-        
-        {/* Map Markers */}
-        <View className="absolute top-[30%] left-[45%] z-10">
-          <TouchableOpacity onPress={() => toggleCallout('callout-1')} className="w-12 h-12 bg-[#ffdad6] rounded-full items-center justify-center border-2 border-white shadow-lg active:scale-95">
-            <MaterialIcons name="warning" size={24} color="#ba1a1a" />
-          </TouchableOpacity>
-          {activeCallout === 'callout-1' && (
-            <View className="absolute bottom-14 left-[50%] -translate-x-[50%] w-48 bg-white/90 p-3 rounded-xl shadow-xl border border-[#bec9be]/30">
-              <Text className="text-[10px] font-bold text-[#ba1a1a] mb-1">ENERGY CRITICAL</Text>
-              <Text className="text-sm text-[#0d1e25] leading-tight mb-2">North Lab surge detected</Text>
-              <TouchableOpacity className="bg-[#00522d] self-start px-3 py-1 rounded-full active:bg-[#006d3e]">
-                <Text className="text-[10px] font-bold text-white">RESOLVE</Text>
-              </TouchableOpacity>
+      <ScrollView className="flex-1 px-5 pt-5" contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
+        {/* Isometric Map Simulated Canvas */}
+        <View className="h-64 bg-[#00522d] rounded-[32px] p-6 justify-between shadow-md mb-6 relative overflow-hidden">
+          <View className="flex-row justify-between items-start z-10">
+            <View>
+              <Text className="text-[10px] font-bold text-[#9cf6ba] uppercase tracking-wider">Campus GIS Telemetry</Text>
+              <Text className="text-xl font-bold text-white mt-0.5">Central Campus Grid</Text>
             </View>
-          )}
-        </View>
-
-        <View className="absolute top-[60%] left-[25%] z-10">
-          <TouchableOpacity onPress={() => toggleCallout('callout-2')} className="w-10 h-10 bg-[#006d3e] rounded-full items-center justify-center border-2 border-white shadow-md active:scale-95">
-            <MaterialIcons name="delete" size={20} color="#92ecb1" />
-          </TouchableOpacity>
-          {activeCallout === 'callout-2' && (
-            <View className="absolute bottom-12 left-[50%] -translate-x-[50%] w-40 bg-white/90 p-3 rounded-xl shadow-xl border border-[#bec9be]/30">
-              <Text className="text-[10px] font-bold text-[#00522d] mb-1">WASTE OPTIMAL</Text>
-              <Text className="text-sm text-[#0d1e25]">Central Hub: 42%</Text>
+            <View className="px-3 py-1 bg-white/10 rounded-full border border-white/20">
+              <Text className="text-[10px] font-bold text-white">4 Active Zones</Text>
             </View>
-          )}
-        </View>
+          </View>
 
-        <View className="absolute top-[45%] left-[70%] z-10">
-          <TouchableOpacity className="w-10 h-10 bg-[#d9e6da] rounded-full items-center justify-center border-2 border-white shadow-md active:scale-95">
-            <MaterialIcons name="bolt" size={20} color="#00522d" />
-          </TouchableOpacity>
-        </View>
+          {/* Interactive node dots on simulated grid */}
+          <View className="flex-row justify-around items-center z-10">
+            {buildings.map((b) => {
+              const isSelected = selectedBuilding === b.name;
+              return (
+                <TouchableOpacity 
+                  key={b.id}
+                  onPress={() => setSelectedBuilding(b.name)}
+                  className={`p-2 rounded-2xl items-center ${
+                    isSelected ? 'bg-white shadow-lg' : 'bg-white/20'
+                  }`}
+                >
+                  <MaterialIcons 
+                    name={b.fill > 85 ? "warning" : "delete"} 
+                    size={20} 
+                    color={isSelected ? (b.fill > 85 ? "#ba1a1a" : "#00522d") : "#ffffff"} 
+                  />
+                  <Text className={`text-[9px] font-bold mt-1 ${isSelected ? 'text-[#0d1e25]' : 'text-white'}`}>
+                    {b.coords}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
 
-        {/* Floating Search Bar */}
-        <View className="absolute top-8 left-5 right-5 z-40 mt-20">
-          <View className="flex-row items-center bg-white/90 rounded-full px-4 py-3 shadow-lg border border-[#bec9be]/30">
-            <MaterialIcons name="search" size={24} color="#6f7a70" />
-            <Text className="flex-1 ml-2 text-base text-[#6f7a70]">Find building or facility...</Text>
-            <MaterialIcons name="mic" size={24} color="#00522d" />
+          <View className="flex-row justify-between items-center z-10 pt-2 border-t border-white/10">
+            <Text className="text-[10px] text-white/80">Tap a zone to inspect real-time sensor diagnostic</Text>
+            <Ionicons name="navigate" size={14} color="#9cf6ba" />
           </View>
         </View>
 
-        {/* Layer Toggles */}
-        <View className="absolute top-44 right-4 gap-3 z-40">
-          <TouchableOpacity className="w-12 h-12 bg-white/80 rounded-xl shadow-md items-center justify-center active:bg-white border border-[#bec9be]/20">
-            <MaterialIcons name="delete" size={24} color="#3f4941" />
-          </TouchableOpacity>
-          <TouchableOpacity className="w-12 h-12 bg-[#006d3e] rounded-xl shadow-md items-center justify-center active:bg-[#00522d]">
-            <MaterialIcons name="bolt" size={24} color="#92ecb1" />
-          </TouchableOpacity>
-          <TouchableOpacity className="w-12 h-12 bg-white/80 rounded-xl shadow-md items-center justify-center active:bg-white border border-[#bec9be]/20">
-            <MaterialIcons name="directions-bus" size={24} color="#3f4941" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Zoom Controls */}
-        <View className="absolute bottom-28 right-4 gap-2 z-40">
-          <TouchableOpacity className="w-10 h-10 bg-white rounded-full shadow-lg items-center justify-center active:scale-90">
-            <MaterialIcons name="add" size={24} color="#00522d" />
-          </TouchableOpacity>
-          <TouchableOpacity className="w-10 h-10 bg-white rounded-full shadow-lg items-center justify-center active:scale-90">
-            <MaterialIcons name="remove" size={24} color="#00522d" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Location Button */}
-        <View className="absolute bottom-28 left-4 z-40">
-          <TouchableOpacity className="w-12 h-12 bg-[#00522d] rounded-full shadow-lg items-center justify-center active:scale-95">
-            <MaterialIcons name="my-location" size={24} color="white" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Status Card */}
-        <View className="absolute bottom-6 left-5 right-5 z-30 mb-20">
-          <View className="bg-white/95 rounded-2xl p-4 shadow-2xl border-t border-[#bec9be]/20 flex-row items-center justify-between">
-            <View className="flex-row items-center gap-3">
-              <View className="w-2 h-2 bg-[#2eb872] rounded-full" />
+        {/* Selected Zone Diagnostic Card */}
+        {selectedBuilding && (
+          <View className="bg-white rounded-[28px] p-6 border border-[#bec9be]/30 shadow-sm space-y-4 mb-6">
+            <View className="flex-row justify-between items-start">
               <View>
-                <Text className="text-sm font-medium text-[#0d1e25]">Campus Overview</Text>
-                <Text className="text-[12px] font-bold text-[#6f7a70]">All systems normal (2 alerts)</Text>
+                <Text className="font-bold text-base text-[#0d1e25]">{selectedBuilding}</Text>
+                <Text className="text-xs text-[#556158]">
+                  {buildings.find(b => b.name === selectedBuilding)?.type}
+                </Text>
+              </View>
+              <View className="px-3 py-1 bg-[#ffdad6] rounded-full">
+                <Text className="text-[10px] font-bold text-[#ba1a1a]">
+                  {buildings.find(b => b.name === selectedBuilding)?.status}
+                </Text>
               </View>
             </View>
-            <MaterialIcons name="keyboard-arrow-up" size={24} color="#6f7a70" />
+
+            <View className="flex-row gap-3 pt-2">
+              <View className="flex-1 bg-[#f4faff] p-3.5 rounded-2xl border border-[#bec9be]/30">
+                <Text className="text-[10px] font-bold text-[#556158] uppercase">Smart Bin Fill</Text>
+                <Text className="text-xl font-bold text-[#ba1a1a] mt-0.5">
+                  {buildings.find(b => b.name === selectedBuilding)?.fill}%
+                </Text>
+              </View>
+              <View className="flex-1 bg-[#f4faff] p-3.5 rounded-2xl border border-[#bec9be]/30">
+                <Text className="text-[10px] font-bold text-[#556158] uppercase">Grid Wattage</Text>
+                <Text className="text-xl font-bold text-[#00522d] mt-0.5">
+                  {buildings.find(b => b.name === selectedBuilding)?.energy}
+                </Text>
+              </View>
+            </View>
+
+            <TouchableOpacity 
+              onPress={() => router.push('/(staff)/route')}
+              className="py-3.5 bg-[#00522d] rounded-full items-center shadow-sm"
+            >
+              <Text className="text-white font-bold text-xs">Dispatch Driver to Location</Text>
+            </TouchableOpacity>
           </View>
+        )}
+
+        {/* Zone Directory List */}
+        <Text className="text-base font-bold text-[#0d1e25] mb-3">All Campus Zonal Hubs</Text>
+        <View className="space-y-3">
+          {buildings.map((b) => (
+            <TouchableOpacity 
+              key={b.id}
+              onPress={() => setSelectedBuilding(b.name)}
+              className="p-4 bg-white rounded-2xl border border-[#bec9be]/30 flex-row justify-between items-center shadow-sm"
+            >
+              <View className="flex-row items-center gap-3">
+                <View className={`w-10 h-10 rounded-xl items-center justify-center ${
+                  b.fill > 85 ? 'bg-[#ffdad6]' : 'bg-[#dff1fb]'
+                }`}>
+                  <MaterialIcons 
+                    name="apartment" 
+                    size={20} 
+                    color={b.fill > 85 ? "#ba1a1a" : "#00522d"} 
+                  />
+                </View>
+                <View>
+                  <Text className="font-bold text-xs text-[#0d1e25]">{b.name}</Text>
+                  <Text className="text-[10px] text-[#556158]">{b.coords} • {b.type}</Text>
+                </View>
+              </View>
+              <Text className={`font-bold text-xs ${b.fill > 85 ? 'text-[#ba1a1a]' : 'text-[#00522d]'}`}>
+                {b.fill}% Fill
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
-
-      </View>
-
-      {/* Bottom Nav */}
-      <View className="absolute bottom-0 left-0 w-full flex-row justify-around items-center pt-2 pb-6 px-4 bg-white/70 border-t border-[#bec9be]/30 shadow-lg h-20 z-50">
-        <TouchableOpacity onPress={() => router.push('/(staff)')} className="items-center active:scale-90 px-4 py-1">
-          <MaterialIcons name="dashboard" size={24} color="#3f4941" />
-          <Text className="text-[10px] font-bold text-[#3f4941] mt-1">Dash</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="items-center active:scale-90 px-4 py-1">
-          <MaterialIcons name="delete" size={24} color="#3f4941" />
-          <Text className="text-[10px] font-bold text-[#3f4941] mt-1">Waste</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="items-center bg-[#006d3e] rounded-full px-4 py-1 active:scale-90">
-          <MaterialIcons name="domain" size={24} color="#92ecb1" />
-          <Text className="text-[10px] font-bold text-[#92ecb1] mt-0.5">Setup</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="items-center active:scale-90 px-4 py-1">
-          <MaterialIcons name="bolt" size={24} color="#3f4941" />
-          <Text className="text-[10px] font-bold text-[#3f4941] mt-1">Energy</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="items-center active:scale-90 px-4 py-1">
-          <MaterialIcons name="track-changes" size={24} color="#3f4941" />
-          <Text className="text-[10px] font-bold text-[#3f4941] mt-1">Goals</Text>
-        </TouchableOpacity>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

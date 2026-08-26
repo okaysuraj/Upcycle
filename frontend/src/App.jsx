@@ -214,21 +214,36 @@ export default function App() {
 
             {/* Epic 5: Eco-Marketplace */}
             <Route path="/marketplace" element={<MarketplaceHome />} />
+            <Route path="/marketplace/new" element={<ListItem />} />
+            <Route path="/marketplace/items/new" element={<ListItem />} />
             <Route path="/marketplace/quotes/compare" element={<CompareVendorQuotes />} />
             <Route path="/marketplace/contracts/:id" element={<ContractDetails />} />
             <Route path="/marketplace/match-recommendation" element={<AiVendorMatchRecommendation />} />
+            <Route path="/marketplace/suggestions" element={<MatchSuggestions />} />
+            <Route path="/marketplace/escrow" element={<PaymentEscrowManagement />} />
 
             {/* Epic 6: Community */}
             <Route path="/community" element={<CommunityFeed />} />
             <Route path="/community/feed" element={<CommunityFeedHome />} />
+            <Route path="/community/leaderboard" element={<LeaderboardRewards />} />
             <Route path="/community/organizations" element={<ConnectedOrganizations />} />
             <Route path="/community/organizations/new" element={<CreateOrganization />} />
+            <Route path="/community/organizations/join" element={<JoinOrganization />} />
+            <Route path="/community/events" element={<EventsHub />} />
             <Route path="/community/events/new" element={<CreateEvent />} />
+            <Route path="/community/groups/:id" element={<GroupDetail />} />
+            <Route path="/education/learning-hub" element={<LearningHub />} />
             <Route path="/education/courses/:id" element={<CourseDetail />} />
+            <Route path="/education/live-seminars" element={<LiveSeminarsSpeakers />} />
 
             {/* Epic 7: Settings */}
             <Route path="/settings" element={<Settings />} />
+            <Route path="/settings/account" element={<AccountSettings />} />
             <Route path="/account-settings" element={<AccountSettings />} />
+            <Route path="/settings/deactivate" element={<AccountDeactivation />} />
+            <Route path="/deactivate" element={<AccountDeactivation />} />
+            <Route path="/settings/notifications" element={<NotificationSettings />} />
+            <Route path="/settings/privacy" element={<PrivacySettings />} />
             <Route path="/edit-profile" element={<EditProfile />} />
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/achievements" element={<AchievementsBadges />} />
@@ -237,50 +252,34 @@ export default function App() {
             <Route path="/notifications" element={<NotificationsCenter />} />
             <Route path="/ai-insights" element={<AiInsights />} />
             <Route path="/ai-insights/recommendations" element={<AiInsightsRecommendations />} />
-            <Route path="/deactivate" element={<AccountDeactivation />} />
+            <Route path="/admin/users" element={<UserManagement />} />
             <Route path="/users" element={<UserManagement />} />
             <Route path="/terms" element={<TermsPolicies />} />
             <Route path="/privacy" element={<PrivacySettings />} />
             <Route path="/support" element={<ContactSupport />} />
             <Route path="/admin/moderation" element={<ContentModeration />} />
+            <Route path="/admin/marketplace-moderation" element={<MarketplaceModeration />} />
+            <Route path="/admin/faq" element={<FaqPage />} />
+            <Route path="/admin/features" element={<FeatureFlagsManager />} />
+            <Route path="/admin/help-center" element={<HelpCenter />} />
+            <Route path="/admin/broadcasts" element={<NotificationBroadcastSystem />} />
+            <Route path="/admin/notifications-settings" element={<NotificationSettings />} />
+            <Route path="/admin/platform-settings" element={<PlatformSettings />} />
+            <Route path="/admin/role-permissions" element={<RolePermissionsManager />} />
+            <Route path="/admin/roles" element={<RolePermissionsManager />} />
 
-            {/* Newly added routes (Batch 4) */}
-            <Route path="/community/events" element={<EventsHub />} />
-            <Route path="/community/groups/:id" element={<GroupDetail />} />
+            {/* Newly added routes (Batch 4-8) */}
             <Route path="/operations/reports/export-pdf" element={<ExportPdfReport />} />
             <Route path="/search" element={<GlobalSearch />} />
             <Route path="/sustainability/goals" element={<GoalProgressTracking />} />
-            <Route path="/admin/faq" element={<FaqPage />} />
-            <Route path="/admin/features" element={<FeatureFlagsManager />} />
             <Route path="/operations/projects/new" element={<FinalizeProjectDetails />} />
-
-            {/* Newly added routes (Batch 5) */}
-            <Route path="/admin/help-center" element={<HelpCenter />} />
-            <Route path="/community/organizations/join" element={<JoinOrganization />} />
-            <Route path="/community/leaderboard" element={<LeaderboardRewards />} />
-            <Route path="/education/learning-hub" element={<LearningHub />} />
-            <Route path="/marketplace/items/new" element={<ListItem />} />
             <Route path="/operations/live-collection" element={<LiveCollectionMonitoring />} />
-            <Route path="/education/live-seminars" element={<LiveSeminarsSpeakers />} />
-
-            {/* Newly added routes (Batch 6) */}
-            <Route path="/admin/marketplace-moderation" element={<MarketplaceModeration />} />
-            <Route path="/marketplace/suggestions" element={<MatchSuggestions />} />
             <Route path="/operations/material-flow" element={<MaterialFlowTracker />} />
             <Route path="/sustainability/milestones" element={<MilestoneTracking />} />
             <Route path="/sustainability/reports/monthly" element={<MonthlyESGReportViewer />} />
-            <Route path="/admin/broadcasts" element={<NotificationBroadcastSystem />} />
-
-            {/* Newly added routes (Batch 7) */}
-            <Route path="/admin/notifications-settings" element={<NotificationSettings />} />
             <Route path="/operations/overflow-alerts" element={<OverflowAlert />} />
-            <Route path="/marketplace/escrow" element={<PaymentEscrowManagement />} />
-
-            {/* Newly added routes (Batch 8) */}
             <Route path="/operations/pickup-alerts" element={<PickupAlerts />} />
             <Route path="/operations/pickup-verification" element={<PickupVerification />} />
-            <Route path="/admin/platform-settings" element={<PlatformSettings />} />
-            <Route path="/admin/role-permissions" element={<RolePermissionsManager />} />
             <Route path="/operations/route-optimization" element={<RouteOptimizationMap />} />
             <Route path="/sustainability/portfolio" element={<PortfolioShowcase />} />
 

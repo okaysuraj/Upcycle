@@ -162,7 +162,7 @@ export default function AccountSettings() {
               <View className="flex-row items-center justify-between opacity-80">
                 <View className="flex-row items-center gap-3">
                   <View className="w-10 h-10 rounded bg-[#c1c8c2] items-center justify-center">
-                    <MaterialIcons name="monitoring" size={24} color="white" />
+                    <MaterialIcons name="insights" size={24} color="white" />
                   </View>
                   <View>
                     <Text className="text-sm font-bold text-[#191c1d]">Eco-Metric Suite</Text>

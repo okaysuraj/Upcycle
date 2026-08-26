@@ -14,13 +14,18 @@ export default function SignupScreen() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [agreeTerms, setAgreeTerms] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
   const handleRegister = async () => {
     if (!name || !email || !password) {
-      setError('Please fill in all fields');
+      setError('Please fill in all required fields');
+      return;
+    }
+    if (!agreeTerms) {
+      setError('Please accept the campus charter terms');
       return;
     }
     setLoading(true);
@@ -30,7 +35,7 @@ export default function SignupScreen() {
     const result = await register(name, email, password);
     
     if (result.success) {
-      setSuccessMsg('A verification link has been sent to your email. Please click the link to verify your account before logging in.');
+      setSuccessMsg('Account created! A verification link has been sent to your institutional email.');
     } else {
       setError(result.error || 'An error occurred during registration.');
     }
@@ -38,91 +43,96 @@ export default function SignupScreen() {
   };
 
   return (
-    <ScreenWrapper className="bg-surface-ice p-0">
-      <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 24 }}>
-        
-        {/* Background aesthetics */}
-        <View className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl opacity-50 -mr-20 -mt-20" />
-
-        <View className="items-center mb-10 mt-10 z-10">
-          <View className="w-16 h-16 bg-primary rounded-full items-center justify-center mb-6 shadow-sm">
+    <ScreenWrapper className="bg-[#f4faff]">
+      <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View className="items-center mb-6 mt-4">
+          <View className="w-16 h-16 bg-[#00522d] rounded-2xl items-center justify-center mb-3 shadow-md">
             <Ionicons name="leaf" size={32} color="#ffffff" />
           </View>
-          <Text className="text-3xl font-black text-on-background mb-2 text-center">Join the Movement</Text>
-          <Text className="text-secondary text-base text-center px-4">
-            Create an account to track your footprint and join eco-initiatives.
+          <Text className="text-3xl font-bold text-[#0d1e25] tracking-tight">Create Account</Text>
+          <Text className="text-xs font-bold text-[#00522d] uppercase tracking-widest bg-[#dff1fb] px-3 py-1 rounded-full mt-2">
+            Campus Member Profile
           </Text>
         </View>
 
-        <View className="bg-white/80 rounded-[32px] p-6 border border-outline-variant/30 shadow-sm mb-6 z-10">
-          
+        {/* Card */}
+        <View className="bg-white rounded-[32px] p-6 border border-[#bec9be]/30 shadow-sm space-y-4 mb-6">
           {error ? (
-            <View className="bg-error-container p-3 rounded-xl mb-4">
-              <Text className="text-on-error-container text-center font-medium">{error}</Text>
+            <View className="bg-[#ffdad6] p-3 rounded-xl">
+              <Text className="text-[#ba1a1a] text-xs font-bold text-center">{error}</Text>
             </View>
           ) : null}
 
           {successMsg ? (
-            <View className="bg-success-container/20 border border-success-container p-4 rounded-xl items-center">
-              <Ionicons name="mail-open-outline" size={40} color="#00522d" style={{ marginBottom: 10 }} />
-              <Text className="text-lg font-bold text-primary mb-2">Verify your email</Text>
-              <Text className="text-center text-on-surface mb-6 leading-5">{successMsg}</Text>
+            <View className="bg-[#dff1fb] p-5 rounded-2xl items-center space-y-3">
+              <Ionicons name="mail-open-outline" size={44} color="#00522d" />
+              <Text className="text-base font-bold text-[#00522d]">Check Your Email</Text>
+              <Text className="text-xs text-[#556158] text-center leading-relaxed">{successMsg}</Text>
               <Button 
                 title="Return to Sign In" 
                 onPress={() => router.push('/(auth)/login')} 
-                className="w-full"
+                className="w-full mt-2 bg-[#00522d]"
               />
             </View>
           ) : (
-            <>
-              <Text className="text-2xl font-bold text-on-background mb-1">Create Account</Text>
-              <Text className="text-sm text-secondary mb-6">Sign up to participate in community initiatives.</Text>
-
+            <View className="space-y-3.5">
               <Input 
                 label="Full Name" 
-                placeholder="Jane Doe"
+                placeholder="Alex Rivera"
                 icon="person-outline"
                 value={name}
                 onChangeText={setName}
-                className="mb-4"
               />
               <Input 
-                label="Email Address" 
-                placeholder="volunteer@city.eco"
+                label="Institutional Email" 
+                placeholder="alex@university.edu"
                 icon="mail-outline"
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize="none"
                 keyboardType="email-address"
-                className="mb-4"
               />
               <Input 
-                label="Password" 
+                label="Create Password" 
                 placeholder="••••••••"
                 icon="lock-closed-outline"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
-                className="mb-6"
               />
 
+              <TouchableOpacity 
+                onPress={() => setAgreeTerms(!agreeTerms)}
+                className="flex-row items-center gap-2 pt-1"
+              >
+                <View className={`w-5 h-5 rounded-md border items-center justify-center ${
+                  agreeTerms ? 'bg-[#00522d] border-[#00522d]' : 'border-[#bec9be]'
+                }`}>
+                  {agreeTerms && <Ionicons name="checkmark" size={14} color="#ffffff" />}
+                </View>
+                <Text className="text-xs text-[#556158]">
+                  I agree to the <Text className="text-[#00522d] font-bold">Campus Zero-Waste Charter</Text>
+                </Text>
+              </TouchableOpacity>
+
               <Button 
-                title="Sign Up" 
+                title="Complete Registration" 
                 onPress={handleRegister} 
                 loading={loading} 
+                className="mt-2 bg-[#00522d]"
               />
-            </>
+            </View>
           )}
         </View>
-        
-        {!successMsg && (
-          <View className="flex-row justify-center mt-2 pb-6 z-10">
-            <Text className="text-secondary text-base">Already have an account? </Text>
-            <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
-              <Text className="text-primary font-bold text-base">Sign In</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+
+        {/* Footer Prompt */}
+        <View className="flex-row justify-center pb-8">
+          <Text className="text-xs text-[#556158]">Already have an account? </Text>
+          <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
+            <Text className="text-xs text-[#00522d] font-bold">Sign In Here</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </ScreenWrapper>
   );

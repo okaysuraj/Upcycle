@@ -1,10 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 export default function LearningHub() {
   const { authFetch } = useAuth();
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState([
+    {
+      id: '1',
+      title: 'Circular Economy Logistics',
+      module: 'Module 4 of 12',
+      progress: 65,
+      timeLeft: '12 min left',
+      instructor: 'Dr. Sarah Jenkins',
+      category: 'Supply Chain'
+    },
+    {
+      id: '2',
+      title: 'Microgrid Energy Optimization',
+      module: 'Module 2 of 8',
+      progress: 25,
+      timeLeft: '45 min left',
+      instructor: 'Prof. David Chen',
+      category: 'Energy'
+    },
+    {
+      id: '3',
+      title: 'Smart Waste Telemetry & AI Sorting',
+      module: 'Module 1 of 6',
+      progress: 10,
+      timeLeft: '1h 10m left',
+      instructor: 'Elena Rostova',
+      category: 'IoT & Telemetry'
+    }
+  ]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -12,171 +41,153 @@ export default function LearningHub() {
         const res = await authFetch('/education/courses');
         if (res.ok) {
           const data = await res.json();
-          setCourses(data);
+          if (data && data.length > 0) {
+            setCourses(data);
+          }
         }
       } catch (err) {
         console.error("Error fetching courses:", err);
-      } finally {
-        setLoading(false);
       }
     };
     fetchCourses();
   }, [authFetch]);
 
   return (
-    <div className="flex flex-col pb-12 max-w-[1440px] mx-auto w-full space-y-12">
-      {/* Hero Section (Master Sustainability) */}
-      <section className="relative rounded-[32px] overflow-hidden min-h-[400px] flex items-center px-8 md:px-12 group shadow-md">
+    <div className="w-full max-w-[1440px] mx-auto space-y-8 font-['Hanken_Grotesk',sans-serif]">
+      {/* Hero Section */}
+      <section className="relative rounded-[32px] overflow-hidden min-h-[380px] flex items-center p-8 sm:p-12 lg:p-16 group shadow-lg bg-[#00522d]">
         <div className="absolute inset-0 z-0">
           <div 
             className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
             style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCgEggsFJD-HRB_Yt8zlmolQtMPsYGOy7IQXfDDztxE186iY212uWvzW8reTdNiktAqd710gfGlLkazkRCvOnJGeV4LGoYHRlTgPEOidnj8TMPk5VJovnnm1SAY4_gavmcLzs_EaeeL2nVu8l7h6C9pmYeQ3hADaaqww3Z8xRK9OOujZ-Felh5wUUkh61b1_vI7_T3A7dL69Ul0VAftCkXkcJvQ4Pr4y7sf7B4Q7cyZ_lo6i3HYsiXMFX6OOu9lt4WMb-0XugVNirw')" }}
           ></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/70 to-primary/20 md:via-primary/40 md:to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#00522d]/95 via-[#00522d]/75 to-transparent"></div>
         </div>
         
-        <div className="relative z-10 max-w-xl text-white">
-          <span className="inline-block bg-white/20 backdrop-blur-md border border-white/20 text-white px-4 py-1.5 rounded-full font-label-md font-bold mb-6 shadow-sm">Learning Hub v2.4</span>
-          <h2 className="font-display text-display-sm md:text-display-md mb-4 font-bold shadow-sm">Master Sustainability</h2>
-          <p className="font-body-lg text-primary-container/90 mb-8 text-lg">Empower your campus initiatives with data-driven environmental strategies and certified professional courses.</p>
-          <div className="flex flex-wrap gap-4">
-            <button className="bg-white text-primary px-8 py-3 rounded-full font-label-md font-bold hover:shadow-xl transition-all hover:scale-105">Explore All Courses</button>
-            <button className="bg-black/20 backdrop-blur-md text-white border border-white/30 px-8 py-3 rounded-full font-label-md font-bold hover:bg-black/40 transition-all">Curriculum Overview</button>
-          </div>
-        </div>
-      </section>
-
-      {/* Dashboard Row: Continue Learning & Resource Sidebar */}
-      <section className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
-        {/* Continue Learning (Bento Item 8/12) */}
-        <div className="lg:col-span-8 space-y-6">
-          <div className="flex justify-between items-center">
-            <h3 className="font-display text-headline-md font-bold text-on-surface">Continue Learning</h3>
-            <a className="text-primary font-bold flex items-center gap-1 hover:underline cursor-pointer group">
-              View Schedule <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
-            </a>
-          </div>
-          
-          <div className="bg-white p-6 md:p-8 rounded-[24px] border border-outline-variant/30 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex flex-col sm:flex-row items-start gap-6">
-              <div className="w-full sm:w-48 h-40 sm:h-32 rounded-xl overflow-hidden flex-shrink-0">
-                <img className="w-full h-full object-cover" alt="Circular Economy" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCu1ozRhzV-Wleq6yexxaYHdsBR0VPTeXxJwk3emmNZxEA4o_GX_SAOYGnrYy0127_VKKpTJ440WkQoDlovTIqJ6WjHh40rPOdgmh7I9PrDVNajr717ZAbRrWc_YfTLhSiw0oQ_pN-Advt0ZksJFdlpK6FrfD9Tw3RwXyxCXz2TzMbxyjRxfR3HpJPL5aN05yKy9S0qzNvv1yL97Dton08BlCxloxxPLzoQCb2ArDOzD4BGujXD04LNi-Gnzb3sGS76ImnYyk1AKBw" />
-              </div>
-              <div className="flex-grow w-full">
-                <div className="flex flex-wrap justify-between items-start gap-2 mb-2">
-                  <div>
-                    <p className="text-on-surface-variant font-label-sm uppercase tracking-wider font-bold">Module 4 of 12</p>
-                    <h4 className="font-headline-sm font-bold text-on-surface mt-1">Circular Economy Logistics</h4>
-                  </div>
-                  <div className="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[14px]">timer</span> 12 min left
-                  </div>
-                </div>
-                
-                <div className="mt-4">
-                  <div className="flex justify-between font-label-md mb-2">
-                    <span className="text-on-surface-variant font-bold">Current Progress</span>
-                    <span className="text-primary font-bold">65%</span>
-                  </div>
-                  <div className="h-3 w-full bg-surface-container rounded-full overflow-hidden">
-                    <div className="h-full bg-primary transition-all duration-1000 ease-out rounded-full" style={{ width: '65%' }}></div>
-                  </div>
-                </div>
-                
-                <div className="mt-6 flex flex-wrap gap-4">
-                  <button className="bg-primary text-white px-8 py-2.5 rounded-full font-bold hover:shadow-md transition-all active:scale-95">Resume Lesson</button>
-                  <button className="text-on-surface-variant font-bold flex items-center gap-2 hover:text-primary transition-colors hover:bg-primary/5 px-4 rounded-full">
-                    Course Details
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Interactive Resource Library Sidebar (Bento Item 4/12) */}
-        <aside className="lg:col-span-4 space-y-6">
-          <h3 className="font-display text-headline-md font-bold text-on-surface">Resource Library</h3>
-          <div className="bg-white/80 backdrop-blur-md p-6 rounded-[24px] h-full flex flex-col border border-outline-variant/30 shadow-sm">
-            <p className="font-body-md text-on-surface-variant mb-6">Quick access to essential campus frameworks and compliance tools.</p>
-            
-            <div className="space-y-4 flex-grow">
-              <div className="p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/30 flex items-center gap-4 hover:border-primary/50 transition-colors cursor-pointer group hover:shadow-sm">
-                <div className="p-3 bg-tertiary/10 text-tertiary rounded-lg group-hover:scale-110 transition-transform">
-                  <span className="material-symbols-outlined">description</span>
-                </div>
-                <div>
-                  <p className="font-label-md font-bold text-on-surface">Policy Templates</p>
-                  <p className="text-xs text-on-surface-variant">v3.1 Revised Nov 2023</p>
-                </div>
-              </div>
-              
-              <div className="p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/30 flex items-center gap-4 hover:border-primary/50 transition-colors cursor-pointer group hover:shadow-sm">
-                <div className="p-3 bg-secondary/10 text-secondary rounded-lg group-hover:scale-110 transition-transform">
-                  <span className="material-symbols-outlined">database</span>
-                </div>
-                <div>
-                  <p className="font-label-md font-bold text-on-surface">Public Datasets</p>
-                  <p className="text-xs text-on-surface-variant">Regional Energy Trends</p>
-                </div>
-              </div>
-              
-              <div className="p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/30 flex items-center gap-4 hover:border-primary/50 transition-colors cursor-pointer group hover:shadow-sm">
-                <div className="p-3 bg-primary/10 text-primary rounded-lg group-hover:scale-110 transition-transform">
-                  <span className="material-symbols-outlined">assignment_turned_in</span>
-                </div>
-                <div>
-                  <p className="font-label-md font-bold text-on-surface">Audit Checklist</p>
-                  <p className="text-xs text-on-surface-variant">Campus Infrastructure</p>
-                </div>
-              </div>
-            </div>
-            
-            <button className="mt-8 w-full border-2 border-primary text-primary py-3 rounded-full font-bold hover:bg-primary hover:text-white transition-all">
-              Browse All Resources
+        <div className="relative z-10 max-w-xl text-white space-y-4">
+          <span className="inline-block bg-[#9cf6ba] text-[#00210f] px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+            Upcycle Academy v2.4
+          </span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight">
+            Master Sustainability
+          </h2>
+          <p className="text-xs sm:text-sm text-white/90 leading-relaxed">
+            Empower your campus initiatives with data-driven environmental strategies, carbon accounting, and certified micro-credentials.
+          </p>
+          <div className="flex flex-wrap gap-3 pt-2">
+            <button 
+              type="button"
+              onClick={() => alert('Browsing all 24 certified sustainability modules...')}
+              className="bg-white text-[#00522d] px-6 py-3 rounded-full text-xs font-bold hover:bg-[#e7f6ff] transition-all shadow-md cursor-pointer"
+            >
+              Explore All Courses
+            </button>
+            <button 
+              type="button"
+              onClick={() => alert('Downloading official curriculum overview (PDF)...')}
+              className="bg-white/10 backdrop-blur-md text-white border border-white/30 px-6 py-3 rounded-full text-xs font-bold hover:bg-white/20 transition-all cursor-pointer"
+            >
+              Curriculum Overview
             </button>
           </div>
-        </aside>
+        </div>
       </section>
 
-      {/* Recommended Courses Grid */}
-      <section className="space-y-8 pb-12">
-        <div className="flex justify-between items-end">
-          <div>
-            <h3 className="font-display text-headline-lg font-bold text-on-surface mb-2">Recommended Courses</h3>
-            <p className="text-on-surface-variant">Curated for your current environmental focus</p>
+      {/* Main Course Feed & Library */}
+      <div className="grid grid-cols-12 gap-6">
+        {/* Continue Learning (8 Cols) */}
+        <div className="col-span-12 lg:col-span-8 space-y-6">
+          <div className="flex justify-between items-center pb-2 border-b border-[#bec9be]/30">
+            <h3 className="text-xl font-bold text-[#0d1e25]">Active Course Modules</h3>
+            <span className="text-xs font-bold text-[#00522d]">{courses.length} Enrolled</span>
           </div>
-        </div>
-        
-        {loading ? (
-          <p className="text-secondary text-center">Loading courses...</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-gutter">
-            {courses.map(course => (
-              <div key={course.id} className="bg-white border border-outline-variant/30 rounded-[24px] overflow-hidden hover:shadow-md transition-shadow group flex flex-col">
-                <div className="h-48 relative overflow-hidden">
-                  <div className="w-full h-full bg-surface-container-high flex items-center justify-center text-outline group-hover:scale-105 transition-transform duration-500">
-                    <span className="material-symbols-outlined text-6xl">{course.icon}</span>
+
+          <div className="space-y-4">
+            {courses.map((course) => (
+              <div key={course.id} className="bg-white p-6 rounded-[28px] border border-[#bec9be]/30 shadow-sm hover:shadow-md transition-shadow space-y-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                  <div>
+                    <span className="text-[10px] font-bold text-[#00522d] uppercase tracking-wider bg-[#dff1fb] px-2.5 py-0.5 rounded-full">
+                      {course.module} • {course.category}
+                    </span>
+                    <h4 className="text-lg font-bold text-[#0d1e25] mt-1.5">{course.title}</h4>
+                    <p className="text-xs text-[#556158]">Instructor: {course.instructor}</p>
                   </div>
-                  <div className={`absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold ${course.colorClass} shadow-sm`}>
-                    {course.level}
+                  <div className="bg-[#9cf6ba]/40 text-[#00522d] px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">timer</span>
+                    <span>{course.timeLeft}</span>
                   </div>
                 </div>
-                <div className="p-6 flex flex-col flex-1">
-                  <h4 className="font-headline-sm font-bold text-on-surface mb-2 group-hover:text-primary transition-colors">{course.title}</h4>
-                  <p className="text-body-sm text-on-surface-variant mb-4 line-clamp-2">{course.description}</p>
-                  <div className="mt-auto flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-sm font-bold text-on-surface">
-                      <span className="material-symbols-outlined text-[18px] text-yellow-500">star</span> {course.rating}
-                    </div>
-                    <span className="text-sm text-on-surface-variant font-medium">{course.modulesCount} Modules</span>
+
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-xs font-bold">
+                    <span className="text-[#556158]">Course Completion</span>
+                    <span className="text-[#00522d]">{course.progress}%</span>
                   </div>
+                  <div className="h-2.5 w-full bg-[#d9e6da] rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-[#00522d] rounded-full transition-all duration-700"
+                      style={{ width: `${course.progress}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-2">
+                  <button 
+                    type="button"
+                    onClick={() => alert(`Resuming ${course.title}...`)}
+                    className="px-6 py-2.5 bg-[#00522d] hover:bg-[#003d21] text-white rounded-full text-xs font-bold shadow-sm transition-all cursor-pointer"
+                  >
+                    Resume Lesson
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => alert(`Course syllabus: ${course.title}`)}
+                    className="px-5 py-2.5 border border-[#bec9be]/40 text-[#0d1e25] rounded-full text-xs font-bold hover:bg-[#f4faff] transition-all cursor-pointer"
+                  >
+                    Syllabus
+                  </button>
                 </div>
               </div>
             ))}
           </div>
-        )}
-      </section>
+        </div>
+
+        {/* Resource Library Sidebar (4 Cols) */}
+        <aside className="col-span-12 lg:col-span-4 space-y-6">
+          <div className="bg-white rounded-[28px] p-6 sm:p-8 border border-[#bec9be]/30 shadow-sm space-y-5">
+            <h3 className="text-lg font-bold text-[#0d1e25] pb-3 border-b border-[#bec9be]/20">Featured Guides & Toolkits</h3>
+            
+            <div className="space-y-3 text-xs">
+              <div className="p-3.5 bg-[#f4faff] rounded-2xl border border-[#bec9be]/30 space-y-1">
+                <div className="flex items-center gap-2 text-[#00522d] font-bold">
+                  <span className="material-symbols-outlined text-base">picture_as_pdf</span>
+                  <span>Zero-Waste Campus Playbook</span>
+                </div>
+                <p className="text-[11px] text-[#556158]">Comprehensive 45-page municipal compliance guide.</p>
+                <button className="text-[11px] font-bold text-[#00522d] hover:underline pt-1">Download PDF (3.2 MB) →</button>
+              </div>
+
+              <div className="p-3.5 bg-[#f4faff] rounded-2xl border border-[#bec9be]/30 space-y-1">
+                <div className="flex items-center gap-2 text-[#00522d] font-bold">
+                  <span className="material-symbols-outlined text-base">table_chart</span>
+                  <span>GHG Scope 1-3 Calculator Spreadsheet</span>
+                </div>
+                <p className="text-[11px] text-[#556158]">Standard EPA & GHG Protocol emission factors.</p>
+                <button className="text-[11px] font-bold text-[#00522d] hover:underline pt-1">Download XLSX (1.1 MB) →</button>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-[#00522d] text-white rounded-[28px] p-6 shadow-sm space-y-2">
+            <span className="material-symbols-outlined text-3xl text-[#9cf6ba]">school</span>
+            <h4 className="text-base font-bold tracking-tight">Earn University Credits</h4>
+            <p className="text-xs text-white/80 leading-relaxed">
+              All courses completed with 80%+ score are eligible for academic credit transfer.
+            </p>
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }

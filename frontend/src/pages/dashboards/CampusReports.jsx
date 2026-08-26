@@ -5,220 +5,172 @@ export default function CampusReports() {
   const [exportFormat, setExportFormat] = useState('pdf');
 
   return (
-    <div className="flex flex-col gap-md">
+    <div className="w-full max-w-[1440px] mx-auto space-y-6 font-['Hanken_Grotesk',sans-serif]">
       {/* Top Header */}
-      <div className="flex justify-between items-center w-full max-w-[1440px] mx-auto mb-lg">
-        <div className="flex items-center gap-4">
-          <span className="font-headline-md text-headline-md text-primary font-bold">Carbon Offset Performance</span>
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2 border-b border-[#bec9be]/30">
+        <div>
+          <span className="text-[11px] font-bold text-[#00522d] uppercase tracking-wider bg-[#dff1fb] px-3 py-1 rounded-full inline-block mb-2">
+            Governance & ESG Auditing
+          </span>
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#00522d] tracking-tight">Sustainability Reports & Audits</h1>
+          <p className="text-sm text-[#556158] mt-1">Generate verified carbon offset certificates and waste diversion logs.</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-12 gap-gutter">
-        {/* Hero Report Selection (Column 8) */}
-        <section className="col-span-12 lg:col-span-8 flex flex-col gap-gutter">
-          <div className="bg-white rounded-[24px] p-md border border-outline-variant/30 shadow-sm relative overflow-hidden">
-            <div className="absolute -right-20 -top-20 w-64 h-64 bg-primary-container/10 rounded-full blur-3xl"></div>
-            <div className="relative z-10">
-              <h2 className="font-headline-lg text-headline-lg mb-gutter">Generate Report</h2>
-              <p className="text-body-md text-on-surface-variant max-w-2xl mb-lg">Select a report type to begin analyzing your campus sustainability goals and carbon footprint impact across all departments.</p>
+      <div className="grid grid-cols-12 gap-6">
+        {/* Left Column: Generator & Parameters (8 Cols) */}
+        <section className="col-span-12 lg:col-span-8 space-y-6">
+          <div className="bg-white rounded-[28px] p-6 sm:p-8 border border-[#bec9be]/30 shadow-sm relative overflow-hidden space-y-5">
+            <div>
+              <h2 className="text-2xl font-bold text-[#0d1e25] tracking-tight">Select Report Model</h2>
+              <p className="text-xs text-[#556158] mt-1">
+                Choose a specialized reporting model to aggregate IoT and logistical telemetry.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Report Card: Impact */}
+              <div 
+                className={`p-5 rounded-[24px] cursor-pointer transition-all border group ${
+                  selectedReport === 'impact' 
+                    ? 'ring-2 ring-[#00522d] bg-[#dff1fb]/40 border-transparent shadow-sm' 
+                    : 'border-[#bec9be]/30 bg-white hover:border-[#00522d]/40'
+                }`}
+                onClick={() => setSelectedReport('impact')}
+              >
+                <div className="w-12 h-12 rounded-2xl bg-[#00522d] flex items-center justify-center text-white mb-3 shadow-sm">
+                  <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>eco</span>
+                </div>
+                <h3 className="text-sm font-bold text-[#0d1e25] mb-1">Impact Report</h3>
+                <p className="text-xs text-[#556158]">Detailed carbon and diversion offset metrics.</p>
+              </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-                {/* Report Card: Impact */}
-                <div 
-                  className={`p-6 rounded-[24px] cursor-pointer hover:shadow-md transition-all border group active:scale-[0.98] ${selectedReport === 'impact' ? 'ring-2 ring-primary bg-primary-fixed/10 border-transparent' : 'border-outline-variant/30 bg-surface-container-high/40'}`}
-                  onClick={() => setSelectedReport('impact')}
-                >
-                  <div className="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container mb-4 group-hover:scale-110 transition-transform">
-                    <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>eco</span>
-                  </div>
-                  <h3 className="font-label-md text-label-md font-bold mb-1">Impact Report</h3>
-                  <p className="text-label-sm text-on-surface-variant">Detailed environmental offset data.</p>
+              {/* Report Card: Progress */}
+              <div 
+                className={`p-5 rounded-[24px] cursor-pointer transition-all border group ${
+                  selectedReport === 'progress' 
+                    ? 'ring-2 ring-[#00522d] bg-[#dff1fb]/40 border-transparent shadow-sm' 
+                    : 'border-[#bec9be]/30 bg-white hover:border-[#00522d]/40'
+                }`}
+                onClick={() => setSelectedReport('progress')}
+              >
+                <div className="w-12 h-12 rounded-2xl bg-[#24502c] flex items-center justify-center text-white mb-3 shadow-sm">
+                  <span className="material-symbols-outlined text-2xl">trending_up</span>
                 </div>
-                
-                {/* Report Card: Progress */}
-                <div 
-                  className={`p-6 rounded-[24px] cursor-pointer hover:shadow-md transition-all border group active:scale-[0.98] ${selectedReport === 'progress' ? 'ring-2 ring-primary bg-primary-fixed/10 border-transparent' : 'border-outline-variant/30 bg-surface-container-high/40'}`}
-                  onClick={() => setSelectedReport('progress')}
-                >
-                  <div className="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container mb-4 group-hover:scale-110 transition-transform">
-                    <span className="material-symbols-outlined">trending_up</span>
-                  </div>
-                  <h3 className="font-label-md text-label-md font-bold mb-1">Progress Report</h3>
-                  <p className="text-label-sm text-on-surface-variant">Year-to-date goal trajectory.</p>
+                <h3 className="text-sm font-bold text-[#0d1e25] mb-1">Progress Report</h3>
+                <p className="text-xs text-[#556158]">Year-to-date trajectory vs. municipal targets.</p>
+              </div>
+              
+              {/* Report Card: Audit */}
+              <div 
+                className={`p-5 rounded-[24px] cursor-pointer transition-all border group ${
+                  selectedReport === 'audit' 
+                    ? 'ring-2 ring-[#00522d] bg-[#dff1fb]/40 border-transparent shadow-sm' 
+                    : 'border-[#bec9be]/30 bg-white hover:border-[#00522d]/40'
+                }`}
+                onClick={() => setSelectedReport('audit')}
+              >
+                <div className="w-12 h-12 rounded-2xl bg-[#2eb872] flex items-center justify-center text-[#00210f] mb-3 shadow-sm">
+                  <span className="material-symbols-outlined text-2xl">verified_user</span>
                 </div>
-                
-                {/* Report Card: Audit */}
-                <div 
-                  className={`p-6 rounded-[24px] cursor-pointer hover:shadow-md transition-all border group active:scale-[0.98] ${selectedReport === 'audit' ? 'ring-2 ring-primary bg-primary-fixed/10 border-transparent' : 'border-outline-variant/30 bg-surface-container-high/40'}`}
-                  onClick={() => setSelectedReport('audit')}
-                >
-                  <div className="w-12 h-12 rounded-full bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed mb-4 group-hover:scale-110 transition-transform">
-                    <span className="material-symbols-outlined">verified_user</span>
-                  </div>
-                  <h3 className="font-label-md text-label-md font-bold mb-1">Audit Log</h3>
-                  <p className="text-label-sm text-on-surface-variant">Compliance and verification data.</p>
-                </div>
+                <h3 className="text-sm font-bold text-[#0d1e25] mb-1">Compliance Audit</h3>
+                <p className="text-xs text-[#556158]">ISO 14001 and municipal legal audits.</p>
               </div>
             </div>
           </div>
           
-          {/* Parameters Panel (Bento) */}
-          <div className="bg-white rounded-[24px] p-md border border-outline-variant/30 shadow-sm">
-            <div className="flex items-center gap-3 mb-6">
-              <span className="material-symbols-outlined text-primary">tune</span>
-              <h2 className="font-headline-md text-headline-md">Report Parameters</h2>
+          {/* Parameters Panel */}
+          <div className="bg-white rounded-[28px] p-6 sm:p-8 border border-[#bec9be]/30 shadow-sm space-y-5">
+            <div className="flex items-center gap-2 pb-3 border-b border-[#bec9be]/20">
+              <span className="material-symbols-outlined text-[#00522d] text-2xl">tune</span>
+              <h2 className="text-xl font-bold text-[#0d1e25]">Report Parameters</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
-              {/* Date Pickers & Selection */}
-              <div className="space-y-6">
-                <label className="block">
-                  <span className="text-label-md font-bold block mb-2">Reporting Period</span>
-                  <div className="flex items-center gap-gutter">
-                    <div className="flex-1 relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant text-[20px]">calendar_today</span>
-                      <input className="w-full pl-10 pr-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/30 text-body-md focus:ring-2 focus:ring-primary" type="date" />
-                    </div>
-                    <span className="text-on-surface-variant">to</span>
-                    <div className="flex-1 relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant text-[20px]">calendar_today</span>
-                      <input className="w-full pl-10 pr-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/30 text-body-md focus:ring-2 focus:ring-primary" type="date" />
-                    </div>
-                  </div>
-                </label>
-                <label className="block">
-                  <span className="text-label-md font-bold block mb-2">Campus Sector</span>
-                  <select className="w-full px-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/30 text-body-md focus:ring-2 focus:ring-primary appearance-none">
-                    <option>All Sectors</option>
-                    <option>Academic Buildings</option>
-                    <option>Residential Halls</option>
-                    <option>Recreational Facilities</option>
-                    <option>Transportation & Logistics</option>
-                  </select>
-                </label>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#556158]">Date Range</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <input type="date" defaultValue="2024-01-01" className="w-full bg-[#f4faff] border border-[#bec9be]/40 rounded-xl px-3 py-2 text-xs font-semibold text-[#0d1e25] outline-none" />
+                  <input type="date" defaultValue="2024-09-30" className="w-full bg-[#f4faff] border border-[#bec9be]/40 rounded-xl px-3 py-2 text-xs font-semibold text-[#0d1e25] outline-none" />
+                </div>
               </div>
-              
-              {/* Export Settings */}
-              <div className="space-y-6">
-                <div>
-                  <span className="text-label-md font-bold block mb-3">Export Format</span>
-                  <div className="grid grid-cols-2 gap-gutter">
-                    <label 
-                      className={`flex items-center justify-center gap-2 p-4 rounded-xl border cursor-pointer transition-colors ${exportFormat === 'pdf' ? 'border-primary bg-primary-fixed/20' : 'border-outline-variant/30 bg-surface-container-low hover:bg-surface-container'}`}
-                      onClick={() => setExportFormat('pdf')}
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#556158]">Campus Sector</label>
+                <select className="w-full bg-[#f4faff] border border-[#bec9be]/40 rounded-xl px-3 py-2.5 text-xs font-semibold text-[#0d1e25] outline-none">
+                  <option>All Campus Sectors (Aggregated)</option>
+                  <option>North Science Complex (Sector 4)</option>
+                  <option>Central Dining & Residence (Sector 1)</option>
+                  <option>Engineering Laboratories (Sector 2)</option>
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#556158]">Export Format</label>
+                <div className="flex gap-2">
+                  {['PDF Certificate', 'CSV Raw Telemetry', 'JSON Bundle'].map((fmt) => (
+                    <button
+                      key={fmt}
+                      type="button"
+                      onClick={() => setExportFormat(fmt)}
+                      className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
+                        exportFormat === fmt 
+                          ? 'bg-[#00522d] text-white shadow-sm' 
+                          : 'bg-[#f4faff] border border-[#bec9be]/40 text-[#556158] hover:bg-[#e7f6ff]'
+                      }`}
                     >
-                      <input type="radio" name="format" value="pdf" className="hidden" readOnly checked={exportFormat === 'pdf'} />
-                      <span className={`material-symbols-outlined ${exportFormat === 'pdf' ? 'text-primary' : 'text-on-surface-variant'}`}>picture_as_pdf</span>
-                      <span className="font-label-md text-label-md">PDF Document</span>
-                    </label>
-                    <label 
-                      className={`flex items-center justify-center gap-2 p-4 rounded-xl border cursor-pointer transition-colors ${exportFormat === 'csv' ? 'border-primary bg-primary-fixed/20' : 'border-outline-variant/30 bg-surface-container-low hover:bg-surface-container'}`}
-                      onClick={() => setExportFormat('csv')}
-                    >
-                      <input type="radio" name="format" value="csv" className="hidden" readOnly checked={exportFormat === 'csv'} />
-                      <span className={`material-symbols-outlined ${exportFormat === 'csv' ? 'text-primary' : 'text-on-surface-variant'}`}>csv</span>
-                      <span className="font-label-md text-label-md">CSV Spreadsheet</span>
-                    </label>
-                  </div>
+                      {fmt.split(' ')[0]}
+                    </button>
+                  ))}
                 </div>
-                <div className="pt-2">
-                  <button className="w-full bg-primary text-on-primary font-bold py-4 rounded-full flex items-center justify-center gap-3 transition-all hover:shadow-lg active:scale-95">
-                    <span className="material-symbols-outlined">rocket_launch</span>
-                    <span>Compile & Generate</span>
-                  </button>
-                </div>
+              </div>
+
+              <div className="flex items-end">
+                <button
+                  type="button"
+                  onClick={() => alert('Generating and exporting report...')}
+                  className="w-full py-3 bg-[#00522d] hover:bg-[#003d21] text-white rounded-xl text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-[18px]">download</span>
+                  <span>Export {selectedReport.toUpperCase()} Report</span>
+                </button>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Recent Reports (Column 4) */}
-        <aside className="col-span-12 lg:col-span-4 bg-white rounded-[24px] border border-outline-variant/30 shadow-sm flex flex-col min-h-[500px]">
-          <div className="p-md border-b border-outline-variant/20 flex justify-between items-center">
-            <h2 className="font-headline-md text-headline-md">Recent Reports</h2>
-            <span className="text-label-sm font-bold text-primary cursor-pointer hover:underline">View All</span>
-          </div>
-          <div className="flex-1 overflow-y-auto p-gutter space-y-4">
-            {/* Recent Item 1 */}
-            <div className="p-4 rounded-xl hover:bg-surface-container-low transition-colors border border-transparent hover:border-outline-variant/30 group">
-              <div className="flex justify-between items-start mb-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-error-container/20 text-error-warm flex items-center justify-center">
-                    <span className="material-symbols-outlined">picture_as_pdf</span>
-                  </div>
-                  <div>
-                    <h4 className="text-label-md font-bold line-clamp-1">Q3_Carbon_Audit_2023.pdf</h4>
-                    <p className="text-label-sm text-on-surface-variant">Generated 2h ago • 4.2 MB</p>
-                  </div>
-                </div>
-                <button className="p-2 rounded-full hover:bg-surface-variant transition-colors group-hover:text-primary">
-                  <span className="material-symbols-outlined text-[20px]">download</span>
-                </button>
-              </div>
-              <div className="flex items-center gap-2 mt-3">
-                <span className="px-2 py-0.5 rounded-full bg-success-container/10 text-primary text-[10px] font-bold uppercase tracking-wider">Completed</span>
-                <span className="px-2 py-0.5 rounded-full bg-surface-variant text-on-surface-variant text-[10px] font-bold uppercase tracking-wider">Audit</span>
-              </div>
-            </div>
+        {/* Right Column: Historical Archive (4 Cols) */}
+        <section className="col-span-12 lg:col-span-4 space-y-6">
+          <div className="bg-white rounded-[28px] p-6 border border-[#bec9be]/30 shadow-sm space-y-4">
+            <h3 className="text-lg font-bold text-[#0d1e25]">Archived Exports</h3>
             
-            {/* Recent Item 2 */}
-            <div className="p-4 rounded-xl hover:bg-surface-container-low transition-colors border border-transparent hover:border-outline-variant/30 group">
-              <div className="flex justify-between items-start mb-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary-fixed/20 text-primary flex items-center justify-center">
-                    <span className="material-symbols-outlined">csv</span>
-                  </div>
-                  <div>
-                    <h4 className="text-label-md font-bold line-clamp-1">Campus_Water_Impact_Dataset.csv</h4>
-                    <p className="text-label-sm text-on-surface-variant">Generated yesterday • 12.8 MB</p>
-                  </div>
+            <div className="divide-y divide-[#bec9be]/20 text-xs">
+              <div className="py-3 flex justify-between items-center">
+                <div>
+                  <h4 className="font-bold text-[#0d1e25]">Q2-2024-Impact.pdf</h4>
+                  <p className="text-[10px] text-[#556158]">Generated July 1, 2024 • 4.2 MB</p>
                 </div>
-                <button className="p-2 rounded-full hover:bg-surface-variant transition-colors group-hover:text-primary">
-                  <span className="material-symbols-outlined text-[20px]">download</span>
-                </button>
+                <button className="p-1.5 rounded-lg bg-[#f4faff] text-[#00522d] hover:bg-[#dff1fb]"><span className="material-symbols-outlined text-base">download</span></button>
               </div>
-              <div className="flex items-center gap-2 mt-3">
-                <span className="px-2 py-0.5 rounded-full bg-success-container/10 text-primary text-[10px] font-bold uppercase tracking-wider">Completed</span>
-                <span className="px-2 py-0.5 rounded-full bg-surface-variant text-on-surface-variant text-[10px] font-bold uppercase tracking-wider">Impact</span>
-              </div>
-            </div>
-            
-            {/* Recent Item 3 */}
-            <div className="p-4 rounded-xl hover:bg-surface-container-low transition-colors border border-transparent hover:border-outline-variant/30 group opacity-70">
-              <div className="flex justify-between items-start mb-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-error-container/20 text-error-warm flex items-center justify-center">
-                    <span className="material-symbols-outlined">picture_as_pdf</span>
-                  </div>
-                  <div>
-                    <h4 className="text-label-md font-bold line-clamp-1">Sustainability_Milestones_V2.pdf</h4>
-                    <p className="text-label-sm text-on-surface-variant">Generated 3 days ago • 8.1 MB</p>
-                  </div>
+
+              <div className="py-3 flex justify-between items-center">
+                <div>
+                  <h4 className="font-bold text-[#0d1e25]">Q1-2024-Audit-Log.csv</h4>
+                  <p className="text-[10px] text-[#556158]">Generated April 2, 2024 • 1.8 MB</p>
                 </div>
-                <button className="p-2 rounded-full hover:bg-surface-variant transition-colors group-hover:text-primary">
-                  <span className="material-symbols-outlined text-[20px]">download</span>
-                </button>
-              </div>
-              <div className="flex items-center gap-2 mt-3">
-                <span className="px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant text-[10px] font-bold uppercase tracking-wider">Archived</span>
-                <span className="px-2 py-0.5 rounded-full bg-surface-variant text-on-surface-variant text-[10px] font-bold uppercase tracking-wider">Progress</span>
+                <button className="p-1.5 rounded-lg bg-[#f4faff] text-[#00522d] hover:bg-[#dff1fb]"><span className="material-symbols-outlined text-base">download</span></button>
               </div>
             </div>
           </div>
-          
-          {/* Visual Quick Insight */}
-          <div className="p-md bg-surface-ice m-gutter rounded-[20px] border border-outline-variant/20 relative overflow-hidden">
-            <div className="relative z-10">
-              <p className="text-label-sm font-bold text-on-surface-variant uppercase tracking-widest mb-2">Storage Status</p>
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-display text-headline-md">72%</span>
-                <span className="text-label-sm text-on-surface-variant">1.4 GB / 2 GB</span>
-              </div>
-              <div className="w-full h-2 bg-secondary-container rounded-full overflow-hidden">
-                <div className="h-full bg-primary w-[72%] rounded-full"></div>
-              </div>
-            </div>
+
+          <div className="bg-[#00522d] text-white rounded-[28px] p-6 shadow-sm space-y-2">
+            <span className="material-symbols-outlined text-3xl text-[#9cf6ba]">policy</span>
+            <h4 className="text-base font-bold tracking-tight">Cryptographic Verification</h4>
+            <p className="text-xs text-white/80 leading-relaxed">
+              All generated PDFs contain SHA-256 digital watermark signatures for audit integrity.
+            </p>
           </div>
-        </aside>
+        </section>
       </div>
     </div>
   );

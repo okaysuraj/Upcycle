@@ -1,205 +1,150 @@
 import React, { useState } from 'react';
-import Card from '../../components/ui/Card';
+import { Link } from 'react-router-dom';
 
 export default function PrivacySettings() {
   const [profileVisible, setProfileVisible] = useState(true);
   const [shareImpact, setShareImpact] = useState(true);
   const [activityFeed, setActivityFeed] = useState(false);
-  const [dataAnalytics, setDataAnalytics] = useState(true);
-
-  const [marketing, setMarketing] = useState('essential');
+  const [saved, setSaved] = useState(false);
 
   const handleSave = () => {
-    // Save logic
-    console.log('Saved settings');
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
   };
 
   return (
-    <div className="p-6 max-w-[1440px] mx-auto min-h-screen">
-      {/* Breadcrumbs & Header */}
-      <div className="space-y-1 mb-8">
-        <nav className="flex items-center gap-2 text-on-surface-variant">
-          <span className="font-bold text-xs">Settings</span>
-          <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-          <span className="font-bold text-xs text-primary">Privacy & Security</span>
-        </nav>
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-          <div>
-            <h2 className="font-display text-3xl font-bold text-primary">Privacy Settings</h2>
-            <p className="text-sm text-on-surface-variant max-w-xl mt-1">Configure how the system handles administrative data, audit trails, and data sharing protocols for the Upcycle ecosystem.</p>
-          </div>
-          <div className="flex gap-3">
-            <button className="px-4 py-2 border border-primary text-primary text-sm font-bold rounded-lg hover:bg-primary/5 transition-colors">Discard Changes</button>
-            <button onClick={handleSave} className="px-6 py-2 bg-primary text-white text-sm font-bold rounded-lg shadow-sm hover:opacity-90 transition-opacity">Save Protocol</button>
-          </div>
+    <div className="w-full max-w-[1440px] mx-auto space-y-6 font-['Hanken_Grotesk',sans-serif]">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2 border-b border-[#bec9be]/30">
+        <div>
+          <span className="text-[11px] font-bold text-[#00522d] uppercase tracking-wider bg-[#dff1fb] px-3 py-1 rounded-full inline-block mb-2">
+            Data Governance & Telemetry
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#00522d] tracking-tight">Privacy & Data Sharing</h2>
+          <p className="text-sm text-[#556158] mt-1">Control your profile visibility, audit trail disclosures, and regional benchmarking telemetry.</p>
         </div>
+        <button 
+          type="button"
+          onClick={handleSave} 
+          className="px-6 py-2.5 bg-[#00522d] text-white text-xs font-bold rounded-full shadow-md hover:bg-[#003d21] transition-all cursor-pointer"
+        >
+          {saved ? 'Protocol Saved!' : 'Save Protocol'}
+        </button>
       </div>
 
+      {saved && (
+        <div className="p-4 rounded-2xl bg-[#9cf6ba] text-[#00210f] font-bold text-xs shadow-sm flex items-center gap-2">
+          <span className="material-symbols-outlined text-base">check_circle</span>
+          <span>Privacy preferences updated successfully across all campus nodes.</span>
+        </div>
+      )}
+
       {/* Bento Grid Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        
-        {/* Profile Visibility Section (5 cols) */}
-        <section className="col-span-1 md:col-span-5 bg-white border border-[#c1c8c2] rounded-xl p-6 flex flex-col justify-between group hover:border-primary/30 transition-all duration-300 shadow-sm">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
+      <div className="grid grid-cols-12 gap-6">
+        {/* Visibility Controls (7 Cols) */}
+        <div className="col-span-12 lg:col-span-7 bg-white rounded-[28px] p-6 sm:p-8 border border-[#bec9be]/30 shadow-sm space-y-6">
+          <div className="flex justify-between items-center pb-2 border-b border-[#bec9be]/20">
+            <h3 className="text-lg font-bold text-[#0d1e25]">Visibility Controls</h3>
+            <span className="text-[10px] font-bold text-[#00522d] bg-[#dff1fb] px-2.5 py-0.5 rounded-full">
+              SHA-256 Encrypted
+            </span>
+          </div>
+
+          <div className="space-y-4 text-xs">
+            <div className="flex items-center justify-between p-4 bg-[#f4faff] rounded-2xl border border-[#bec9be]/30">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-[#cce6d0] flex items-center justify-center text-primary">
-                  <span className="material-symbols-outlined">visibility</span>
+                <div className="w-10 h-10 rounded-xl bg-white border border-[#bec9be]/40 flex items-center justify-center text-[#00522d] shadow-sm">
+                  <span className="material-symbols-outlined text-xl">visibility</span>
                 </div>
-                <h3 className="font-display text-xl font-bold">Profile Visibility</h3>
+                <div>
+                  <p className="font-bold text-[#0d1e25]">Campus Leaderboard Visibility</p>
+                  <p className="text-[11px] text-[#556158]">Display your profile name and earned points on campus leaderboards.</p>
+                </div>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" checked={profileVisible} onChange={() => setProfileVisible(!profileVisible)} className="sr-only peer" />
-                <div className={`w-11 h-6 rounded-full peer transition-colors ${profileVisible ? 'bg-primary' : 'bg-[#e1e3e4]'}`}></div>
-                <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${profileVisible ? 'translate-x-5' : ''}`}></div>
-              </label>
+              <button
+                type="button"
+                onClick={() => setProfileVisible(!profileVisible)}
+                className={`w-12 h-6 rounded-full p-0.5 transition-colors cursor-pointer ${
+                  profileVisible ? 'bg-[#00522d]' : 'bg-[#bec9be]/50'
+                }`}
+              >
+                <div className={`w-5 h-5 rounded-full bg-white transition-transform ${
+                  profileVisible ? 'translate-x-6' : 'translate-x-0'
+                }`}></div>
+              </button>
             </div>
-            <p className="text-sm text-on-surface-variant">Control if your administrator profile and active sessions are visible to other system oversight members.</p>
-            <div className="pt-4 space-y-3">
-              <div className="flex items-center justify-between p-3 bg-[#f3f4f5] rounded-lg">
-                <span className="text-xs font-bold">Show Online Status</span>
-                <input type="checkbox" defaultChecked className="w-4 h-4 text-primary bg-white border-[#717973] rounded focus:ring-primary/20" />
-              </div>
-              <div className="flex items-center justify-between p-3 bg-[#f3f4f5] rounded-lg">
-                <span className="text-xs font-bold">Audit Trail Attribution</span>
-                <input type="checkbox" defaultChecked className="w-4 h-4 text-primary bg-white border-[#717973] rounded focus:ring-primary/20" />
-              </div>
-            </div>
-          </div>
-          <div className="mt-6 flex items-center gap-2 text-[10px] font-bold text-[#0e5138] bg-[#b1f0ce]/30 px-3 py-1.5 rounded-full w-fit">
-            <span className="material-symbols-outlined text-[14px]">info</span>
-            Public visibility is recommended for Level 4+
-          </div>
-        </section>
 
-        {/* Data Sharing Section (7 cols) */}
-        <section className="col-span-1 md:col-span-7 bg-white border border-[#c1c8c2] rounded-xl p-6 space-y-6 hover:border-primary/30 transition-all duration-300 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[#bdefbf] flex items-center justify-center text-[#24502c]">
-              <span className="material-symbols-outlined">analytics</span>
-            </div>
-            <h3 className="font-display text-xl font-bold">Data Sharing & Analytics</h3>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 border border-[#c1c8c2] rounded-xl space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-primary">Diagnostic Logs</span>
-                <input type="checkbox" defaultChecked className="w-4 h-4 text-primary bg-white border-[#717973] rounded focus:ring-primary/20" />
+            <div className="flex items-center justify-between p-4 bg-[#f4faff] rounded-2xl border border-[#bec9be]/30">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white border border-[#bec9be]/40 flex items-center justify-center text-[#00522d] shadow-sm">
+                  <span className="material-symbols-outlined text-xl">analytics</span>
+                </div>
+                <div>
+                  <p className="font-bold text-[#0d1e25]">Anonymized Municipal Telemetry</p>
+                  <p className="text-[11px] text-[#556158]">Contribute aggregated diversion metrics to municipal benchmarks.</p>
+                </div>
               </div>
-              <p className="text-xs text-on-surface-variant">Send anonymized system performance data to Upcycle Core developers.</p>
+              <button
+                type="button"
+                onClick={() => setShareImpact(!shareImpact)}
+                className={`w-12 h-6 rounded-full p-0.5 transition-colors cursor-pointer ${
+                  shareImpact ? 'bg-[#00522d]' : 'bg-[#bec9be]/50'
+                }`}
+              >
+                <div className={`w-5 h-5 rounded-full bg-white transition-transform ${
+                  shareImpact ? 'translate-x-6' : 'translate-x-0'
+                }`}></div>
+              </button>
             </div>
-            <div className="p-4 border border-[#c1c8c2] rounded-xl space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-primary">Usage Statistics</span>
-                <input type="checkbox" className="w-4 h-4 text-primary bg-white border-[#717973] rounded focus:ring-primary/20" />
-              </div>
-              <p className="text-xs text-on-surface-variant">Collect data on administrative workflow efficiency to optimize the UI.</p>
-            </div>
-          </div>
-          
-          <div className="p-4 bg-[#f3f4f5] rounded-xl border border-dashed border-[#c1c8c2]">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="material-symbols-outlined text-primary text-[20px]">security</span>
-              <span className="text-xs font-bold text-primary">Encryption Protocol</span>
-            </div>
-            <p className="text-xs text-on-surface-variant mb-4">All outgoing data is hashed using SHA-256 and transmitted via TLS 1.3 with Perfect Forward Secrecy.</p>
-            <button className="text-primary text-xs font-bold hover:underline flex items-center gap-1">
-              Review Technical Documentation
-              <span className="material-symbols-outlined text-[14px]">open_in_new</span>
-            </button>
-          </div>
-        </section>
 
-        {/* Marketing Intelligence */}
-        <section className="col-span-1 md:col-span-4 bg-white border border-[#c1c8c2] rounded-xl p-6 space-y-4 hover:border-primary/30 transition-all duration-300 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[#006d3e] flex items-center justify-center text-white">
-              <span className="material-symbols-outlined">campaign</span>
+            <div className="flex items-center justify-between p-4 bg-[#f4faff] rounded-2xl border border-[#bec9be]/30">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white border border-[#bec9be]/40 flex items-center justify-center text-[#00522d] shadow-sm">
+                  <span className="material-symbols-outlined text-xl">dynamic_feed</span>
+                </div>
+                <div>
+                  <p className="font-bold text-[#0d1e25]">Public Social Feed Broadcasts</p>
+                  <p className="text-[11px] text-[#556158]">Automatically post milestone badges to the campus community feed.</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActivityFeed(!activityFeed)}
+                className={`w-12 h-6 rounded-full p-0.5 transition-colors cursor-pointer ${
+                  activityFeed ? 'bg-[#00522d]' : 'bg-[#bec9be]/50'
+                }`}
+              >
+                <div className={`w-5 h-5 rounded-full bg-white transition-transform ${
+                  activityFeed ? 'translate-x-6' : 'translate-x-0'
+                }`}></div>
+              </button>
             </div>
-            <h3 className="font-display text-xl font-bold">Marketing Intelligence</h3>
           </div>
-          <p className="text-sm text-on-surface-variant">Receive updates regarding new administrative tools, system patches, and sustainability reports.</p>
-          <div className="space-y-2">
-            <label className="flex items-center gap-3 p-3 hover:bg-[#f3f4f5] rounded-lg cursor-pointer transition-colors">
-              <input type="radio" name="marketing" value="essential" checked={marketing === 'essential'} onChange={() => setMarketing('essential')} className="text-primary focus:ring-primary/20" />
-              <div>
-                <p className="text-xs font-bold">Essential Only</p>
-                <p className="text-[11px] text-on-surface-variant">System-critical updates and security patches.</p>
-              </div>
-            </label>
-            <label className="flex items-center gap-3 p-3 hover:bg-[#f3f4f5] rounded-lg cursor-pointer transition-colors">
-              <input type="radio" name="marketing" value="standard" checked={marketing === 'standard'} onChange={() => setMarketing('standard')} className="text-primary focus:ring-primary/20" />
-              <div>
-                <p className="text-xs font-bold">Standard Updates</p>
-                <p className="text-[11px] text-on-surface-variant">New feature highlights and monthly summaries.</p>
-              </div>
-            </label>
-            <label className="flex items-center gap-3 p-3 hover:bg-[#f3f4f5] rounded-lg cursor-pointer transition-colors">
-              <input type="radio" name="marketing" value="full" checked={marketing === 'full'} onChange={() => setMarketing('full')} className="text-primary focus:ring-primary/20" />
-              <div>
-                <p className="text-xs font-bold">Full Insights</p>
-                <p className="text-[11px] text-on-surface-variant">Detailed research, beta invites, and reports.</p>
-              </div>
-            </label>
-          </div>
-        </section>
+        </div>
 
-        {/* Your Data Rights Section */}
-        <section className="col-span-1 md:col-span-8 relative overflow-hidden bg-[#1b4332] rounded-xl p-8 text-white flex flex-col justify-between shadow-sm">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl"></div>
-          <div className="relative z-10 space-y-6">
-            <div className="flex items-center gap-4">
-              <span className="material-symbols-outlined text-[40px] text-[#9cf6ba]">account_balance</span>
-              <div>
-                <h3 className="font-display text-3xl font-bold leading-tight">Your Data Rights</h3>
-                <p className="text-base text-[#9cf6ba]/80 mt-1">Full transparency over your administrative footprint.</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
-              <div className="p-4 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10">
-                <h4 className="text-xs font-bold mb-1 text-[#9cf6ba]">Access & Portability</h4>
-                <p className="text-xs opacity-80">Download a complete machine-readable archive of all activity logs and profile data associated with this account.</p>
-              </div>
-              <div className="p-4 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10">
-                <h4 className="text-xs font-bold mb-1 text-[#9cf6ba]">Right to Erasure</h4>
-                <p className="text-xs opacity-80">Request the permanent removal of your non-audit administrative records from the Upcycle production environment.</p>
-              </div>
+        {/* Security & Audit Policies (5 Cols) */}
+        <div className="col-span-12 lg:col-span-5 bg-white rounded-[28px] p-6 sm:p-8 border border-[#bec9be]/30 shadow-sm space-y-4 flex flex-col justify-between">
+          <div className="space-y-4">
+            <h3 className="text-lg font-bold text-[#0d1e25] pb-2 border-b border-[#bec9be]/20">Audit Trail Integrity</h3>
+            <p className="text-xs text-[#556158] leading-relaxed">
+              In compliance with ISO 14001 certification requirements, all waste weight entries and logistics manifests maintain tamper-evident immutable audit trails.
+            </p>
+            <div className="p-3 bg-[#f4faff] rounded-2xl border border-[#bec9be]/30 text-xs space-y-1">
+              <span className="font-bold text-[#00522d]">Data Retention Period</span>
+              <p className="text-[11px] text-[#556158]">Operational telemetry retained for 36 months under standard academic archive license.</p>
             </div>
           </div>
-          <div className="relative z-10 mt-8 flex flex-wrap gap-4">
-            <button className="flex items-center gap-2 px-6 py-3 bg-white text-primary font-bold text-sm rounded-lg shadow-lg hover:bg-[#9cf6ba] transition-colors">
-              <span className="material-symbols-outlined">download</span>
-              Export Data Archive
-            </button>
-            <button className="flex items-center gap-2 px-6 py-3 border border-white/30 text-white font-bold text-sm rounded-lg hover:bg-white/10 transition-colors">
-              <span className="material-symbols-outlined text-[#ffdad6]" style={{ fontVariationSettings: "'FILL' 1" }}>delete_forever</span>
-              Delete Profile
-            </button>
-          </div>
-        </section>
-        
-        {/* Status Summary Section */}
-        <section className="col-span-1 md:col-span-12 bg-[#edeeef] border border-[#c1c8c2] rounded-xl p-4 flex flex-wrap items-center justify-between gap-6 shadow-sm">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
-              <span className="text-xs font-bold">Privacy Compliance: GDPR/CCPA Compliant</span>
-            </div>
-            <div className="h-4 w-px bg-[#c1c8c2]"></div>
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px] text-[#414844]">update</span>
-              <span className="text-xs font-bold text-[#414844]">Last security audit: 4 days ago</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-xs font-bold text-[#414844]">Session ID: <span className="font-mono bg-white px-2 py-0.5 rounded border border-[#c1c8c2]/50 text-[10px]">UP-772-AD-99X</span></span>
-            <button className="p-2 hover:bg-[#e7e8e9] rounded-full transition-colors text-[#414844]">
-              <span className="material-symbols-outlined text-[20px]">print</span>
-            </button>
-          </div>
-        </section>
 
+          <div className="pt-4 border-t border-[#bec9be]/20">
+            <Link 
+              to="/terms"
+              className="text-xs font-bold text-[#00522d] hover:underline flex items-center gap-1"
+            >
+              <span>View Full Privacy Policy & Compliance Charter</span>
+              <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

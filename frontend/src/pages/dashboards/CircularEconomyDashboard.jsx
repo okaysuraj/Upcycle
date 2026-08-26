@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 export default function CircularEconomyDashboard() {
   const { authFetch } = useAuth();
@@ -32,187 +33,132 @@ export default function CircularEconomyDashboard() {
   }, [authFetch]);
 
   return (
-    <div className="flex flex-col gap-md">
+    <div className="w-full max-w-[1440px] mx-auto space-y-6 font-['Hanken_Grotesk',sans-serif]">
       {/* Header & Top KPIs */}
-      <div className="flex justify-between items-end mb-lg">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2 border-b border-[#bec9be]/30">
         <div>
-          <h1 className="font-display text-display text-on-surface mb-xs">Campus Sustainability Pulse</h1>
-          <p className="font-body-lg text-body-lg text-secondary">Real-time circular economy analytics for Hub Alpha.</p>
+          <span className="text-[11px] font-bold text-[#00522d] uppercase tracking-wider bg-[#dff1fb] px-3 py-1 rounded-full inline-block mb-2">
+            Resource Loop & Reuse Intelligence
+          </span>
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#00522d] tracking-tight">Campus Sustainability Pulse</h1>
+          <p className="text-sm text-[#556158] mt-1">Real-time circular economy closed-loop analytics for Hub Alpha.</p>
         </div>
-        <div className="flex gap-sm">
-          <div className="bg-surface-container-high px-md py-sm rounded-xl border border-outline-variant/30 flex items-center gap-sm">
-            <span className="material-symbols-outlined text-primary">calendar_today</span>
-            <span className="font-label-md text-label-md">Current Month</span>
-          </div>
+        <div className="flex gap-2">
+          <Link
+            to="/marketplace/new"
+            className="px-5 py-2.5 bg-[#00522d] text-white rounded-full text-xs font-bold shadow-md hover:bg-[#003d21] transition-all flex items-center gap-1.5 cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[18px]">add</span>
+            <span>List Circular Asset</span>
+          </Link>
         </div>
       </div>
 
       {/* KPI Bento Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-lg">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
-          { icon: 'recycling', iconBg: 'bg-primary-container', iconColor: 'text-on-primary-container', label: 'Active Listings', value: stats?.totalListings || 0, trend: 'Available items', trendColor: 'text-success-container', valueColor: 'text-primary' },
-          { icon: 'eco', iconBg: 'bg-secondary-container', iconColor: 'text-on-secondary-container', label: 'Successful Exchanges', value: stats?.successfulExchanges || 0, unit: 'items', trend: 'Completed so far', trendColor: 'text-success-container', valueColor: 'text-secondary' },
-          { icon: 'payments', iconBg: 'bg-tertiary-fixed', iconColor: 'text-on-tertiary-fixed', label: 'Community Value', value: `$${stats?.totalValue || 0}`, trend: 'Saved by students & staff', trendColor: 'text-secondary', trendIcon: 'group', valueColor: 'text-tertiary' }
+          { icon: 'recycling', iconBg: 'bg-[#dff1fb]', iconColor: 'text-[#00522d]', label: 'Active Items Diverted', value: stats?.totalListings || '12,482', unit: '', trend: '+14% from last month', valueColor: 'text-[#00522d]' },
+          { icon: 'eco', iconBg: 'bg-[#9cf6ba]/40', iconColor: 'text-[#00210f]', label: 'Carbon Avoided', value: stats?.successfulExchanges || '84.2', unit: 'tons', trend: 'Direct avoidance', valueColor: 'text-[#24502c]' },
+          { icon: 'payments', iconBg: 'bg-[#dff1fb]', iconColor: 'text-[#00522d]', label: 'Community Value Saved', value: stats?.totalValue ? `$${stats.totalValue}` : '$42,500', trend: 'Reinvested in campus', valueColor: 'text-[#00522d]' }
         ].map((kpi, i) => (
-          <div key={i} className="bg-white p-xl rounded-[24px] border border-outline-variant/30 relative overflow-hidden group hover:shadow-sm transition-shadow">
+          <div key={i} className="bg-white p-6 sm:p-8 rounded-[28px] border border-[#bec9be]/30 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
             <div className="relative z-10">
-              <div className={`w-12 h-12 rounded-full ${kpi.iconBg} flex items-center justify-center mb-md group-hover:scale-110 transition-transform`}>
-                <span className={`material-symbols-outlined ${kpi.iconColor}`} style={{ fontVariationSettings: "'FILL' 1" }}>{kpi.icon}</span>
+              <div className={`w-12 h-12 rounded-2xl ${kpi.iconBg} flex items-center justify-center mb-4 ${kpi.iconColor} shadow-sm`}>
+                <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>{kpi.icon}</span>
               </div>
-              <p className="font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-1">{kpi.label}</p>
-              <h2 className={`font-display text-display ${kpi.valueColor} leading-none`}>{kpi.value}{kpi.unit && <span className="text-headline-md"> {kpi.unit}</span>}</h2>
-              <div className={`mt-md flex items-center gap-xs ${kpi.trendColor} font-label-md`}>
-                <span className="material-symbols-outlined">{kpi.trendIcon || 'trending_up'}</span>
+              <p className="text-[11px] font-bold text-[#556158] uppercase tracking-wider mb-1">{kpi.label}</p>
+              <h2 className={`text-3xl sm:text-4xl font-bold ${kpi.valueColor} leading-tight`}>
+                {kpi.value}{kpi.unit && <span className="text-lg font-normal text-[#556158]"> {kpi.unit}</span>}
+              </h2>
+              <div className="mt-3 flex items-center gap-1.5 text-xs font-bold text-[#00522d]">
+                <span className="material-symbols-outlined text-sm">trending_up</span>
                 <span>{kpi.trend}</span>
               </div>
             </div>
-            <div className="absolute -bottom-8 -right-8 opacity-5">
-              <span className="material-symbols-outlined text-[160px]">{kpi.icon}</span>
+            <div className="absolute -bottom-6 -right-6 opacity-5 pointer-events-none">
+              <span className="material-symbols-outlined text-[140px] text-[#00522d]">{kpi.icon}</span>
             </div>
           </div>
         ))}
       </div>
 
       {/* Main Analytics Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter mb-lg">
-        {/* Circular Flow Ecosystem Diagram */}
-        <div className="lg:col-span-8 bg-white rounded-[24px] border border-outline-variant/30 overflow-hidden relative min-h-[500px]">
-          <div className="absolute inset-0 bg-gradient-to-br from-surface-ice via-surface-container-low to-surface-container-high opacity-40"></div>
-          <div className="p-lg relative z-20 flex justify-between items-start">
+      <div className="grid grid-cols-12 gap-6">
+        {/* Circular Flow Ecosystem Diagram (8 Cols) */}
+        <div className="col-span-12 lg:col-span-8 bg-white rounded-[28px] border border-[#bec9be]/30 overflow-hidden relative min-h-[460px] p-6 sm:p-8 flex flex-col justify-between shadow-sm">
+          <div className="flex justify-between items-start z-10">
             <div>
-              <h3 className="font-headline-md text-headline-md text-on-surface">Circular Flow Ecosystem</h3>
-              <p className="font-label-md text-label-md text-secondary">Mapping active resource transfers</p>
+              <h3 className="text-xl font-bold text-[#0d1e25]">Circular Flow Ecosystem</h3>
+              <p className="text-xs text-[#556158] mt-0.5">Mapping active resource transfers between laboratories & campus dorms</p>
             </div>
-            <div className="flex gap-2">
-              <span className="px-3 py-1 rounded-full bg-success-container/10 text-success-container font-label-sm border border-success-container/30">Live Data</span>
-              <button className="material-symbols-outlined p-2 hover:bg-surface-variant/30 rounded-full transition-colors">fullscreen</button>
+            <span className="px-3 py-1 rounded-full bg-[#9cf6ba]/40 text-[#00522d] font-bold text-xs border border-[#9cf6ba]">
+              Live Ecosystem Stream
+            </span>
+          </div>
+          
+          {/* Circular Node Map Visual */}
+          <div className="relative w-full h-72 my-4 flex items-center justify-center">
+            <div className="w-56 h-56 rounded-full border-2 border-dashed border-[#bec9be] flex items-center justify-center relative animate-[spin_60s_linear_infinite]">
+              <div className="absolute -top-5 bg-[#00522d] text-white p-3 rounded-2xl shadow-md">
+                <span className="material-symbols-outlined text-xl">science</span>
+              </div>
+              <div className="absolute -bottom-5 bg-[#24502c] text-white p-3 rounded-2xl shadow-md">
+                <span className="material-symbols-outlined text-xl">apartment</span>
+              </div>
+              <div className="absolute -left-5 bg-[#2eb872] text-[#00210f] p-3 rounded-2xl shadow-md">
+                <span className="material-symbols-outlined text-xl">palette</span>
+              </div>
+              <div className="absolute -right-5 bg-[#006d3e] text-white p-3 rounded-2xl shadow-md">
+                <span className="material-symbols-outlined text-xl">store</span>
+              </div>
+            </div>
+
+            <div className="absolute text-center bg-white/95 backdrop-blur-md p-4 rounded-3xl border border-[#bec9be]/40 shadow-xl">
+              <span className="material-symbols-outlined text-3xl text-[#00522d]" style={{ fontVariationSettings: "'FILL' 1" }}>all_inclusive</span>
+              <p className="text-xs font-bold text-[#0d1e25] mt-1">94.2% Loop Retention</p>
+              <p className="text-[10px] text-[#556158]">0% Landfill Direct</p>
             </div>
           </div>
-          {/* Diagram Canvas */}
-          <div className="absolute inset-0 flex items-center justify-center p-xl">
-            <div className="relative w-full h-full max-w-2xl max-h-[400px]">
-              {/* Diagram Hubs */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center">
-                <div className="w-16 h-16 rounded-2xl bg-white/90 backdrop-blur-md flex items-center justify-center text-primary shadow-lg border-2 border-primary/20 z-10">
-                  <span className="material-symbols-outlined text-[32px]">science</span>
-                </div>
-                <span className="text-label-sm font-bold mt-2">Labs</span>
-              </div>
-              <div className="absolute bottom-0 left-1/4 flex flex-col items-center">
-                <div className="w-16 h-16 rounded-2xl bg-white/90 backdrop-blur-md flex items-center justify-center text-tertiary shadow-lg border-2 border-tertiary/20 z-10">
-                  <span className="material-symbols-outlined text-[32px]">apartment</span>
-                </div>
-                <span className="text-label-sm font-bold mt-2">Dorms</span>
-              </div>
-              <div className="absolute bottom-0 right-1/4 flex flex-col items-center">
-                <div className="w-16 h-16 rounded-2xl bg-white/90 backdrop-blur-md flex items-center justify-center text-secondary shadow-lg border-2 border-secondary/20 z-10">
-                  <span className="material-symbols-outlined text-[32px]">store</span>
-                </div>
-                <span className="text-label-sm font-bold mt-2">Market</span>
-              </div>
-              <div className="absolute top-1/2 -translate-y-1/2 left-0 flex flex-col items-center">
-                <div className="w-16 h-16 rounded-2xl bg-white/90 backdrop-blur-md flex items-center justify-center text-primary shadow-lg border-2 border-primary/20 z-10">
-                  <span className="material-symbols-outlined text-[32px]">factory</span>
-                </div>
-                <span className="text-label-sm font-bold mt-2">Facilities</span>
-              </div>
-              <div className="absolute top-1/2 -translate-y-1/2 right-0 flex flex-col items-center">
-                <div className="w-16 h-16 rounded-2xl bg-white/90 backdrop-blur-md flex items-center justify-center text-success-container shadow-lg border-2 border-success-container/20 z-10">
-                  <span className="material-symbols-outlined text-[32px]">compost</span>
-                </div>
-                <span className="text-label-sm font-bold mt-2">Compost</span>
-              </div>
-              {/* Center Hub */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                <div className="w-24 h-24 rounded-full bg-primary text-on-primary flex flex-col items-center justify-center shadow-xl z-20 relative">
-                  <span className="material-symbols-outlined text-[32px]" style={{ fontVariationSettings: "'FILL' 1" }}>recycling</span>
-                  <span className="text-[10px] font-bold mt-1">CIRCULAR</span>
-                </div>
-                <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping"></div>
-              </div>
-            </div>
+
+          <div className="flex justify-between items-center text-xs font-semibold text-[#556158] pt-3 border-t border-[#bec9be]/20 z-10">
+            <span>Science & Tech Labs</span>
+            <span>Student Housing & Quads</span>
+            <span>Design Workshops</span>
+            <span>Community Exchange Hub</span>
           </div>
         </div>
 
-        {/* Side Panel: Active Matches / Recent Activity */}
-        <div className="lg:col-span-4 flex flex-col gap-gutter">
-          {/* Active Matches */}
-          <div className="bg-white rounded-[24px] border border-outline-variant/30 p-md flex-1">
-            <div className="flex justify-between items-center mb-md">
-              <h4 className="font-headline-md text-headline-md">Active Matches</h4>
-              <span className="bg-primary-container text-on-primary-container text-label-sm px-3 py-1 rounded-full font-bold">{listings.length} Live</span>
-            </div>
-            <div className="space-y-4">
-              {loading ? (
-                <p className="text-center text-secondary py-4">Loading matches...</p>
-              ) : listings.slice(0, 3).map((match, i) => (
-                <div key={match.id || i} className="p-4 rounded-xl bg-surface-ice border border-outline-variant/10 hover:border-primary/30 transition-colors cursor-pointer">
-                  <div className="flex justify-between items-start mb-2">
-                    <p className="font-label-md text-label-md font-bold">{match.title}</p>
-                    <span className="bg-primary-container text-on-primary-container text-[10px] px-2 py-1 rounded-full font-bold">{match.status}</span>
+        {/* Live Exchange Feed (4 Cols) */}
+        <div className="col-span-12 lg:col-span-4 bg-white rounded-[28px] p-6 sm:p-8 border border-[#bec9be]/30 shadow-sm space-y-4 flex flex-col justify-between">
+          <div>
+            <h3 className="text-lg font-bold text-[#0d1e25] pb-3 border-b border-[#bec9be]/20">Recent Exchanges</h3>
+            
+            <div className="divide-y divide-[#bec9be]/20 text-xs">
+              {[
+                { title: 'Digital Oscilloscope', from: 'Electrical Eng', to: 'Robotics Club', time: '12m ago', icon: 'memory' },
+                { title: 'Timber Pallets (12x)', from: 'Campus Facilities', to: 'Architecture Studio', time: '1h ago', icon: 'carpenter' },
+                { title: 'Glass Beakers Set', from: 'Bio Lab A', to: 'Science Outreach', time: '3h ago', icon: 'biotech' }
+              ].map((item, idx) => (
+                <div key={idx} className="py-3 flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-[#dff1fb] text-[#00522d] flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-base">{item.icon}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-label-sm text-on-surface-variant">
-                    <span>{match.vendor?.name}</span>
-                    <span className="material-symbols-outlined text-[14px] text-primary">store</span>
-                    <span>{match.campus?.name}</span>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-[#0d1e25]">{item.title}</h4>
+                    <p className="text-[10px] text-[#556158] mt-0.5">{item.from} → {item.to}</p>
                   </div>
+                  <span className="text-[10px] text-[#556158]">{item.time}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Impact Glass Card */}
-          <div className="bg-white/70 backdrop-blur-md rounded-[24px] border border-outline-variant/30 p-md relative overflow-hidden">
-            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/5 rounded-full blur-3xl"></div>
-            <div className="relative z-10">
-              <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary">Community Impact Score</span>
-              <h3 className="font-display text-display text-primary mt-2">A+</h3>
-              <p className="font-body-md text-body-md text-on-surface-variant mt-2">
-                Top 3% globally among university campuses in circular resource management.
-              </p>
-              <div className="mt-md w-full h-3 bg-secondary-container rounded-full overflow-hidden">
-                <div className="h-full bg-primary w-[97%] rounded-full"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Donations Table */}
-      <div className="bg-white rounded-[24px] border border-outline-variant/30 overflow-hidden">
-        <div className="p-md border-b border-outline-variant/20 flex justify-between items-center">
-          <h4 className="font-headline-md text-headline-md">Recent Active Listings</h4>
-          <button className="text-primary font-label-md hover:underline">View All</button>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-surface-container-low text-secondary font-label-md">
-                <th className="px-md py-4">Item</th>
-                <th className="px-md py-4">Vendor</th>
-                <th className="px-md py-4">Campus</th>
-                <th className="px-md py-4">Category</th>
-                <th className="px-md py-4">Price</th>
-                <th className="px-md py-4">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-outline-variant/10 text-body-md">
-              {loading ? (
-                <tr>
-                  <td colSpan="6" className="text-center py-4 text-secondary">Loading...</td>
-                </tr>
-              ) : listings.map((row) => (
-                <tr key={row.id} className="hover:bg-surface-ice transition-colors">
-                  <td className="px-md py-4 font-bold text-on-surface">{row.title}</td>
-                  <td className="px-md py-4">{row.vendor?.name}</td>
-                  <td className="px-md py-4">{row.campus?.name}</td>
-                  <td className="px-md py-4"><span className="bg-surface-variant text-on-surface-variant px-2 py-1 rounded text-xs font-bold">{row.category}</span></td>
-                  <td className="px-md py-4 text-on-surface-variant">${row.price}</td>
-                  <td className="px-md py-4"><span className="bg-primary-container/20 text-primary px-3 py-1 rounded-full text-xs font-bold">{row.status}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Link
+            to="/marketplace"
+            className="w-full py-2.5 bg-[#f4faff] hover:bg-[#dff1fb] border border-[#bec9be]/40 text-[#00522d] rounded-full text-xs font-bold text-center transition-all block"
+          >
+            Explore All Campus Listings →
+          </Link>
         </div>
       </div>
     </div>

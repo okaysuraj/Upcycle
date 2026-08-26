@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 
@@ -16,148 +16,105 @@ export default function UserProfileOverview() {
 
   return (
     <SafeAreaView className="flex-1 bg-[#f4faff]">
-      {/* Header */}
-      <View className="flex-row justify-between items-center px-5 h-14 bg-[#f4faff] z-50">
-        <TouchableOpacity className="active:scale-95">
-          <MaterialIcons name="menu" size={24} color="#006d3e" />
+      {/* Top Bar */}
+      <View className="flex-row justify-between items-center px-5 h-16 bg-[#f4faff] border-b border-[#bec9be]/30">
+        <TouchableOpacity onPress={() => router.back()} className="p-2 rounded-full active:bg-[#dff1fb]">
+          <MaterialIcons name="arrow-back" size={24} color="#00522d" />
         </TouchableOpacity>
-        <Text className="text-2xl font-bold text-[#006d3e]">Upcycle</Text>
-        <TouchableOpacity className="active:scale-95">
-          <MaterialIcons name="notifications" size={24} color="#006d3e" />
+        <Text className="text-base font-bold text-[#00522d]">Profile & Settings</Text>
+        <TouchableOpacity onPress={handleLogout} className="p-2 rounded-full active:bg-[#ffdad6]">
+          <MaterialIcons name="logout" size={22} color="#ba1a1a" />
         </TouchableOpacity>
       </View>
 
-      <ScrollView className="flex-1 px-5 pt-8" contentContainerStyle={{ paddingBottom: 100 }}>
-        
+      <ScrollView className="flex-1 px-5 pt-6" contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
         {/* Profile Header */}
-        <View className="items-center mb-10">
-          <View className="relative mb-6">
-            <View className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-[#2eb872] p-1 bg-[#f4faff] overflow-hidden">
-              <Image 
-                source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDcawwB8H5QtuFjq_uioybOt83WX4yJqck8RuJ5LufmoqHEEn7vwrmBGSSaPlGR7NHgpK26tPBj9iQ4ilbPZUp_W54VcTgQzzJkJFgMCe6UQ4NyI4rSWb_Px_nDPEpBjoX_N5SQMkOgvY2h2-VQMlWa_wrMkDND-gynzYtWe6ela6bQfd6FqwOduflDIb82iPEgox6ucnwsIBZV75IUXAr_G9N_trvC6EqABTe_sOZ7CfuBF7ao7qIfPV5Vb9F6j-OYOzs3YF747VQ' }}
-                className="w-full h-full rounded-full"
-              />
+        <View className="items-center mb-8">
+          <View className="relative mb-3">
+            <View className="w-24 h-24 rounded-full bg-[#00522d] items-center justify-center shadow-md">
+              <Ionicons name="person" size={48} color="#ffffff" />
             </View>
-            <View className="absolute bottom-0 right-2 bg-[#2eb872] p-2 rounded-full border-4 border-[#f4faff] shadow-md items-center justify-center">
-              <MaterialIcons name="eco" size={20} color="white" />
+            <View className="absolute bottom-0 right-0 bg-[#2eb872] w-7 h-7 rounded-full border-2 border-white items-center justify-center shadow-sm">
+              <Ionicons name="checkmark" size={16} color="#ffffff" />
             </View>
           </View>
           
-          <Text className="text-3xl font-bold text-[#0d1e25] mb-2">Alex River</Text>
-          <View className="flex-row items-center px-4 py-1.5 rounded-full bg-[#E8F5E9]">
-            <MaterialIcons name="workspace-premium" size={16} color="#006d3e" className="mr-2" />
-            <Text className="text-[#006d3e] font-bold text-sm">Eco Warrior</Text>
+          <Text className="text-2xl font-bold text-[#0d1e25] tracking-tight">{user?.name || 'Alex River'}</Text>
+          <Text className="text-xs font-bold text-[#00522d] bg-[#dff1fb] px-3.5 py-1 rounded-full uppercase tracking-wider mt-1.5">
+            {user?.role || 'Campus Lead'}
+          </Text>
+        </View>
+
+        {/* Impact Bento Card */}
+        <View className="p-6 rounded-[28px] bg-white border border-[#bec9be]/30 shadow-sm mb-4 space-y-4">
+          <View className="flex-row justify-between items-center">
+            <Text className="text-base font-bold text-[#0d1e25]">Sustainability Impact</Text>
+            <Text className="text-xs font-bold text-[#00522d]">Top 5%</Text>
+          </View>
+
+          <View className="flex-row gap-3">
+            <View className="flex-1 bg-[#f4faff] p-3 rounded-2xl border border-[#bec9be]/30 text-center items-center">
+              <Text className="text-[10px] font-bold text-[#556158] uppercase">Carbon Offset</Text>
+              <Text className="text-lg font-bold text-[#00522d] mt-1">12.4 <Text className="text-xs font-normal">tCO₂e</Text></Text>
+            </View>
+            <View className="flex-1 bg-[#f4faff] p-3 rounded-2xl border border-[#bec9be]/30 text-center items-center">
+              <Text className="text-[10px] font-bold text-[#556158] uppercase">Waste Diverted</Text>
+              <Text className="text-lg font-bold text-[#0d1e25] mt-1">85%</Text>
+            </View>
           </View>
         </View>
 
-        {/* Navigation Cards */}
-        <View className="gap-4">
-          
-          {/* Sustainability Impact Card */}
-          <TouchableOpacity className="bg-[#e7f6ff] rounded-3xl p-6 shadow-sm active:scale-[0.98]">
-            <View className="flex-row justify-between items-start mb-4">
-              <MaterialIcons name="analytics" size={32} color="#006d3e" />
-              <MaterialIcons name="arrow-forward" size={24} color="#6d7a6f" />
-            </View>
-            <Text className="text-2xl font-bold text-[#0d1e25] mb-2">Sustainability Impact</Text>
-            <Text className="text-base text-[#3d4a40] mb-8">Track your journey through carbon reduction metrics and waste diversion milestones.</Text>
-            
-            <View>
-              <View className="flex-row justify-between mb-2">
-                <Text className="text-sm font-medium text-[#0d1e25]">Weekly Goal</Text>
-                <Text className="text-sm font-bold text-[#006d3e]">85%</Text>
-              </View>
-              <View className="w-full h-3 bg-[#E8F5E9] rounded-full overflow-hidden">
-                <View className="h-full bg-[#2eb872]" style={{ width: '85%' }} />
-              </View>
-            </View>
-          </TouchableOpacity>
-
-          <View className="flex-row gap-4">
-            {/* Achievements Card */}
-            <TouchableOpacity className="flex-1 bg-[#d4e5ef] rounded-3xl p-6 shadow-sm items-center active:scale-[0.98]">
-              <View className="w-16 h-16 rounded-2xl bg-white items-center justify-center mb-4 shadow-sm">
-                <MaterialIcons name="military-tech" size={32} color="#006d3e" />
-              </View>
-              <Text className="text-lg font-bold text-[#0d1e25] mb-2 text-center">Achievements</Text>
-              <Text className="text-xs font-medium text-[#3d4a40] text-center mb-4">12 Badges</Text>
-              
-              <View className="flex-row justify-center -space-x-3">
-                <View className="w-8 h-8 rounded-full border-2 border-[#d4e5ef] bg-[#2eb872] items-center justify-center z-30">
-                  <MaterialIcons name="stars" size={16} color="white" />
-                </View>
-                <View className="w-8 h-8 rounded-full border-2 border-[#d4e5ef] bg-[#7ead81] items-center justify-center z-20">
-                  <MaterialIcons name="recycling" size={16} color="white" />
-                </View>
-                <View className="w-8 h-8 rounded-full border-2 border-[#d4e5ef] bg-[#bdcabe] items-center justify-center z-10">
-                  <MaterialIcons name="eco" size={16} color="white" />
-                </View>
-              </View>
-            </TouchableOpacity>
-
-            {/* Activity History Card */}
-            <TouchableOpacity className="flex-1 bg-[#d9e6da] rounded-3xl p-6 shadow-sm active:scale-[0.98]">
-              <MaterialIcons name="history" size={24} color="#006d3e" className="mb-4" />
-              <Text className="text-lg font-bold text-[#0d1e25] mb-2">Activity History</Text>
-              <Text className="text-xs text-[#3d4a40] mb-4">View your recent log entries.</Text>
-              <View className="mt-auto pt-4 border-t border-[#bccabd]/50">
-                <Text className="text-[10px] font-bold text-[#006d3e]">Last log: Yesterday</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-
-          {/* Account Settings Card */}
+        {/* Settings Navigation Group */}
+        <View className="bg-white rounded-[28px] border border-[#bec9be]/30 shadow-sm overflow-hidden divide-y divide-[#bec9be]/20">
           <TouchableOpacity 
             onPress={() => router.push('/user/account-settings')}
-            className="bg-[#d9ebf5] rounded-3xl p-6 shadow-sm flex-row items-center justify-between active:scale-[0.98]"
+            className="p-4 flex-row items-center justify-between"
           >
-            <View className="flex-1 pr-4">
-              <MaterialIcons name="settings" size={24} color="#3d4a40" className="mb-4" />
-              <Text className="text-xl font-bold text-[#0d1e25] mb-2">Account Settings</Text>
-              <Text className="text-sm text-[#3d4a40]">Security, notifications, and profile details.</Text>
+            <View className="flex-row items-center gap-3">
+              <View className="w-10 h-10 rounded-xl bg-[#dff1fb] items-center justify-center">
+                <Ionicons name="settings-outline" size={20} color="#00522d" />
+              </View>
+              <View>
+                <Text className="text-sm font-bold text-[#0d1e25]">Account Settings</Text>
+                <Text className="text-[11px] text-[#556158]">Credentials & personal info</Text>
+              </View>
             </View>
-            <MaterialIcons name="chevron-right" size={24} color="#6d7a6f" />
+            <MaterialIcons name="chevron-right" size={22} color="#556158" />
           </TouchableOpacity>
 
-        </View>
-
-        {/* Logout Button */}
-        <View className="mt-10 mb-8 items-center">
           <TouchableOpacity 
-            onPress={handleLogout}
-            className="flex-row items-center px-8 py-4 rounded-full bg-[#E8F5E9] active:bg-[#ffdad6]"
+            onPress={() => router.push('/user/privacy-settings')}
+            className="p-4 flex-row items-center justify-between"
           >
-            <MaterialIcons name="logout" size={20} color="#ba1a1a" className="mr-2" />
-            <Text className="text-[#ba1a1a] font-bold">Sign Out</Text>
+            <View className="flex-row items-center gap-3">
+              <View className="w-10 h-10 rounded-xl bg-[#dff1fb] items-center justify-center">
+                <Ionicons name="shield-checkmark-outline" size={20} color="#00522d" />
+              </View>
+              <View>
+                <Text className="text-sm font-bold text-[#0d1e25]">Privacy & Telemetry</Text>
+                <Text className="text-[11px] text-[#556158]">Data sharing permissions</Text>
+              </View>
+            </View>
+            <MaterialIcons name="chevron-right" size={22} color="#556158" />
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            onPress={() => router.push('/user/account-deactivation')}
+            className="p-4 flex-row items-center justify-between"
+          >
+            <View className="flex-row items-center gap-3">
+              <View className="w-10 h-10 rounded-xl bg-[#ffdad6] items-center justify-center">
+                <Ionicons name="person-remove-outline" size={20} color="#ba1a1a" />
+              </View>
+              <View>
+                <Text className="text-sm font-bold text-[#ba1a1a]">Deactivate Account</Text>
+                <Text className="text-[11px] text-[#556158]">Manage account lifecycle</Text>
+              </View>
+            </View>
+            <MaterialIcons name="chevron-right" size={22} color="#ba1a1a" />
           </TouchableOpacity>
         </View>
-
       </ScrollView>
-
-      {/* Bottom Nav */}
-      <View className="absolute bottom-0 w-full flex-row justify-around items-center bg-[#f4faff] border-t border-[#bccabd]/30 py-2 px-2 z-50 h-16 pb-2">
-        <TouchableOpacity className="items-center p-2 active:scale-95">
-          <MaterialIcons name="home" size={24} color="#5b675e" />
-          <Text className="text-[10px] text-[#5b675e]">Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="items-center p-2 active:scale-95">
-          <MaterialIcons name="analytics" size={24} color="#5b675e" />
-          <Text className="text-[10px] text-[#5b675e]">Impact</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="items-center p-2 active:scale-95">
-          <MaterialIcons name="add-circle" size={24} color="#5b675e" />
-          <Text className="text-[10px] text-[#5b675e]">Log</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="items-center p-2 active:scale-95">
-          <MaterialIcons name="group" size={24} color="#5b675e" />
-          <Text className="text-[10px] text-[#5b675e]">Community</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="items-center bg-[#2eb872] rounded-full px-4 py-1">
-          <MaterialIcons name="person" size={24} color="#004224" />
-          <Text className="text-[10px] text-[#004224]">Profile</Text>
-        </TouchableOpacity>
-      </View>
-
     </SafeAreaView>
   );
 }

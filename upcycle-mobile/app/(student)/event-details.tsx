@@ -1,72 +1,106 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, SafeAreaView, TouchableOpacity, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 export default function EventDetailsScreen() {
-  const [event] = useState({
+  const router = useRouter();
+  const [rsvp, setRsvp] = useState(false);
+
+  const event = {
     id: 1,
-    title: 'Campus Clean-up Drive',
-    date: 'Oct 15, 2026',
-    time: '10:00 AM - 02:00 PM',
-    location: 'North Campus Quad',
-    attendees: 124,
+    title: 'Annual Campus Climate Summit 2024',
+    type: 'Summit & Workshop',
+    date: 'Wednesday, Oct 14, 2024',
+    time: '10:00 AM – 03:30 PM EST',
+    location: 'Central Campus Auditorium & Quad',
+    attendees: 342,
     points: 50,
-    description: 'Join us for the largest campus clean-up event of the semester. Gloves and bags will be provided.',
-    rsvp: false
-  });
+    organizer: 'Office of Campus Sustainability',
+    description: 'Join faculty, students, and municipal recycling leaders for keynotes, live IoT bin demos, and actionable workshops aimed at achieving a 90% diversion target before 2025. Lunch and zero-waste kits included.'
+  };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <ScrollView>
-        <View className="h-64 bg-green-100 items-center justify-center relative">
-          <Ionicons name="image-outline" size={64} color="#15803d" className="opacity-20" />
-          <TouchableOpacity className="absolute top-4 left-4 bg-white/80 p-2 rounded-full">
-             <Ionicons name="arrow-back" size={24} color="#374151" />
-          </TouchableOpacity>
-        </View>
+    <SafeAreaView className="flex-1 bg-[#f4faff]">
+      {/* Top Bar */}
+      <View className="flex-row items-center justify-between px-5 h-16 border-b border-[#bec9be]/30 bg-[#f4faff]">
+        <TouchableOpacity onPress={() => router.back()} className="p-2 rounded-full active:bg-[#dff1fb]">
+          <MaterialIcons name="arrow-back" size={24} color="#00522d" />
+        </TouchableOpacity>
+        <Text className="text-base font-bold text-[#00522d]">Event Details</Text>
+        <TouchableOpacity className="p-2 bg-[#dff1fb] rounded-full">
+          <Ionicons name="share-social-outline" size={20} color="#00522d" />
+        </TouchableOpacity>
+      </View>
 
-        <View className="p-6 -mt-6 bg-white rounded-t-3xl shadow-sm">
-          <View className="flex-row justify-between items-start mb-4">
-            <Text className="text-3xl font-black text-gray-900 flex-1 mr-4">{event.title}</Text>
-            <View className="bg-green-100 px-3 py-1.5 rounded-full items-center">
-              <Text className="text-green-700 font-black">+{event.points}</Text>
-              <Text className="text-[10px] text-green-700 uppercase font-bold">PTS</Text>
+      <ScrollView className="flex-1 px-5 pt-5" contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
+        {/* Event Header Card */}
+        <View className="bg-white rounded-[32px] p-6 border border-[#bec9be]/30 shadow-sm space-y-4 mb-6">
+          <View className="flex-row justify-between items-start">
+            <View className="px-3 py-1 bg-[#dff1fb] rounded-full">
+              <Text className="text-xs font-bold text-[#00522d] uppercase">{event.type}</Text>
+            </View>
+            <View className="px-3 py-1 bg-[#9cf6ba]/40 rounded-full">
+              <Text className="text-xs font-bold text-[#00210f]">+{event.points} Eco-Points</Text>
             </View>
           </View>
 
-          <View className="space-y-4 mb-6 pb-6 border-b border-gray-100">
-            <View className="flex-row items-center">
-              <View className="w-10 h-10 rounded-full bg-blue-50 items-center justify-center mr-4">
-                <Ionicons name="calendar" size={20} color="#2563eb" />
+          <Text className="text-2xl font-bold text-[#0d1e25] leading-tight">{event.title}</Text>
+          <Text className="text-xs text-[#556158]">Organized by <Text className="font-bold text-[#00522d]">{event.organizer}</Text></Text>
+
+          {/* Logistics list */}
+          <View className="space-y-3 pt-3 border-t border-[#bec9be]/20 text-xs">
+            <View className="flex-row items-center gap-3">
+              <View className="w-10 h-10 rounded-xl bg-[#dff1fb] items-center justify-center">
+                <Ionicons name="calendar" size={20} color="#00522d" />
               </View>
               <View>
-                <Text className="font-bold text-gray-800">{event.date}</Text>
-                <Text className="text-sm text-gray-500">{event.time}</Text>
+                <Text className="font-bold text-xs text-[#0d1e25]">{event.date}</Text>
+                <Text className="text-[11px] text-[#556158]">{event.time}</Text>
               </View>
             </View>
-            
-            <View className="flex-row items-center">
-              <View className="w-10 h-10 rounded-full bg-orange-50 items-center justify-center mr-4">
-                <Ionicons name="location" size={20} color="#ea580c" />
+
+            <View className="flex-row items-center gap-3">
+              <View className="w-10 h-10 rounded-xl bg-[#dff1fb] items-center justify-center">
+                <Ionicons name="location" size={20} color="#00522d" />
               </View>
               <View>
-                <Text className="font-bold text-gray-800">{event.location}</Text>
-                <Text className="text-sm text-gray-500">View on map</Text>
+                <Text className="font-bold text-xs text-[#0d1e25]">{event.location}</Text>
+                <Text className="text-[11px] text-[#00522d] font-bold">Directions & Campus Map</Text>
+              </View>
+            </View>
+
+            <View className="flex-row items-center gap-3">
+              <View className="w-10 h-10 rounded-xl bg-[#9cf6ba]/40 items-center justify-center">
+                <Ionicons name="people" size={20} color="#00210f" />
+              </View>
+              <View>
+                <Text className="font-bold text-xs text-[#0d1e25]">{event.attendees} Registered Attendees</Text>
+                <Text className="text-[11px] text-[#556158]">Open to all verified campus members</Text>
               </View>
             </View>
           </View>
-
-          <Text className="font-bold text-lg text-gray-800 mb-2">About this event</Text>
-          <Text className="text-gray-600 leading-relaxed mb-8">{event.description}</Text>
-
-          <TouchableOpacity className={`w-full py-4 rounded-full items-center ${
-            event.rsvp ? 'bg-gray-200' : 'bg-green-700'
-          }`}>
-            <Text className={`font-bold text-lg ${
-              event.rsvp ? 'text-gray-600' : 'text-white'
-            }`}>{event.rsvp ? 'RSVP Confirmed' : 'RSVP Now'}</Text>
-          </TouchableOpacity>
         </View>
+
+        {/* Description Card */}
+        <View className="bg-white rounded-[28px] p-6 border border-[#bec9be]/30 shadow-sm space-y-2 mb-6">
+          <Text className="text-base font-bold text-[#0d1e25]">About This Event</Text>
+          <Text className="text-xs text-[#556158] leading-relaxed">{event.description}</Text>
+        </View>
+
+        {/* RSVP Action */}
+        <TouchableOpacity 
+          onPress={() => setRsvp(!rsvp)}
+          className={`py-4 rounded-full items-center shadow-md flex-row justify-center gap-2 ${
+            rsvp ? 'bg-[#2eb872]' : 'bg-[#00522d]'
+          }`}
+        >
+          <Ionicons name={rsvp ? "checkmark-circle" : "calendar"} size={18} color="white" />
+          <Text className="text-white font-bold text-sm">
+            {rsvp ? 'RSVP Confirmed (Ticket Saved)' : 'Confirm Event RSVP (+50 pts)'}
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );

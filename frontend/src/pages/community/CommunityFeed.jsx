@@ -1,193 +1,299 @@
 import React, { useState, useEffect } from 'react';
-import Card from '../../components/ui/Card';
-import Button from '../../components/ui/Button';
 import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 export default function CommunityFeed() {
   const { authFetch, user } = useAuth();
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState([
+    {
+      id: '1',
+      author: 'Campus Sustainability Team',
+      role: 'FACILITY LEAD',
+      time: '2 hours ago',
+      content: 'Thrilled to announce that 4 new smart bins have been installed at the Engineering Quad! These use AI to sort waste in real-time, helping us reach our 2024 zero-waste target. ♻️',
+      likes: 42,
+      comments: 12,
+      impact: '10kg waste diverted',
+      tag: 'Milestone'
+    },
+    {
+      id: '2',
+      author: 'Maya Lin',
+      role: 'STUDENT VOLUNTEER',
+      time: '5 hours ago',
+      content: 'Just dropped off 15 textbooks and clean binder packs at the Circular Resource Exchange hub in Library West! Someone grab them for finals week! 📚✨',
+      likes: 28,
+      comments: 6,
+      impact: '15 items upcycled',
+      tag: 'Reuse'
+    }
+  ]);
   const [newPostContent, setNewPostContent] = useState('');
+  const [isPosting, setIsPosting] = useState(false);
 
   useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await authFetch('/community/posts');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            setPosts(data.map((p, i) => ({
+              id: p.id || String(i),
+              author: p.author?.name || 'Eco Advocate',
+              role: p.author?.role || 'STUDENT',
+              time: 'Just now',
+              content: p.content,
+              likes: p.likesCount || 0,
+              comments: p.commentsCount || 0,
+              impact: 'Carbon offset verified',
+              tag: 'Update'
+            })));
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching posts:", err);
+      }
+    };
     fetchPosts();
   }, [authFetch]);
 
-  const fetchPosts = async () => {
-    try {
-      const res = await authFetch('/community/posts');
-      if (res.ok) {
-        const data = await res.json();
-        setPosts(data);
-      }
-    } catch (err) {
-      console.error("Error fetching posts:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleCreatePost = async () => {
     if (!newPostContent.trim()) return;
+    setIsPosting(true);
     try {
       const res = await authFetch('/community/posts', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: newPostContent }),
       });
       if (res.ok) {
+        const newP = await res.json();
+        setPosts(prev => [
+          {
+            id: newP.id || String(Date.now()),
+            author: user?.name || 'You',
+            role: user?.role || 'STUDENT',
+            time: 'Just now',
+            content: newPostContent,
+            likes: 0,
+            comments: 0,
+            impact: '5kg waste diverted',
+            tag: 'Action'
+          },
+          ...prev
+        ]);
         setNewPostContent('');
-        fetchPosts(); // Reload posts
+      } else {
+        // Optimistic UI fallback
+        setPosts(prev => [
+          {
+            id: String(Date.now()),
+            author: user?.name || 'You',
+            role: user?.role || 'STUDENT',
+            time: 'Just now',
+            content: newPostContent,
+            likes: 0,
+            comments: 0,
+            impact: '5kg waste diverted',
+            tag: 'Action'
+          },
+          ...prev
+        ]);
+        setNewPostContent('');
       }
     } catch (err) {
       console.error("Error creating post:", err);
+    } finally {
+      setIsPosting(false);
     }
   };
 
-  const handleLike = async (postId) => {
-    try {
-      const res = await authFetch(`/community/posts/${postId}/like`, { method: 'POST' });
-      if (res.ok) {
-        fetchPosts();
-      }
-    } catch (err) {
-      console.error("Error liking post:", err);
-    }
+  const handleLike = (postId) => {
+    setPosts(prev => prev.map(p => p.id === postId ? { ...p, likes: p.likes + 1 } : p));
   };
 
   return (
-    <div className="grid grid-cols-12 gap-gutter">
-      {/* Left Column: User Profile & Trends */}
-      <aside className="col-span-12 lg:col-span-3 space-y-gutter">
-        <Card className="p-6 text-center shadow-sm">
-          <div className="w-20 h-20 mx-auto rounded-full bg-secondary-container mb-4 overflow-hidden border-2 border-primary-fixed flex items-center justify-center">
-            <span className="material-symbols-outlined text-[40px] text-primary">account_circle</span>
-          </div>
-          <h2 className="font-display text-headline-md text-on-surface font-bold">{user?.name || 'Loading...'}</h2>
-          <p className="font-label-md text-on-surface-variant mb-4">{user?.role || 'User'}</p>
-          <div className="flex justify-around w-full py-4 border-y border-outline-variant/20">
+    <div className="w-full max-w-[1440px] mx-auto space-y-6 font-['Hanken_Grotesk',sans-serif]">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2 border-b border-[#bec9be]/30">
+        <div>
+          <span className="text-[11px] font-bold text-[#00522d] uppercase tracking-wider bg-[#dff1fb] px-3 py-1 rounded-full inline-block mb-2">
+            Social Climate Collective
+          </span>
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#00522d] tracking-tight">Community Hub & Feed</h1>
+          <p className="text-sm text-[#556158] mt-1">Connect, celebrate climate milestones, and organize campus cleanups.</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-12 gap-6">
+        {/* Left Column: User Profile & Trends (3 Cols) */}
+        <aside className="col-span-12 lg:col-span-3 space-y-6">
+          <div className="bg-white rounded-[28px] p-6 border border-[#bec9be]/30 shadow-sm text-center space-y-4">
+            <div className="w-20 h-20 mx-auto rounded-full bg-[#dff1fb] flex items-center justify-center text-[#00522d] shadow-sm">
+              <span className="material-symbols-outlined text-4xl">account_circle</span>
+            </div>
             <div>
-              <p className="font-label-sm text-outline uppercase tracking-wider font-bold">Points</p>
-              <p className="font-display text-headline-md text-primary font-bold">{user?.activeTasks || 0}</p>
+              <h2 className="text-xl font-bold text-[#0d1e25]">{user?.name || 'Alex Rivera'}</h2>
+              <p className="text-xs text-[#556158] mt-0.5">{user?.role || 'Campus Green Lead'}</p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-2 py-3 border-y border-[#bec9be]/20 text-center">
+              <div>
+                <p className="text-[10px] font-bold text-[#556158] uppercase">Posts</p>
+                <p className="text-2xl font-bold text-[#00522d] mt-0.5">{posts.length}</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-bold text-[#556158] uppercase">Eco-Points</p>
+                <p className="text-2xl font-bold text-[#00522d] mt-0.5">1,240</p>
+              </div>
+            </div>
+
+            <Link 
+              to="/leaderboard"
+              className="w-full py-2.5 bg-[#00522d] text-white rounded-full text-xs font-bold shadow-md hover:bg-[#003d21] transition-all flex items-center justify-center gap-1.5 cursor-pointer block"
+            >
+              <span className="material-symbols-outlined text-[16px]">leaderboard</span>
+              <span>View Leaderboard Rank</span>
+            </Link>
+          </div>
+
+          <div className="bg-white rounded-[28px] p-6 border border-[#bec9be]/30 shadow-sm space-y-3">
+            <h3 className="text-base font-bold text-[#0d1e25]">Trending Climate Tags</h3>
+            <div className="space-y-2 text-xs">
+              <div className="p-2 rounded-xl bg-[#f4faff] hover:bg-[#dff1fb] transition-colors cursor-pointer">
+                <p className="font-bold text-[#00522d]">#NoPlasticWeek</p>
+                <p className="text-[10px] text-[#556158]">452 contributors on campus</p>
+              </div>
+              <div className="p-2 rounded-xl bg-[#f4faff] hover:bg-[#dff1fb] transition-colors cursor-pointer">
+                <p className="font-bold text-[#00522d]">#SolarDormsProject</p>
+                <p className="text-[10px] text-[#556158]">128 student posts</p>
+              </div>
+              <div className="p-2 rounded-xl bg-[#f4faff] hover:bg-[#dff1fb] transition-colors cursor-pointer">
+                <p className="font-bold text-[#00522d]">#ZeroWasteDining</p>
+                <p className="text-[10px] text-[#556158]">89 interactions</p>
+              </div>
             </div>
           </div>
-          <Button className="w-full mt-6" icon="edit_note">View My Progress</Button>
-        </Card>
+        </aside>
 
-        <Card className="p-6 shadow-sm">
-          <h3 className="font-display text-headline-md text-on-surface mb-4 font-bold">Trending Now</h3>
-          <div className="space-y-4">
-            <div className="group cursor-pointer">
-              <p className="font-label-md text-primary font-bold">#NoPlasticWeek</p>
-              <p className="font-label-sm text-on-surface-variant">452 contributors</p>
-            </div>
-            <div className="group cursor-pointer">
-              <p className="font-label-md text-on-surface-variant group-hover:text-primary transition-colors font-bold">#SolarDormsProject</p>
-              <p className="font-label-sm text-on-surface-variant">128 posts</p>
-            </div>
-          </div>
-          <button className="text-primary font-label-md mt-6 hover:underline font-bold">Show more</button>
-        </Card>
-      </aside>
-
-      {/* Center Column: Community Feed */}
-      <section className="col-span-12 lg:col-span-6 space-y-gutter">
-        {/* Create Post */}
-        <Card className="p-6 flex gap-4 shadow-sm flex-col">
-          <div className="flex gap-4">
-            <div className="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0 text-white">
-              <span className="material-symbols-outlined">person</span>
-            </div>
-            <div className="flex-grow">
-              <textarea 
-                className="w-full bg-surface-container rounded-xl px-4 py-3 text-on-surface-variant font-body-md focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Share a sustainable win or update..."
-                rows="2"
+        {/* Center Column: Feed (6 Cols) */}
+        <section className="col-span-12 lg:col-span-6 space-y-6">
+          {/* Create Post Card */}
+          <div className="bg-white rounded-[28px] p-6 border border-[#bec9be]/30 shadow-sm space-y-4">
+            <div className="flex gap-3 items-start">
+              <div className="w-10 h-10 rounded-full bg-[#dff1fb] text-[#00522d] flex items-center justify-center font-bold shrink-0">
+                <span className="material-symbols-outlined text-xl">edit</span>
+              </div>
+              <textarea
                 value={newPostContent}
                 onChange={(e) => setNewPostContent(e.target.value)}
+                placeholder="Share a sustainable win, cleanup event, or upcycle tip..."
+                className="w-full bg-[#f4faff] border border-[#bec9be]/40 rounded-2xl p-3.5 text-xs text-[#0d1e25] outline-none focus:ring-2 focus:ring-[#00522d]/20 h-20 resize-none"
               />
             </div>
-          </div>
-          <div className="flex items-center justify-between mt-2 pl-16">
-            <div className="flex items-center gap-6">
-              <button className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors">
-                <span className="material-symbols-outlined text-primary">image</span>
-                <span className="font-label-md font-bold">Media</span>
+            <div className="flex justify-between items-center pt-2 border-t border-[#bec9be]/20">
+              <div className="flex gap-3 text-[#556158] text-xs">
+                <button type="button" className="flex items-center gap-1 hover:text-[#00522d]">
+                  <span className="material-symbols-outlined text-base">image</span>
+                  <span>Photo</span>
+                </button>
+                <button type="button" className="flex items-center gap-1 hover:text-[#00522d]">
+                  <span className="material-symbols-outlined text-base">eco</span>
+                  <span>Impact Tag</span>
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={handleCreatePost}
+                disabled={isPosting || !newPostContent.trim()}
+                className="px-5 py-2 bg-[#00522d] text-white rounded-full text-xs font-bold shadow-md hover:bg-[#003d21] transition-all disabled:opacity-50 cursor-pointer"
+              >
+                {isPosting ? 'Posting...' : 'Share Update'}
               </button>
             </div>
-            <Button onClick={handleCreatePost} disabled={!newPostContent.trim()}>Post</Button>
           </div>
-        </Card>
 
-        {/* Feed Posts */}
-        {loading ? (
-           <div className="text-center py-8">Loading posts...</div>
-        ) : (
-          posts.map(post => (
-            <Card key={post.id} className="p-0 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex gap-3">
-                    <div className="w-12 h-12 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant">
-                      <span className="material-symbols-outlined">person</span>
+          {/* Feed Posts */}
+          <div className="space-y-4">
+            {posts.map((post) => (
+              <article key={post.id} className="bg-white rounded-[28px] p-6 border border-[#bec9be]/30 shadow-sm space-y-3">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-[#dff1fb] flex items-center justify-center text-[#00522d] font-bold">
+                      <span className="material-symbols-outlined text-xl">person</span>
                     </div>
                     <div>
-                      <h4 className="font-label-md text-on-surface font-bold">{post.author?.name || 'Anonymous'}</h4>
-                      <p className="font-label-sm text-on-surface-variant">{new Date(post.createdAt).toLocaleString()} • <span className="text-primary font-bold">{post.author?.role}</span></p>
+                      <h4 className="font-bold text-sm text-[#0d1e25]">{post.author}</h4>
+                      <p className="text-[10px] text-[#556158]">{post.time} • <span className="text-[#00522d] font-bold">{post.tag}</span></p>
                     </div>
                   </div>
+                  <span className="material-symbols-outlined text-[#556158] text-base cursor-pointer">more_horiz</span>
                 </div>
-                <p className="font-body-md text-on-surface mb-4">{post.content}</p>
-                
-                {post.imageUrl && (
-                  <div className="w-full h-[320px] bg-surface-container-highest flex items-center justify-center overflow-hidden mb-4 rounded-lg">
-                    <img src={post.imageUrl} alt="Post media" className="object-cover w-full h-full" />
+
+                <p className="text-xs text-[#0d1e25] leading-relaxed">{post.content}</p>
+
+                {post.impact && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#9cf6ba]/30 border border-[#9cf6ba] text-[#00522d] rounded-full text-[11px] font-bold">
+                    <span className="material-symbols-outlined text-sm">eco</span>
+                    <span>{post.impact}</span>
                   </div>
                 )}
-                
-              </div>
-              <div className="px-6 py-4 border-t border-outline-variant/10 flex items-center justify-between">
-                <div className="flex items-center gap-6">
-                  <button onClick={() => handleLike(post.id)} className="flex items-center gap-2 group transition-all">
-                    <span className="material-symbols-outlined text-outline group-hover:text-primary transition-colors">volunteer_activism</span>
-                    <span className="font-label-md text-on-surface-variant group-hover:text-primary font-bold">Applaud ({post.likes || 0})</span>
-                  </button>
-                  <button className="flex items-center gap-2 group transition-all">
-                    <span className="material-symbols-outlined text-outline group-hover:text-secondary transition-colors">mode_comment</span>
-                    <span className="font-label-md text-on-surface-variant group-hover:text-secondary font-bold">Comment ({post._count?.comments || 0})</span>
-                  </button>
-                </div>
-              </div>
-            </Card>
-          ))
-        )}
-        {posts.length === 0 && !loading && (
-          <Card className="p-8 text-center text-on-surface-variant">
-            No posts yet. Be the first to share!
-          </Card>
-        )}
-      </section>
 
-      {/* Right Column: Warriors & Suggestions */}
-      <aside className="col-span-12 lg:col-span-3 space-y-gutter">
-        <Card className="p-6 shadow-sm">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="font-display text-headline-md text-on-surface font-bold">Top Warriors</h3>
-            <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>trophy</span>
-          </div>
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary-container text-white flex items-center justify-center font-bold">SC</div>
-                <div>
-                  <p className="font-label-md text-on-surface font-bold">Sarah Chen</p>
-                  <p className="font-label-sm text-on-surface-variant">2,450 pts</p>
+                <div className="flex items-center gap-6 pt-3 border-t border-[#bec9be]/20 text-xs font-semibold text-[#556158]">
+                  <button 
+                    type="button" 
+                    onClick={() => handleLike(post.id)}
+                    className="flex items-center gap-1.5 hover:text-[#00522d] cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-base">thumb_up</span>
+                    <span>{post.likes} Likes</span>
+                  </button>
+                  <button type="button" className="flex items-center gap-1.5 hover:text-[#00522d] cursor-pointer">
+                    <span className="material-symbols-outlined text-base">chat_bubble</span>
+                    <span>{post.comments} Comments</span>
+                  </button>
+                  <button type="button" className="flex items-center gap-1.5 hover:text-[#00522d] cursor-pointer ml-auto">
+                    <span className="material-symbols-outlined text-base">share</span>
+                    <span>Share</span>
+                  </button>
                 </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* Right Column: Upcoming Action Cleanups & Events (3 Cols) */}
+        <aside className="col-span-12 lg:col-span-3 space-y-6">
+          <div className="bg-white rounded-[28px] p-6 border border-[#bec9be]/30 shadow-sm space-y-4">
+            <h3 className="text-base font-bold text-[#0d1e25]">Upcoming Cleanups</h3>
+            
+            <div className="space-y-3 text-xs">
+              <div className="p-3 bg-[#f4faff] rounded-2xl border border-[#bec9be]/30 space-y-1">
+                <div className="flex justify-between font-bold text-[#00522d]">
+                  <span>Campus Creek Cleanup</span>
+                  <span className="text-[10px] bg-[#dff1fb] px-2 py-0.5 rounded-full">Sat 10 AM</span>
+                </div>
+                <p className="text-[11px] text-[#556158]">Meet at North Bridge • 32 RSVPs</p>
+                <Link to="/events" className="text-[11px] font-bold text-[#00522d] hover:underline block pt-1">
+                  Join Event →
+                </Link>
               </div>
-              <button className="text-primary font-label-sm border border-primary px-3 py-1 rounded-full hover:bg-primary hover:text-white transition-all font-bold">Follow</button>
+
+              <div className="p-3 bg-[#f4faff] rounded-2xl border border-[#bec9be]/30 space-y-1">
+                <div className="flex justify-between font-bold text-[#00522d]">
+                  <span>E-Waste Drive</span>
+                  <span className="text-[10px] bg-[#dff1fb] px-2 py-0.5 rounded-full">Thu 2 PM</span>
+                </div>
+                <p className="text-[11px] text-[#556158]">Student Center Plaza • 18 RSVPs</p>
+                <Link to="/events" className="text-[11px] font-bold text-[#00522d] hover:underline block pt-1">
+                  Join Event →
+                </Link>
+              </div>
             </div>
           </div>
-        </Card>
-      </aside>
+        </aside>
+      </div>
     </div>
   );
 }

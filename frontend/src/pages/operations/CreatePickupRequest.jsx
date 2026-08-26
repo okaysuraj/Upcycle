@@ -1,164 +1,164 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function CreatePickupRequest() {
+  const navigate = useNavigate();
+  const [selectedZone, setSelectedZone] = useState('All Zones');
+  const [selectedBins, setSelectedBins] = useState(['BIN-40291', 'BIN-40112']);
+
+  const bins = [
+    { id: 'BIN-40291', loc: 'Central Plaza A', zone: 'Central Plaza', level: 98, type: 'Plastic/Glass', cap: '120L' },
+    { id: 'BIN-40315', loc: 'North Park Entrance', zone: 'North Campus', level: 87, type: 'Organic Waste', cap: '240L' },
+    { id: 'BIN-40112', loc: 'West Side Lab 2', zone: 'West Wing', level: 92, type: 'Hazardous', cap: '60L' },
+    { id: 'BIN-40544', loc: 'Library Main', zone: 'Central Plaza', level: 85, type: 'Paper/Cardboard', cap: '120L' },
+    { id: 'BIN-40221', loc: 'Cafeteria Rear', zone: 'North Campus', level: 95, type: 'General Waste', cap: '240L' },
+    { id: 'BIN-40677', loc: 'Sports Complex', zone: 'West Wing', level: 82, type: 'Plastic/Glass', cap: '120L' }
+  ];
+
+  const toggleBin = (id) => {
+    setSelectedBins(prev => 
+      prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id]
+    );
+  };
+
+  const filteredBins = bins.filter(b => selectedZone === 'All Zones' || b.zone === selectedZone);
+
   return (
-    <div className="flex flex-col gap-md">
+    <div className="w-full max-w-[1440px] mx-auto space-y-6 font-['Hanken_Grotesk',sans-serif]">
       {/* Breadcrumbs & Header */}
-      <div className="mb-md flex items-end justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2 border-b border-[#bec9be]/30">
         <div>
-          <div className="flex items-center gap-2 text-label-sm text-on-surface-variant mb-2">
-            <span>Logistics</span>
-            <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-            <span className="text-primary font-bold">New Pickup Request</span>
-          </div>
-          <h2 className="font-display text-headline-lg text-on-surface">Create Pickup Request</h2>
-          <p className="font-body-md text-on-surface-variant">Select overflowing bins to optimize collection routes.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center bg-surface-container-high rounded-full p-1">
-            <button className="px-6 py-2 rounded-full bg-primary text-on-primary text-label-md font-bold shadow-md transition-all active:scale-95">Grid View</button>
-            <button className="px-6 py-2 rounded-full text-on-surface-variant text-label-md hover:bg-surface-variant transition-all">Map View</button>
-          </div>
+          <span className="text-[11px] font-bold text-[#00522d] uppercase tracking-wider bg-[#dff1fb] px-3 py-1 rounded-full inline-block mb-2">
+            Smart Logistics Dispatch
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#0d1e25] tracking-tight">Create Pickup Request</h2>
+          <p className="text-sm text-[#556158] mt-1">Select overflowing smart bins to optimize route and dispatch EV fleet.</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
-        {/* Filters & Bin Grid */}
-        <div className="lg:col-span-8 space-y-gutter">
+      <div className="grid grid-cols-12 gap-6">
+        {/* Filters & Bin Grid (8 Cols) */}
+        <div className="col-span-12 lg:col-span-8 space-y-5">
           {/* Filters Bar */}
-          <div className="bg-white p-md rounded-[24px] border border-outline-variant/30 flex items-center justify-between shadow-sm">
-            <div className="flex items-center gap-4 flex-wrap">
-              <span className="text-label-md font-bold text-on-surface-variant">Filter by Zone:</span>
-              <div className="flex gap-2 flex-wrap">
-                <button className="px-4 py-1.5 rounded-full border border-primary bg-primary-container/20 text-primary text-label-sm font-bold">All Zones</button>
-                <button className="px-4 py-1.5 rounded-full border border-outline-variant text-on-surface-variant text-label-sm hover:border-primary hover:text-primary transition-colors">North Campus</button>
-                <button className="px-4 py-1.5 rounded-full border border-outline-variant text-on-surface-variant text-label-sm hover:border-primary hover:text-primary transition-colors">Central Plaza</button>
-                <button className="px-4 py-1.5 rounded-full border border-outline-variant text-on-surface-variant text-label-sm hover:border-primary hover:text-primary transition-colors">West Wing</button>
+          <div className="bg-white p-4 rounded-2xl border border-[#bec9be]/30 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-xs font-bold text-[#556158]">Filter Zone:</span>
+              <div className="flex gap-1.5 flex-wrap">
+                {['All Zones', 'North Campus', 'Central Plaza', 'West Wing'].map((zone) => (
+                  <button 
+                    key={zone}
+                    type="button"
+                    onClick={() => setSelectedZone(zone)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                      selectedZone === zone 
+                        ? 'bg-[#00522d] text-white shadow-sm' 
+                        : 'bg-[#f4faff] border border-[#bec9be]/40 text-[#556158] hover:bg-[#e7f6ff]'
+                    }`}
+                  >
+                    {zone}
+                  </button>
+                ))}
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-label-sm text-on-surface-variant hidden md:block">Showing: <b>24 overflowing bins</b></span>
-              <button className="p-2 rounded-full hover:bg-surface-variant">
-                <span className="material-symbols-outlined">filter_list</span>
-              </button>
-            </div>
+            <span className="text-xs text-[#556158]">
+              Selected: <b>{selectedBins.length} bins</b>
+            </span>
           </div>
 
           {/* Bin Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">
-            {/* Bin Card (Selected State) */}
-            <div className="group relative bg-white p-5 rounded-[24px] border-2 border-primary shadow-lg ring-4 ring-primary/5 cursor-pointer transition-all hover:-translate-y-1">
-              <div className="absolute top-4 right-4 w-6 h-6 rounded-full bg-primary flex items-center justify-center text-on-primary">
-                <span className="material-symbols-outlined text-[16px] font-bold">check</span>
-              </div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-primary-container/30 flex items-center justify-center text-primary">
-                  <span className="material-symbols-outlined text-3xl">delete</span>
-                </div>
-                <div>
-                  <p className="text-label-sm text-on-surface-variant">BIN-40291</p>
-                  <h4 className="font-bold text-on-surface">Central Plaza A</h4>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div>
-                  <div className="flex justify-between text-label-sm mb-1">
-                    <span className="text-on-surface-variant">Fill Level</span>
-                    <span className="text-error font-bold">98% Full</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            {filteredBins.map((bin) => {
+              const isSelected = selectedBins.includes(bin.id);
+              return (
+                <div 
+                  key={bin.id}
+                  onClick={() => toggleBin(bin.id)}
+                  className={`group relative p-5 rounded-[24px] cursor-pointer transition-all shadow-sm ${
+                    isSelected 
+                      ? 'bg-white border-2 border-[#00522d] shadow-md ring-4 ring-[#00522d]/10' 
+                      : 'bg-white border border-[#bec9be]/40 hover:border-[#00522d]/50'
+                  }`}
+                >
+                  <div className={`absolute top-4 right-4 w-6 h-6 rounded-full flex items-center justify-center text-white transition-all ${
+                    isSelected ? 'bg-[#00522d]' : 'border border-[#bec9be]/60 bg-transparent'
+                  }`}>
+                    {isSelected && <span className="material-symbols-outlined text-[16px] font-bold">check</span>}
                   </div>
-                  <div className="w-full h-2 bg-surface-variant rounded-full overflow-hidden">
-                    <div className="h-full bg-error rounded-full" style={{ width: '98%' }}></div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between pt-2">
-                  <span className="px-3 py-1 rounded-full bg-surface-container text-[10px] font-bold uppercase tracking-wide text-on-surface-variant">Plastic/Glass</span>
-                  <span className="text-label-sm font-medium">120L Cap.</span>
-                </div>
-              </div>
-            </div>
 
-            {/* Bin Card (Standard State) */}
-            {[
-              { id: 'BIN-40315', loc: 'North Park Entrance', level: 87, type: 'Organic Waste', cap: '240L' },
-              { id: 'BIN-40112', loc: 'West Side Lab 2', level: 92, type: 'Hazardous', cap: '60L' },
-              { id: 'BIN-40544', loc: 'Library Main', level: 85, type: 'Paper/Cardboard', cap: '120L' },
-              { id: 'BIN-40221', loc: 'Cafeteria Rear', level: 95, type: 'General Waste', cap: '240L' },
-              { id: 'BIN-40677', loc: 'Sports Complex', level: 82, type: 'Plastic/Glass', cap: '120L' }
-            ].map((bin, i) => (
-              <div key={i} className="group bg-white p-5 rounded-[24px] border border-outline-variant/30 cursor-pointer transition-all hover:border-primary/50 hover:shadow-md">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-surface-container-low flex items-center justify-center text-on-surface-variant group-hover:bg-primary-container/20 group-hover:text-primary transition-colors">
-                    <span className="material-symbols-outlined text-3xl">delete</span>
-                  </div>
-                  <div>
-                    <p className="text-label-sm text-on-surface-variant">{bin.id}</p>
-                    <h4 className="font-bold text-on-surface">{bin.loc}</h4>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div>
-                    <div className="flex justify-between text-label-sm mb-1">
-                      <span className="text-on-surface-variant">Fill Level</span>
-                      <span className="text-error-warm font-bold">{bin.level}% Full</span>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-11 h-11 rounded-xl bg-[#dff1fb] flex items-center justify-center text-[#00522d]">
+                      <span className="material-symbols-outlined text-2xl">delete</span>
                     </div>
-                    <div className="w-full h-2 bg-surface-variant rounded-full overflow-hidden">
-                      <div className="h-full bg-error-warm rounded-full" style={{ width: `${bin.level}%` }}></div>
+                    <div>
+                      <p className="text-[11px] font-mono font-bold text-[#556158]">{bin.id}</p>
+                      <h4 className="font-bold text-sm text-[#0d1e25]">{bin.loc}</h4>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between pt-2">
-                    <span className="px-3 py-1 rounded-full bg-surface-container text-[10px] font-bold uppercase tracking-wide text-on-surface-variant">{bin.type}</span>
-                    <span className="text-label-sm font-medium">{bin.cap} Cap.</span>
+
+                  <div className="space-y-2.5">
+                    <div>
+                      <div className="flex justify-between text-xs font-bold mb-1">
+                        <span className="text-[#556158]">Fill Level</span>
+                        <span className={bin.level > 90 ? 'text-[#ba1a1a]' : 'text-[#00522d]'}>
+                          {bin.level}% Full
+                        </span>
+                      </div>
+                      <div className="w-full h-2 bg-[#d9e6da] rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full rounded-full ${bin.level > 90 ? 'bg-[#ba1a1a]' : 'bg-[#00522d]'}`}
+                          style={{ width: `${bin.level}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pt-2 border-t border-[#bec9be]/20 text-[11px] text-[#556158]">
+                      <span className="px-2 py-0.5 rounded-full bg-[#f4faff] font-semibold text-[#0d1e25] border border-[#bec9be]/30">
+                        {bin.type}
+                      </span>
+                      <span>{bin.cap}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
-        {/* Selected Route Panel */}
-        <aside className="lg:col-span-4 flex flex-col gap-gutter h-[calc(100vh-120px)] sticky top-[90px]">
-          <div className="bg-white rounded-[24px] border border-outline-variant/30 shadow-sm flex flex-col h-full overflow-hidden">
-            <div className="p-6 border-b border-outline-variant/20 bg-surface-ice">
-              <h3 className="font-headline-sm text-primary mb-1">Current Selection</h3>
-              <p className="text-label-md text-on-surface-variant">1 Bin Selected • Est. Route 0.4km</p>
-            </div>
+        {/* Route Optimization Summary Panel (4 Cols) */}
+        <div className="col-span-12 lg:col-span-4 space-y-6">
+          <div className="bg-white rounded-[28px] p-6 sm:p-8 border border-[#bec9be]/30 shadow-sm space-y-5">
+            <h3 className="text-xl font-bold text-[#0d1e25] tracking-tight">Route Summary</h3>
             
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              {/* Selected Bin List Item */}
-              <div className="flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest border border-primary/20">
-                <div className="flex items-center gap-3">
-                  <span className="material-symbols-outlined text-primary">drag_indicator</span>
-                  <div>
-                    <p className="font-bold text-label-md text-on-surface">BIN-40291</p>
-                    <p className="text-label-sm text-on-surface-variant">Central Plaza A • Plastic</p>
-                  </div>
-                </div>
-                <button className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-error-container hover:text-error transition-colors">
-                  <span className="material-symbols-outlined text-[18px]">close</span>
-                </button>
+            <div className="space-y-3">
+              <div className="p-3 bg-[#f4faff] rounded-2xl border border-[#bec9be]/30">
+                <span className="text-[10px] font-bold uppercase text-[#556158]">Total Selected Waste</span>
+                <p className="text-2xl font-bold text-[#00522d] mt-0.5">{selectedBins.length * 85} kg</p>
               </div>
-              
-              <div className="p-4 border-2 border-dashed border-outline-variant/40 rounded-xl text-center">
-                <p className="text-label-md text-on-surface-variant">Select more bins to optimize route.</p>
+
+              <div className="p-3 bg-[#f4faff] rounded-2xl border border-[#bec9be]/30">
+                <span className="text-[10px] font-bold uppercase text-[#556158]">Estimated Collection Time</span>
+                <p className="text-2xl font-bold text-[#0d1e25] mt-0.5">{selectedBins.length * 15} Mins</p>
+              </div>
+
+              <div className="p-3 bg-[#f4faff] rounded-2xl border border-[#bec9be]/30">
+                <span className="text-[10px] font-bold uppercase text-[#556158]">Assigned EV Truck</span>
+                <p className="text-sm font-bold text-[#0d1e25] mt-0.5">Truck #02 (Fleet North)</p>
               </div>
             </div>
-            
-            <div className="p-6 border-t border-outline-variant/20 bg-surface-container-lowest space-y-4">
-              <div className="flex justify-between items-center text-label-md">
-                <span className="text-on-surface-variant">Total Estimated Volume</span>
-                <span className="font-bold text-on-surface">118 Liters</span>
-              </div>
-              <div className="flex justify-between items-center text-label-md">
-                <span className="text-on-surface-variant">Priority Level</span>
-                <span className="font-bold text-error bg-error-container/30 px-2 py-0.5 rounded">High (98% Full)</span>
-              </div>
-              <button className="w-full py-4 rounded-full bg-primary text-on-primary font-bold shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 mt-4">
-                <span className="material-symbols-outlined">route</span>
-                Dispatch Route (1 Bin)
-              </button>
-            </div>
+
+            <button 
+              type="button"
+              disabled={selectedBins.length === 0}
+              onClick={() => {
+                alert(`Dispatch requested for ${selectedBins.length} bins!`);
+                navigate('/operations/waste');
+              }}
+              className="w-full py-3.5 bg-[#00522d] hover:bg-[#003d21] text-white rounded-full text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              <span className="material-symbols-outlined text-[18px]">send</span>
+              <span>Confirm & Dispatch Pickup</span>
+            </button>
           </div>
-        </aside>
+        </div>
       </div>
     </div>
   );
