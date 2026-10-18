@@ -1,144 +1,121 @@
+// Manage shared resources and their recorded availability.
 const express = require('express');
 const router = express.Router();
-const { pool } = require('../config/db');
-const { auth } = require('./auth');
-
-async function checkAndNotifyLowStock(resource) {
-  if (resource.quantity <= resource.threshold) {
-    const adminRes = await pool.query("SELECT id FROM users WHERE role = 'admin' LIMIT 1");
-    if (adminRes.rows.length > 0) {
-      await pool.query(`
-        INSERT INTO notifications (type, message, "userId", read)
-        VALUES ('stock_low', $1, $2, false)
-      `, [`⚠️ Low Stock Alert: ${resource.name} is below threshold (${resource.quantity} ${resource.unit} remaining)`, adminRes.rows[0].id]);
-    }
-  }
-}
-
-// GET /api/resources
-router.get('/', auth, async (req, res) => {
-  try {
-    const resources = await pool.query('SELECT * FROM resources');
-    res.json(resources.rows);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// GET /api/resources/stats
-router.get('/stats', auth, async (req, res) => {
-  try {
-    const resourcesRes = await pool.query('SELECT * FROM resources');
-    const resources = resourcesRes.rows;
-    const stats = {
+const { prisma } = require('../config/db');
+const { auth } = require('../middleware/auth');
+const { requireRole } = require('../middleware/rbac');
+const { route, httpError, transaction, operationsRoles, positiveNumber } = require('../utils/http');
+const manage = requireRole(operationsRoles);
+router.get(
+  '/',
+  auth,
+  route(async (req, res) => res.json(await prisma.resource.findMany()))
+);
+router.get(
+  '/stats',
+  auth,
+  route(async (req, res) => {
+    const resources = await prisma.resource.findMany();
+    res.json({
       total: resources.length,
-      lowStock: resources.filter(r => r.quantity <= r.threshold).length,
-      critical: resources.filter(r => r.quantity <= r.threshold * 0.5).length,
-      healthy: resources.filter(r => r.quantity > r.threshold).length,
-    };
-    res.json(stats);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// GET /api/resources/:id
-router.get('/:id', auth, async (req, res) => {
-  try {
-    const resourceRes = await pool.query('SELECT * FROM resources WHERE id = $1', [req.params.id]);
-    if (resourceRes.rows.length === 0) return res.status(404).json({ message: 'Resource not found' });
-    res.json(resourceRes.rows[0]);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// POST /api/resources
-router.post('/', auth, async (req, res) => {
-  try {
-    const { name, quantity, unit, threshold, category, icon } = req.body;
-    const resourceRes = await pool.query(`
-      INSERT INTO resources (name, quantity, unit, threshold, category, icon)
-      VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING *
-    `, [name, quantity, unit, threshold, category, icon]);
-    res.status(201).json(resourceRes.rows[0]);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// PUT /api/resources/:id
-router.put('/:id', auth, async (req, res) => {
-  try {
-    const { name, quantity, unit, threshold, category, icon } = req.body;
-    const resourceRes = await pool.query(`
-      UPDATE resources
-      SET name = COALESCE($1, name),
-          quantity = COALESCE($2, quantity),
-          unit = COALESCE($3, unit),
-          threshold = COALESCE($4, threshold),
-          category = COALESCE($5, category),
-          icon = COALESCE($6, icon),
-          "updatedAt" = CURRENT_TIMESTAMP
-      WHERE id = $7
-      RETURNING *
-    `, [name, quantity, unit, threshold, category, icon, req.params.id]);
-    
-    if (resourceRes.rows.length === 0) return res.status(404).json({ message: 'Resource not found' });
-    
-    await checkAndNotifyLowStock(resourceRes.rows[0]);
-    res.json(resourceRes.rows[0]);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// POST /api/resources/:id/consume — deduct stock
-router.post('/:id/consume', auth, async (req, res) => {
-  try {
-    const { amount } = req.body;
-    const resourceRes = await pool.query('SELECT quantity FROM resources WHERE id = $1', [req.params.id]);
-    if (resourceRes.rows.length === 0) return res.status(404).json({ message: 'Resource not found' });
-
-    const newQuantity = Math.max(0, resourceRes.rows[0].quantity - amount);
-    const updatedRes = await pool.query(`
-      UPDATE resources SET quantity = $1, "updatedAt" = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *
-    `, [newQuantity, req.params.id]);
-
-    await checkAndNotifyLowStock(updatedRes.rows[0]);
-    res.json(updatedRes.rows[0]);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// POST /api/resources/:id/restock — add stock
-router.post('/:id/restock', auth, async (req, res) => {
-  try {
-    const { amount } = req.body;
-    const resourceRes = await pool.query('SELECT quantity FROM resources WHERE id = $1', [req.params.id]);
-    if (resourceRes.rows.length === 0) return res.status(404).json({ message: 'Resource not found' });
-
-    const newQuantity = resourceRes.rows[0].quantity + amount;
-    const updatedRes = await pool.query(`
-      UPDATE resources SET quantity = $1, "updatedAt" = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *
-    `, [newQuantity, req.params.id]);
-    res.json(updatedRes.rows[0]);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// DELETE /api/resources/:id
-router.delete('/:id', auth, async (req, res) => {
-  try {
-    const deleteRes = await pool.query('DELETE FROM resources WHERE id = $1 RETURNING *', [req.params.id]);
-    if (deleteRes.rows.length === 0) return res.status(404).json({ message: 'Resource not found' });
+      lowStock: resources.filter((r) => r.quantity <= r.threshold).length,
+      critical: resources.filter((r) => r.quantity <= r.threshold * 0.5).length,
+      healthy: resources.filter((r) => r.quantity > r.threshold).length,
+    });
+  })
+);
+router.get(
+  '/:id',
+  auth,
+  route(async (req, res) => {
+    const resource = await prisma.resource.findUnique({ where: { id: req.params.id } });
+    if (!resource) throw httpError(404, 'Resource not found');
+    res.json(resource);
+  })
+);
+function input(body, partial = false) {
+  const data = {};
+  for (const key of ['name', 'unit', 'category', 'icon'])
+    if (body[key] !== undefined) data[key] = body[key];
+  for (const key of ['quantity', 'threshold'])
+    if (body[key] !== undefined) {
+      const n = Number(body[key]);
+      if (!Number.isInteger(n) || n < 0)
+        throw httpError(400, `${key} must be a non-negative integer`);
+      data[key] = n;
+    }
+  if (
+    !partial &&
+    (!data.name ||
+      !data.unit ||
+      !data.category ||
+      data.quantity === undefined ||
+      data.threshold === undefined)
+  )
+    throw httpError(400, 'Name, unit, category, quantity and threshold are required');
+  return data;
+}
+router.post(
+  '/',
+  auth,
+  manage,
+  route(async (req, res) =>
+    res.status(201).json(await prisma.resource.create({ data: input(req.body) }))
+  )
+);
+router.put(
+  '/:id',
+  auth,
+  manage,
+  route(async (req, res) =>
+    res.json(
+      await prisma.resource.update({ where: { id: req.params.id }, data: input(req.body, true) })
+    )
+  )
+);
+for (const action of ['consume', 'restock'])
+  router.post(
+    `/:id/${action}`,
+    auth,
+    manage,
+    route(async (req, res) => {
+      const amount = positiveNumber(req.body.amount);
+      if (!Number.isInteger(amount)) throw httpError(400, 'Amount must be an integer');
+      const resource = await transaction(prisma, async (tx) => {
+        const current = await tx.resource.findUnique({ where: { id: req.params.id } });
+        if (!current) throw httpError(404, 'Resource not found');
+        if (action === 'consume' && current.quantity < amount)
+          throw httpError(409, 'Not enough stock');
+        const updated = await tx.resource.update({
+          where: { id: current.id },
+          data: { quantity: { increment: action === 'restock' ? amount : -amount } },
+        });
+        if (updated.quantity <= updated.threshold && current.quantity > current.threshold) {
+          const admins = await tx.user.findMany({
+            where: { isActive: true, role: { in: ['ADMIN', 'PLATFORM_ADMIN'] } },
+            select: { id: true },
+          });
+          if (admins.length)
+            await tx.notification.createMany({
+              data: admins.map((user) => ({
+                userId: user.id,
+                type: 'stock_low',
+                message: `Low stock: ${updated.name} (${updated.quantity} ${updated.unit} remaining)`,
+              })),
+            });
+        }
+        return updated;
+      });
+      res.json(resource);
+    })
+  );
+router.delete(
+  '/:id',
+  auth,
+  manage,
+  route(async (req, res) => {
+    await prisma.resource.delete({ where: { id: req.params.id } });
     res.json({ message: 'Resource deleted' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
+  })
+);
 module.exports = router;

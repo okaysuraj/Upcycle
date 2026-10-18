@@ -1,0 +1,599 @@
+[
+  {
+    "key": "comparison",
+    "title": "Campus comparison",
+    "group": "Sustainability",
+    "endpoint": "/records/comparison",
+    "columns": [
+      {
+        "key": "name",
+        "label": "Campus",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "wasteKg",
+        "label": "Waste logged (kg)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "wasteRecords",
+        "label": "Waste records",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "energyKwh",
+        "label": "Energy use (kWh)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "energyRecords",
+        "label": "Energy records",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "waterGallons",
+        "label": "Water use (gal)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "waterRecords",
+        "label": "Water records",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "note": "All-time totals from each campus ledger. Missing measurements stay unknown. Campuses are not ranked because population, reporting periods and coverage differ.",
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "goals",
+    "title": "Goals & projects",
+    "group": "Sustainability",
+    "endpoint": "/goals",
+    "columns": [
+      {
+        "key": "title",
+        "label": "Goal",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "category",
+        "label": "Category",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "baseline",
+        "label": "Baseline",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "targetValue",
+        "label": "Target",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "currentVal",
+        "label": "Current recorded value",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "progressPct",
+        "label": "Milestones complete (%)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "targetYear",
+        "label": "Target year",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "create": {
+      "endpoint": "/goals",
+      "fields": [
+        {
+          "key": "campusId",
+          "label": "Campus",
+          "type": "select",
+          "required": true,
+          "source": "/campuses"
+        },
+        {
+          "key": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "baseline",
+          "label": "Baseline",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "targetValue",
+          "label": "Target value",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "currentVal",
+          "label": "Current value",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "targetYear",
+          "label": "Target year",
+          "type": "integer",
+          "required": true,
+          "min": 2000
+        },
+        {
+          "key": "department",
+          "label": "Department",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "milestones",
+          "label": "Milestones",
+          "type": "collection",
+          "required": false,
+          "fields": [
+            {
+              "key": "title",
+              "label": "Title",
+              "type": "text",
+              "required": true
+            },
+            {
+              "key": "leadTeam",
+              "label": "Responsible team",
+              "type": "text",
+              "required": false
+            },
+            {
+              "key": "completed",
+              "label": "Completed",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        }
+      ],
+      "roles": [
+        "STUDENT",
+        "VOLUNTEER",
+        "STAFF",
+        "WASTE_STAFF",
+        "CAMPUS_ADMIN",
+        "ADMIN",
+        "PLATFORM_ADMIN",
+        "VENDOR",
+        "CONSULTANT",
+        "EVENT_ORGANIZER"
+      ]
+    },
+    "nested": ["milestones"],
+    "milestoneActions": true,
+    "note": "Progress reflects completed stored milestones. It does not certify measured environmental outcomes.",
+    "kind": "records",
+    "export": true,
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "energy",
+    "title": "Energy records",
+    "group": "Sustainability",
+    "endpoint": "/records/energy",
+    "columns": [
+      {
+        "key": "campus.name",
+        "label": "Campus",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "date",
+        "label": "Date",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "kwhUsed",
+        "label": "Energy use (kWh)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "percentageRenewable",
+        "label": "Reported renewable share (%)",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "create": {
+      "endpoint": "/records/energy",
+      "fields": [
+        {
+          "key": "campusId",
+          "label": "Campus",
+          "type": "select",
+          "required": true,
+          "source": "/campuses"
+        },
+        {
+          "key": "date",
+          "label": "Date",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "key": "kwhUsed",
+          "label": "Energy use (kWh)",
+          "type": "number",
+          "required": true,
+          "min": 0
+        },
+        {
+          "key": "percentageRenewable",
+          "label": "Renewable share (%)",
+          "type": "number",
+          "required": true,
+          "min": 0,
+          "max": 100
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"]
+    },
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "water",
+    "title": "Water records",
+    "group": "Sustainability",
+    "endpoint": "/records/water",
+    "columns": [
+      {
+        "key": "campus.name",
+        "label": "Campus",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "date",
+        "label": "Date",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "gallonsUsed",
+        "label": "Water use (gal)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "saved",
+        "label": "Reported savings (gal)",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "create": {
+      "endpoint": "/records/water",
+      "fields": [
+        {
+          "key": "campusId",
+          "label": "Campus",
+          "type": "select",
+          "required": true,
+          "source": "/campuses"
+        },
+        {
+          "key": "date",
+          "label": "Date",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "key": "gallonsUsed",
+          "label": "Water use (gal)",
+          "type": "number",
+          "required": true,
+          "min": 0
+        },
+        {
+          "key": "saved",
+          "label": "Reported savings (gal)",
+          "type": "number",
+          "required": true,
+          "min": 0
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"]
+    },
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "carbon",
+    "title": "Emissions records",
+    "group": "Sustainability",
+    "endpoint": "/records/carbon",
+    "columns": [
+      {
+        "key": "campus.name",
+        "label": "Campus",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "month",
+        "label": "Month",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "totalEmissions",
+        "label": "Reported emissions",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "reduction",
+        "label": "Reported reduction",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "create": {
+      "endpoint": "/records/carbon",
+      "fields": [
+        {
+          "key": "campusId",
+          "label": "Campus",
+          "type": "select",
+          "required": true,
+          "source": "/campuses"
+        },
+        {
+          "key": "month",
+          "label": "Month",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "key": "totalEmissions",
+          "label": "Reported emissions",
+          "type": "number",
+          "required": true,
+          "min": 0
+        },
+        {
+          "key": "reduction",
+          "label": "Reported reduction",
+          "type": "number",
+          "required": true,
+          "min": 0
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"]
+    },
+    "note": "The existing records do not specify emissions units or scope. No unit, certification, or scope is inferred.",
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "esg",
+    "title": "Sustainability overview",
+    "group": "Sustainability",
+    "endpoint": "/esg/corporate",
+    "columns": [
+      {
+        "key": "totalCampuses",
+        "label": "Campuses",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "totalUsers",
+        "label": "Accounts",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "totalEvents",
+        "label": "Events",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "totalWasteLoggedKg",
+        "label": "Waste logged (kg)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "estimatedCarbonOffsetKg",
+        "label": "Estimated waste offset (kg)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "totalEnergyKwh",
+        "label": "Energy use (kWh)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "totalWaterGallons",
+        "label": "Water use (gal)",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "kind": "metrics",
+    "dataPath": "globalImpact",
+    "note": "Current platform totals from stored records. Waste offset is a simple estimate, not certification.",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "reports",
+    "title": "Report archive",
+    "group": "Sustainability",
+    "endpoint": "/records/reports",
+    "columns": [
+      {
+        "key": "campus.name",
+        "label": "Campus",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "month",
+        "label": "Month",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "status",
+        "label": "Stored status",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "reportUrl",
+        "label": "Report document",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "note": "Only saved report records and document links are shown. Certification and external report generation are unavailable. Use Sustainability overview to export current totals.",
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  }
+]

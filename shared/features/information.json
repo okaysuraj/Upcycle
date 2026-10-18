@@ -1,0 +1,398 @@
+[
+  {
+    "key": "terms",
+    "title": "Terms of service",
+    "group": "Information",
+    "endpoint": "/content?kind=TERMS",
+    "columns": [
+      {
+        "key": "title",
+        "label": "Title",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "body",
+        "label": "Document text",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "version",
+        "label": "Version",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "isPublished",
+        "label": "Published",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "updatedAt",
+        "label": "Last updated",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "public": true,
+    "publicEndpoint": "/content/public?kind=TERMS",
+    "create": {
+      "endpoint": "/content",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "body",
+          "label": "Document text",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "key": "version",
+          "label": "Version",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "isPublished",
+          "label": "Publish document",
+          "type": "boolean",
+          "required": false
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN"],
+      "body": {
+        "kind": "TERMS"
+      }
+    },
+    "edit": {
+      "endpoint": "/content/{id}",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "body",
+          "label": "Document text",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "key": "version",
+          "label": "Version",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "isPublished",
+          "label": "Publish document",
+          "type": "boolean",
+          "required": false
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN"],
+      "method": "PUT"
+    },
+    "actions": [
+      {
+        "label": "Delete document",
+        "endpoint": "/content/{id}",
+        "method": "DELETE",
+        "body": {},
+        "roles": ["ADMIN", "PLATFORM_ADMIN"],
+        "fields": [],
+        "confirm": true
+      }
+    ],
+    "note": "Only administrator-authored content is stored. Unpublished drafts are visible to administrators; other users see published documents.",
+    "kind": "records",
+    "nested": [],
+    "toolbar": [],
+    "export": true
+  },
+  {
+    "key": "privacy-policy",
+    "title": "Privacy policy",
+    "group": "Information",
+    "endpoint": "/content?kind=PRIVACY",
+    "columns": [
+      {
+        "key": "title",
+        "label": "Title",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "body",
+        "label": "Document text",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "version",
+        "label": "Version",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "isPublished",
+        "label": "Published",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "updatedAt",
+        "label": "Last updated",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "public": true,
+    "publicEndpoint": "/content/public?kind=PRIVACY",
+    "create": {
+      "endpoint": "/content",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "body",
+          "label": "Document text",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "key": "version",
+          "label": "Version",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "isPublished",
+          "label": "Publish document",
+          "type": "boolean",
+          "required": false
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN"],
+      "body": {
+        "kind": "PRIVACY"
+      }
+    },
+    "edit": {
+      "endpoint": "/content/{id}",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "body",
+          "label": "Document text",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "key": "version",
+          "label": "Version",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "isPublished",
+          "label": "Publish document",
+          "type": "boolean",
+          "required": false
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN"],
+      "method": "PUT"
+    },
+    "actions": [
+      {
+        "label": "Delete document",
+        "endpoint": "/content/{id}",
+        "method": "DELETE",
+        "body": {},
+        "roles": ["ADMIN", "PLATFORM_ADMIN"],
+        "fields": [],
+        "confirm": true
+      }
+    ],
+    "note": "Only administrator-authored content is stored. Unpublished drafts are visible to administrators; other users see published documents.",
+    "kind": "records",
+    "nested": [],
+    "toolbar": [],
+    "export": true
+  },
+  {
+    "key": "faq",
+    "title": "FAQ",
+    "group": "Information",
+    "endpoint": "/content?kind=FAQ",
+    "columns": [
+      {
+        "key": "title",
+        "label": "Title",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "body",
+        "label": "Document text",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "version",
+        "label": "Version",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "isPublished",
+        "label": "Published",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "updatedAt",
+        "label": "Last updated",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "public": true,
+    "publicEndpoint": "/content/public?kind=FAQ",
+    "create": {
+      "endpoint": "/content",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "body",
+          "label": "Document text",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "key": "version",
+          "label": "Version",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "isPublished",
+          "label": "Publish document",
+          "type": "boolean",
+          "required": false
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN"],
+      "body": {
+        "kind": "FAQ"
+      }
+    },
+    "edit": {
+      "endpoint": "/content/{id}",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "body",
+          "label": "Document text",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "key": "version",
+          "label": "Version",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "isPublished",
+          "label": "Publish document",
+          "type": "boolean",
+          "required": false
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN"],
+      "method": "PUT"
+    },
+    "actions": [
+      {
+        "label": "Delete document",
+        "endpoint": "/content/{id}",
+        "method": "DELETE",
+        "body": {},
+        "roles": ["ADMIN", "PLATFORM_ADMIN"],
+        "fields": [],
+        "confirm": true
+      }
+    ],
+    "note": "Only administrator-authored content is stored. Unpublished drafts are visible to administrators; other users see published documents.",
+    "kind": "records",
+    "nested": [],
+    "toolbar": [],
+    "export": true
+  }
+]

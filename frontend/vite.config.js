@@ -1,8 +1,9 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
+  resolve: { dedupe: ['react', 'react-dom'] },
   plugins: [react(), tailwindcss()],
   server: {
     port: 5173,
@@ -10,7 +11,7 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,
-      }
-    }
-  }
-})
+      },
+    },
+  },
+});

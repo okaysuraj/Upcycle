@@ -15,7 +15,7 @@ model User {
   password            String
   role                Role         @default(VOLUNTEER) // Student, Campus Admin, Vendor, etc.
   skills              String[]
-  availabilityHours   Int          @default(10)
+  availabilityHours   Int          @default(0)
   activeTasks         Int          @default(0)
   isVerified          Boolean      @default(false)
   kycStatus           String       @default("NONE") // NONE, PENDING, VERIFIED, REJECTED
@@ -49,6 +49,12 @@ model User {
   reportedContent     ContentModeration[] @relation("ReportedBy")
   disputes            Dispute[]
   quotes              Quote[]
+  supportTickets      SupportTicket[]
+  volunteerSignups    VolunteerSignup[]
+  documents          ContentDocument[]
+  postLikes PostLike[]
+  @@index([campusId, role])
+  @@index([isActive, points])
 }
 
 enum Role {
@@ -69,7 +75,7 @@ model Campus {
   id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name                String
   domain              String?      @unique
-  sustainabilityScore Float        @default(0)
+  sustainabilityScore Float?
   location            String?
   logoUrl             String?      // Cloudinary URL for campus logo
   photoUrls           String[]     // Cloudinary URLs for campus photos
@@ -88,6 +94,10 @@ model Campus {
   rfps                RFP[]
   posts               Post[]
   ecoGroups           EcoGroup[]
+  buildings           Building[]
+  goals               SustainabilityGoal[]
+  shifts              VolunteerShift[]
+  dispatches          DispatchOrder[]
 }
 
 // 4. Waste Management
@@ -97,12 +107,18 @@ model SmartBin {
   campus              Campus       @relation(fields: [campusId], references: [id])
   location            String
   category            WasteCategory
-  fillLevel           Float        @default(0.0) // 0 to 100%
+  fillLevel           Float // 0 to 100%
   lastEmptied         DateTime?
+  buildingId          String?      @db.Uuid
+  building            Building?    @relation(fields: [buildingId], references: [id])
+  @@index([campusId, fillLevel])
+  @@index([buildingId])
 }
 
 enum WasteCategory {
   PLASTIC
+  GLASS
+  METAL
   ORGANIC
   E_WASTE
   PAPER
@@ -120,6 +136,8 @@ model WasteLog {
   quantityKg          Float
   photoUrl            String?      // Cloudinary URL for waste photo proof
   date                DateTime     @default(now())
+  @@index([campusId, date])
+  @@index([userId, date])
 }
 
 // 5. Eco-Friendly Marketplace
@@ -141,6 +159,9 @@ model MarketplaceListing {
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
   escrowTransactions  EscrowTransaction[]
+  @@index([status, createdAt])
+  @@index([vendorId])
+  @@index([campusId])
 }
 
 enum ServiceType {
@@ -167,6 +188,8 @@ model Event {
   registrations       EventRegistration[]
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
+  @@index([campusId, date])
+  @@index([status, date])
 }
 
 enum EventStatus {
@@ -183,9 +206,11 @@ model EventRegistration {
   userId              String       @db.Uuid
   user                User         @relation(fields: [userId], references: [id])
   status              RegistrationStatus @default(REGISTERED)
+  hoursLogged         Float        @default(0)
   createdAt           DateTime     @default(now())
 
   @@unique([eventId, userId])
+  @@index([userId, status])
 }
 
 enum RegistrationStatus {
@@ -212,6 +237,8 @@ model Task {
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
   notifications       Notification[]
+  @@index([assignedToId, status])
+  @@index([status, dueDate])
 }
 
 model Resource {
@@ -237,6 +264,8 @@ model Notification {
   read                Boolean      @default(false)
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
+  @@index([userId, read, createdAt])
+  @@index([taskId])
 }
 
 model Plant {
@@ -258,6 +287,7 @@ model Harvest {
   unit                String
   date                DateTime     @default(now())
   createdAt           DateTime     @default(now())
+  @@index([plantId, date])
 }
 
 // 7. ESG & Carbon Tracking
@@ -269,6 +299,7 @@ model CarbonFootprint {
   totalEmissions      Float
   reduction           Float
   createdAt           DateTime     @default(now())
+  @@index([campusId, month])
 }
 
 model WaterUsage {
@@ -279,6 +310,7 @@ model WaterUsage {
   gallonsUsed         Float
   saved               Float
   createdAt           DateTime     @default(now())
+  @@index([campusId, date])
 }
 
 model EnergyUsage {
@@ -289,6 +321,7 @@ model EnergyUsage {
   kwhUsed             Float
   percentageRenewable Float
   createdAt           DateTime     @default(now())
+  @@index([campusId, date])
 }
 
 model MonthlyESGReport {
@@ -299,6 +332,7 @@ model MonthlyESGReport {
   reportUrl           String?
   status              String       @default("GENERATED")
   createdAt           DateTime     @default(now())
+  @@index([campusId, month])
 }
 
 // 8. Expanded Marketplace & Vendor Management
@@ -313,6 +347,7 @@ model RFP {
   status              String       @default("OPEN")
   createdAt           DateTime     @default(now())
   quotes              Quote[]
+  @@index([campusId, deadline])
 }
 
 model Quote {
@@ -325,6 +360,8 @@ model Quote {
   proposalDetails     String
   status              String       @default("PENDING")
   createdAt           DateTime     @default(now())
+  @@index([rfpId])
+  @@index([vendorId, createdAt])
 }
 
 model EscrowTransaction {
@@ -338,6 +375,9 @@ model EscrowTransaction {
   amount              Float
   status              String       @default("HELD") // HELD, RELEASED, REFUNDED
   createdAt           DateTime     @default(now())
+  @@index([buyerId, createdAt])
+  @@index([sellerId, createdAt])
+  @@index([listingId])
 }
 
 model VendorVerification {
@@ -349,6 +389,7 @@ model VendorVerification {
   reviewedBy          String?      @db.Uuid
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
+  @@index([vendorId, status])
 }
 
 // 9. Gamification
@@ -369,6 +410,8 @@ model UserBadge {
   badgeId             String       @db.Uuid
   badge               Badge        @relation(fields: [badgeId], references: [id])
   earnedAt            DateTime     @default(now())
+  @@unique([userId, badgeId])
+  @@index([badgeId])
 }
 
 model RewardItem {
@@ -376,7 +419,7 @@ model RewardItem {
   name                String
   description         String
   pointsCost          Int
-  quantityAvailable   Int          @default(100)
+  quantityAvailable   Int          @default(0)
   redemptions         Redemption[]
 }
 
@@ -387,6 +430,8 @@ model Redemption {
   rewardId            String       @db.Uuid
   reward              RewardItem   @relation(fields: [rewardId], references: [id])
   redeemedAt          DateTime     @default(now())
+  @@index([userId, redeemedAt])
+  @@index([rewardId])
 }
 
 // 10. Community & Events
@@ -394,6 +439,8 @@ model Post {
   id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   authorId            String       @db.Uuid
   author              User         @relation(fields: [authorId], references: [id])
+  groupId             String?      @db.Uuid
+  group               EcoGroup?    @relation(fields: [groupId], references: [id], onDelete: Restrict)
   campusId            String?      @db.Uuid
   campus              Campus?      @relation(fields: [campusId], references: [id])
   content             String
@@ -402,6 +449,10 @@ model Post {
   createdAt           DateTime     @default(now())
   comments            Comment[]
   moderations         ContentModeration[]
+  postLikes PostLike[]
+  @@index([authorId])
+  @@index([campusId, createdAt])
+  @@index([groupId, createdAt])
 }
 
 model Comment {
@@ -412,6 +463,8 @@ model Comment {
   author              User         @relation(fields: [authorId], references: [id])
   content             String
   createdAt           DateTime     @default(now())
+  @@index([postId, createdAt])
+  @@index([authorId])
 }
 
 model EcoGroup {
@@ -421,7 +474,23 @@ model EcoGroup {
   campusId            String?      @db.Uuid
   campus              Campus?      @relation(fields: [campusId], references: [id])
   members             EcoGroupMember[]
+  posts               Post[]
   createdAt           DateTime     @default(now())
+  @@index([campusId])
+}
+
+model ContentDocument {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  kind        String
+  title       String
+  body        String
+  version     String
+  isPublished Boolean  @default(false)
+  createdById String   @db.Uuid
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([kind, isPublished])
 }
 
 model EcoGroupMember {
@@ -432,6 +501,8 @@ model EcoGroupMember {
   user                User         @relation(fields: [userId], references: [id])
   role                String       @default("MEMBER") // ADMIN, MEMBER
   joinedAt            DateTime     @default(now())
+  @@unique([groupId, userId])
+  @@index([userId])
 }
 
 // 11. Admin & System
@@ -444,6 +515,9 @@ model AuditLog {
   entityId            String
   details             Json?
   timestamp           DateTime     @default(now())
+  @@index([timestamp])
+  @@index([userId])
+  @@index([entity, entityId])
 }
 
 model FeatureFlag {
@@ -462,6 +536,9 @@ model ContentModeration {
   reason              String
   status              String       @default("PENDING") // PENDING, RESOLVED, DISMISSED
   createdAt           DateTime     @default(now())
+  @@index([status, createdAt])
+  @@index([postId])
+  @@index([reportedById])
 }
 
 model Dispute {
@@ -472,5 +549,159 @@ model Dispute {
   reason              String
   status              String       @default("OPEN")
   createdAt           DateTime     @default(now())
+  @@index([userId, status])
 }
 
+// 12. Facilities & Blueprints
+model Building {
+  id             String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  campusId       String     @db.Uuid
+  campus         Campus     @relation(fields: [campusId], references: [id], onDelete: Cascade)
+  name           String
+  code           String     @unique
+  sector         String
+  zonesCount     Int        @default(1)
+  efficiency     Float?
+  leadTechnician String?
+  status         String     @default("OPERATIONAL")
+  bins           SmartBin[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  @@index([campusId])
+}
+
+// 13. Support & Service Tickets
+model SupportTicket {
+  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String     @db.Uuid
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject     String
+  category    String     @default("GENERAL")
+  priority    String     @default("MEDIUM")
+  status      String     @default("OPEN")
+  description String
+  assignedTo  String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  @@index([userId, createdAt])
+  @@index([status, priority])
+}
+
+// 14. Fleet & Logistics Dispatch
+model FleetVehicle {
+  id          String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  code        String          @unique
+  type        String          @default("ELECTRIC_VAN")
+  batteryPct  Int
+  status      String          @default("ACTIVE")
+  latitude    Float?
+  longitude   Float?
+  dispatches  DispatchOrder[]
+  createdAt   DateTime        @default(now())
+}
+
+model DispatchOrder {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vehicleId   String?       @db.Uuid
+  vehicle     FleetVehicle? @relation(fields: [vehicleId], references: [id])
+  campusId    String        @db.Uuid
+  campus      Campus        @relation(fields: [campusId], references: [id], onDelete: Cascade)
+  status      String        @default("QUEUED")
+  targetBins  Json?
+  payloadKg   Float         @default(0.0)
+  etaMinutes  Int
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  @@index([campusId, createdAt])
+  @@index([vehicleId, status])
+}
+
+// 15. Sustainability Goals & Milestones
+model SustainabilityGoal {
+  id          String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  campusId    String          @db.Uuid
+  campus      Campus          @relation(fields: [campusId], references: [id], onDelete: Cascade)
+  category    String
+  title       String
+  targetYear  Int
+  baseline    String
+  targetValue String
+  currentVal  String
+  progressPct Float           @default(0.0)
+  department  String?
+  milestones  GoalMilestone[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  @@index([campusId])
+}
+
+model GoalMilestone {
+  id          String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  goalId      String             @db.Uuid
+  goal        SustainabilityGoal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  title       String
+  leadTeam    String?
+  completed   Boolean            @default(false)
+  completedAt DateTime?
+  createdAt   DateTime           @default(now())
+  @@index([goalId])
+}
+
+// 16. Volunteer Shifts & Rosters
+model VolunteerShift {
+  id          String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  campusId    String            @db.Uuid
+  campus      Campus            @relation(fields: [campusId], references: [id], onDelete: Cascade)
+  role        String
+  date        DateTime
+  startTime   String
+  endTime     String
+  location    String
+  hours       Float
+  points      Int
+  maxSlots    Int
+  supervisor  String?
+  signups     VolunteerSignup[]
+  createdAt   DateTime          @default(now())
+  @@index([campusId, date])
+}
+
+model VolunteerSignup {
+  id        String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  shiftId   String         @db.Uuid
+  shift     VolunteerShift @relation(fields: [shiftId], references: [id], onDelete: Cascade)
+  userId    String         @db.Uuid
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status    String         @default("CONFIRMED")
+  createdAt DateTime       @default(now())
+
+  @@unique([shiftId, userId])
+  @@index([userId, status])
+}
+
+// 17. Academy Curriculum
+model Course {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code        String   @unique
+  title       String
+  description String
+  category    String
+  durationHrs Float
+  level       String   @default("INTERMEDIATE")
+  rating      Float?
+  icon        String?  @default("school")
+  colorClass  String?  @default("text-primary")
+  modules     Json
+  createdAt   DateTime @default(now())
+}
+
+model PostLike {
+  postId    String   @db.Uuid
+  userId    String   @db.Uuid
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  @@id([postId, userId])
+  @@index([userId])
+}

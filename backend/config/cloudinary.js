@@ -25,31 +25,19 @@ const uploadToCloudinary = (fileBuffer, options = {}) => {
       ...(options.transformation && { transformation: options.transformation }),
     };
 
-    const uploadStream = cloudinary.uploader.upload_stream(
-      uploadOptions,
-      (error, result) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve({
-            url: result.secure_url,
-            publicId: result.public_id,
-          });
-        }
+    const uploadStream = cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve({
+          url: result.secure_url,
+          publicId: result.public_id,
+        });
       }
-    );
+    });
 
     uploadStream.end(fileBuffer);
   });
-};
-
-/**
- * Delete a file from Cloudinary by public ID.
- * @param {string} publicId - The Cloudinary public ID
- * @returns {Promise<Object>}
- */
-const deleteFromCloudinary = async (publicId) => {
-  return cloudinary.uploader.destroy(publicId);
 };
 
 /**
@@ -63,7 +51,7 @@ const generateUploadSignature = (params = {}) => {
     timestamp,
     ...params,
   };
-  
+
   const signature = cloudinary.utils.api_sign_request(
     paramsToSign,
     process.env.CLOUDINARY_API_SECRET
@@ -80,6 +68,5 @@ const generateUploadSignature = (params = {}) => {
 module.exports = {
   cloudinary,
   uploadToCloudinary,
-  deleteFromCloudinary,
   generateUploadSignature,
 };

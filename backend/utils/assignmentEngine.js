@@ -22,7 +22,7 @@ function scoreCandidate(user, task) {
   const userSkills = user.skills || [];
 
   // Skill match score
-  const matchedSkills = requiredSkills.filter(s => userSkills.includes(s));
+  const matchedSkills = requiredSkills.filter((s) => userSkills.includes(s));
   const skillScore = matchedSkills.length * 10;
 
   // Workload penalty
@@ -32,12 +32,12 @@ function scoreCandidate(user, task) {
   const availabilityBonus = (user.availabilityHours || 0) * 0.5;
 
   // Role bonus: staff get +5 for handling complex tasks
-  const roleBonus = (user.role === 'staff' || user.role === 'admin') ? 5 : 0;
+  const roleBonus = ['STAFF', 'WASTE_STAFF', 'CAMPUS_ADMIN'].includes(user.role) ? 5 : 0;
 
   const totalScore = skillScore - workloadPenalty + availabilityBonus + roleBonus;
 
   return {
-    userId: user._id,
+    userId: user.id || user._id,
     name: user.name,
     role: user.role,
     skills: userSkills,
@@ -56,8 +56,11 @@ function runAssignmentEngine(candidates, task) {
   if (!candidates || candidates.length === 0) return null;
 
   const scored = candidates
-    .filter(u => u.role !== 'admin') // Admins manage, they don't get assigned
-    .map(user => scoreCandidate(user, task))
+    .filter(
+      (u) =>
+        u.isActive !== false && ['STUDENT', 'VOLUNTEER', 'STAFF', 'WASTE_STAFF'].includes(u.role)
+    ) // Admins manage, they don't get assigned
+    .map((user) => scoreCandidate(user, task))
     .sort((a, b) => b.totalScore - a.totalScore);
 
   return scored;

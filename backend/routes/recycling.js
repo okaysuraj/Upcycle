@@ -1,64 +1,73 @@
-const express = require('express');
-const router = express.Router();
-const { pool } = require('../config/db');
-const { auth } = require('./auth');
-
-// GET /api/recycling/stats
-router.get('/stats', auth, async (req, res) => {
-  try {
-    const globalStatsRes = await pool.query(`
-      SELECT "materialType", SUM(quantity) as total_quantity, unit
-      FROM recycling_logs
-      GROUP BY "materialType", unit
-    `);
-    
-    const userStatsRes = await pool.query(`
-      SELECT "materialType", SUM(quantity) as total_quantity, unit
-      FROM recycling_logs
-      WHERE "userId" = $1
-      GROUP BY "materialType", unit
-    `, [req.user.id]);
-
-    res.json({
-      global: globalStatsRes.rows,
-      user: userStatsRes.rows
+// Compatibility endpoints backed by the same WasteLog ledger as the web/mobile apps.
+const router = require('express').Router();
+const { prisma } = require('../config/db');
+const { auth } = require('../middleware/auth');
+const { route, httpError, positiveNumber, operationsRoles } = require('../utils/http');
+router.get(
+  '/stats',
+  auth,
+  route(async (req, res) => {
+    const summarize = async (where) =>
+      (await prisma.wasteLog.groupBy({ by: ['category'], where, _sum: { quantityKg: true } })).map(
+        (row) => ({ materialType: row.category, total_quantity: row._sum.quantityKg, unit: 'kg' })
+      );
+    const [global, user] = await Promise.all([summarize({}), summarize({ userId: req.user.id })]);
+    res.json({ global, user });
+  })
+);
+router.get(
+  '/logs',
+  auth,
+  route(async (req, res) => {
+    const logs = await prisma.wasteLog.findMany({
+      where: operationsRoles.includes(req.user.role) ? {} : { userId: req.user.id },
+      include: { user: { select: { name: true } } },
+      orderBy: { date: 'desc' },
     });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// GET /api/recycling/logs
-router.get('/logs', auth, async (req, res) => {
-  try {
-    const logs = await pool.query(`
-      SELECT rl.*, u.name as "userName"
-      FROM recycling_logs rl
-      JOIN users u ON rl."userId" = u.id
-      ORDER BY rl.date DESC
-    `);
-    res.json(logs.rows);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// POST /api/recycling/log
-router.post('/log', auth, async (req, res) => {
-  try {
-    const { materialType, quantity, unit } = req.body;
-    const userId = req.user.id;
-
-    const newLog = await pool.query(`
-      INSERT INTO recycling_logs ("userId", "materialType", quantity, unit)
-      VALUES ($1, $2, $3, $4)
-      RETURNING *
-    `, [userId, materialType, quantity, unit]);
-
-    res.status(201).json(newLog.rows[0]);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
+    res.json(
+      logs.map(({ user, ...log }) => ({
+        ...log,
+        userName: user.name,
+        materialType: log.category,
+        quantity: log.quantityKg,
+        unit: 'kg',
+      }))
+    );
+  })
+);
+router.post(
+  '/log',
+  auth,
+  route(async (req, res) => {
+    const campusId = req.body.campusId || req.user.campusId;
+    if (!campusId) throw httpError(400, 'Select a campus');
+    if (req.body.unit && req.body.unit !== 'kg') throw httpError(400, 'Record the weight in kg');
+    const category = String(req.body.materialType || '').toUpperCase();
+    if (
+      ![
+        'PLASTIC',
+        'PAPER',
+        'GLASS',
+        'METAL',
+        'ORGANIC',
+        'E_WASTE',
+        'GENERAL',
+        'HAZARDOUS',
+      ].includes(category)
+    )
+      throw httpError(400, 'Invalid material category');
+    res
+      .status(201)
+      .json(
+        await prisma.wasteLog.create({
+          data: {
+            campusId,
+            userId: req.user.id,
+            category,
+            quantityKg: positiveNumber(req.body.quantity),
+          },
+        })
+      );
+  })
+);
 module.exports = router;

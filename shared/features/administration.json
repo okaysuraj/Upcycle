@@ -1,0 +1,452 @@
+[
+  {
+    "key": "users",
+    "title": "User management",
+    "group": "Administration",
+    "endpoint": "/admin/users",
+    "columns": [
+      {
+        "key": "name",
+        "label": "Name",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "email",
+        "label": "Email",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "role",
+        "label": "Role",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "isActive",
+        "label": "Active",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "kycStatus",
+        "label": "Verification",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "points",
+        "label": "Points",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": ["ADMIN", "PLATFORM_ADMIN"],
+    "actions": [
+      {
+        "label": "Update access",
+        "endpoint": "/admin/users/{id}/role",
+        "method": "PUT",
+        "body": {},
+        "roles": ["ADMIN", "PLATFORM_ADMIN"],
+        "fields": [
+          {
+            "key": "role",
+            "label": "Role",
+            "type": "select",
+            "required": true,
+            "options": [
+              "STUDENT",
+              "VOLUNTEER",
+              "STAFF",
+              "WASTE_STAFF",
+              "CAMPUS_ADMIN",
+              "ADMIN",
+              "PLATFORM_ADMIN",
+              "VENDOR",
+              "CONSULTANT",
+              "EVENT_ORGANIZER"
+            ]
+          },
+          {
+            "key": "isActive",
+            "label": "Active account",
+            "type": "boolean",
+            "required": false
+          }
+        ]
+      }
+    ],
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "toolbar": []
+  },
+  {
+    "key": "flags",
+    "title": "Feature flags",
+    "group": "Administration",
+    "endpoint": "/admin/feature-flags",
+    "columns": [
+      {
+        "key": "name",
+        "label": "Flag",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "description",
+        "label": "Description",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "isEnabled",
+        "label": "Enabled",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": ["ADMIN", "PLATFORM_ADMIN"],
+    "create": {
+      "endpoint": "/admin/feature-flags/{name}",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "isEnabled",
+          "label": "Enabled",
+          "type": "boolean",
+          "required": false
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN"],
+      "method": "PUT"
+    },
+    "actions": [
+      {
+        "label": "Update flag",
+        "endpoint": "/admin/feature-flags/{name}",
+        "method": "PUT",
+        "body": {},
+        "roles": ["ADMIN", "PLATFORM_ADMIN"],
+        "fields": [
+          {
+            "key": "isEnabled",
+            "label": "Enabled",
+            "type": "boolean",
+            "required": false
+          }
+        ]
+      }
+    ],
+    "note": "Flags are saved configuration. A flag does not imply an unconfigured external integration is active.",
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "toolbar": []
+  },
+  {
+    "key": "moderation",
+    "title": "Content moderation",
+    "group": "Administration",
+    "endpoint": "/admin/moderation-queue",
+    "columns": [
+      {
+        "key": "reason",
+        "label": "Reason",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "post.content",
+        "label": "Reported post",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "reportedBy.name",
+        "label": "Reporter",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "status",
+        "label": "Status",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "createdAt",
+        "label": "Reported at",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": ["ADMIN", "PLATFORM_ADMIN"],
+    "actions": [
+      {
+        "label": "Dismiss",
+        "endpoint": "/admin/moderation/{id}",
+        "method": "PUT",
+        "body": {
+          "status": "DISMISSED",
+          "action": "IGNORE"
+        },
+        "roles": ["ADMIN", "PLATFORM_ADMIN"],
+        "fields": []
+      },
+      {
+        "label": "Resolve",
+        "endpoint": "/admin/moderation/{id}",
+        "method": "PUT",
+        "body": {
+          "status": "RESOLVED",
+          "action": "IGNORE"
+        },
+        "roles": ["ADMIN", "PLATFORM_ADMIN"],
+        "fields": []
+      },
+      {
+        "label": "Remove reported post",
+        "endpoint": "/admin/moderation/{id}",
+        "method": "PUT",
+        "body": {
+          "status": "RESOLVED",
+          "action": "DELETE_POST"
+        },
+        "roles": ["ADMIN", "PLATFORM_ADMIN"],
+        "fields": [],
+        "confirm": true
+      }
+    ],
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "toolbar": []
+  },
+  {
+    "key": "listing-moderation",
+    "title": "Marketplace moderation",
+    "group": "Administration",
+    "endpoint": "/marketplace/moderation",
+    "columns": [
+      {
+        "key": "title",
+        "label": "Listing",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "vendor.name",
+        "label": "Listed by",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "category",
+        "label": "Category",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "status",
+        "label": "Status",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": ["ADMIN", "PLATFORM_ADMIN"],
+    "actions": [
+      {
+        "label": "Approve",
+        "endpoint": "/marketplace/listings/{id}/status",
+        "method": "PATCH",
+        "body": {
+          "status": "ACTIVE"
+        },
+        "roles": ["ADMIN", "PLATFORM_ADMIN"],
+        "fields": []
+      },
+      {
+        "label": "Suspend",
+        "endpoint": "/marketplace/listings/{id}/status",
+        "method": "PATCH",
+        "body": {
+          "status": "SUSPENDED"
+        },
+        "roles": ["ADMIN", "PLATFORM_ADMIN"],
+        "fields": []
+      }
+    ],
+    "batchAction": {
+      "label": "Approve selected",
+      "endpoint": "/marketplace/listings/{id}/status",
+      "method": "PATCH",
+      "body": {
+        "status": "ACTIVE"
+      },
+      "roles": ["ADMIN", "PLATFORM_ADMIN"],
+      "fields": []
+    },
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "toolbar": []
+  },
+  {
+    "key": "broadcasts",
+    "title": "Notification broadcasts",
+    "group": "Administration",
+    "endpoint": "/notifications?scope=all",
+    "columns": [
+      {
+        "key": "message",
+        "label": "Message",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "type",
+        "label": "Type",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "createdAt",
+        "label": "Sent at",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": ["ADMIN", "PLATFORM_ADMIN"],
+    "create": {
+      "endpoint": "/notifications",
+      "fields": [
+        {
+          "key": "message",
+          "label": "Message",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "key": "audience",
+          "label": "Audience",
+          "type": "select",
+          "required": true,
+          "options": ["ALL", "STAFF", "STUDENT", "LOGISTICS_CARRIERS"]
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN"],
+      "body": {
+        "broadcast": true,
+        "type": "SYSTEM_ALERT"
+      }
+    },
+    "note": "Broadcasts create in-app notification records. External email, SMS, and push delivery are not configured.",
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "audit",
+    "title": "Audit log",
+    "group": "Administration",
+    "endpoint": "/admin/audit-logs",
+    "columns": [
+      {
+        "key": "action",
+        "label": "Action",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "entity",
+        "label": "Entity",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "entityId",
+        "label": "Record",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "user.name",
+        "label": "Actor",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "timestamp",
+        "label": "Time",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": ["ADMIN", "PLATFORM_ADMIN"],
+    "nested": ["details"],
+    "kind": "records",
+    "export": true,
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "health",
+    "title": "System health",
+    "group": "Administration",
+    "endpoint": "/admin/system-health",
+    "columns": [
+      {
+        "key": "status",
+        "label": "Status",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "uptime",
+        "label": "Process uptime (seconds)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "stats.userCount",
+        "label": "Accounts",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "stats.campusCount",
+        "label": "Campuses",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "stats.errorLogs",
+        "label": "Recorded errors",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "timestamp",
+        "label": "Checked at",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": ["ADMIN", "PLATFORM_ADMIN"],
+    "kind": "metrics",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  }
+]

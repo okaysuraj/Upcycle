@@ -1,0 +1,387 @@
+[
+  {
+    "key": "overview",
+    "title": "Overview",
+    "group": "Campus",
+    "endpoint": "/records/summary",
+    "columns": [
+      {
+        "key": "wasteLoggedKg",
+        "label": "Waste logged (kg)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "estimatedWasteOffsetKg",
+        "label": "Estimated waste offset (kg)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "recordedEnergyKwh",
+        "label": "Recorded energy use (kWh)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "recordedWaterGallons",
+        "label": "Recorded water use (gal)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "points",
+        "label": "Your points",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "unreadNotifications",
+        "label": "Unread notifications",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "kind": "metrics",
+    "note": "Waste offset uses a 0.5 kg per kg estimate from self-reported deposits. Energy and water show stored totals for your campus, or platform totals if no campus is assigned.",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "impact",
+    "title": "Personal impact",
+    "group": "Campus",
+    "endpoint": "/analytics/dashboard/student",
+    "columns": [
+      {
+        "key": "points",
+        "label": "Points",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "totalWasteKg",
+        "label": "Waste logged (kg)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "estimatedCarbonOffsetKg",
+        "label": "Estimated waste offset (kg)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "badges",
+        "label": "Badges earned",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "rank",
+        "label": "Leaderboard position",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "kind": "metrics",
+    "note": "Points are the stored account balance. Logging waste does not automatically award points. Offset is an estimate, not a measured or certified reduction.",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "waste",
+    "title": "Waste records",
+    "group": "Campus",
+    "endpoint": "/waste/logs",
+    "columns": [
+      {
+        "key": "category",
+        "label": "Category",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "quantityKg",
+        "label": "Weight (kg)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "campus.name",
+        "label": "Campus",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "date",
+        "label": "Recorded at",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "photoUrl",
+        "label": "Photo proof",
+        "type": "text",
+        "required": false,
+        "optional": true
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "create": {
+      "endpoint": "/waste/logs",
+      "fields": [
+        {
+          "key": "campusId",
+          "label": "Campus",
+          "type": "select",
+          "required": true,
+          "source": "/campuses"
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "type": "select",
+          "required": true,
+          "options": [
+            "PLASTIC",
+            "PAPER",
+            "GLASS",
+            "METAL",
+            "ORGANIC",
+            "E_WASTE",
+            "HAZARDOUS",
+            "GENERAL"
+          ]
+        },
+        {
+          "key": "quantityKg",
+          "label": "Weight (kg)",
+          "type": "number",
+          "required": true,
+          "min": 0.001
+        },
+        {
+          "key": "photoUrl",
+          "label": "Photo proof",
+          "type": "asset",
+          "required": false,
+          "uploadEndpoint": "/upload/waste-photo",
+          "formKey": "image",
+          "multiple": false,
+          "maxFiles": 1
+        }
+      ],
+      "roles": [
+        "STUDENT",
+        "VOLUNTEER",
+        "STAFF",
+        "WASTE_STAFF",
+        "CAMPUS_ADMIN",
+        "ADMIN",
+        "PLATFORM_ADMIN",
+        "VENDOR",
+        "CONSULTANT",
+        "EVENT_ORGANIZER"
+      ]
+    },
+    "note": "Self-reported deposits. No automatic eco-points are awarded for this action.",
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "campuses",
+    "title": "Campuses",
+    "group": "Campus",
+    "endpoint": "/campuses",
+    "columns": [
+      {
+        "key": "name",
+        "label": "Campus",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "location",
+        "label": "Location",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "domain",
+        "label": "Domain",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "_count.users",
+        "label": "Accounts",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "_count.bins",
+        "label": "Bins",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "_count.events",
+        "label": "Events",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "create": {
+      "endpoint": "/campuses",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "domain",
+          "label": "Domain",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "location",
+          "label": "Location",
+          "type": "text",
+          "required": false
+        }
+      ],
+      "roles": ["PLATFORM_ADMIN"]
+    },
+    "edit": {
+      "endpoint": "/campuses/{id}",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "domain",
+          "label": "Domain",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "location",
+          "label": "Location",
+          "type": "text",
+          "required": false
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"],
+      "method": "PUT"
+    },
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "search",
+    "title": "Search",
+    "group": "Campus",
+    "endpoint": "/records/search",
+    "columns": [
+      {
+        "key": "title",
+        "label": "Name",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "kind",
+        "label": "Type",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "description",
+        "label": "Description",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "kind": "search",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  }
+]

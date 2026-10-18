@@ -1,0 +1,489 @@
+[
+  {
+    "key": "marketplace-summary",
+    "title": "Marketplace overview",
+    "group": "Marketplace",
+    "endpoint": "/marketplace/stats",
+    "columns": [
+      {
+        "key": "totalListings",
+        "label": "Active listings",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "totalValue",
+        "label": "Listed asking value (USD)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "successfulExchanges",
+        "label": "Listings marked sold",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "activeVendorsCount",
+        "label": "Accounts with active listings",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "kind": "metrics",
+    "note": "Current stored listing totals. Asking prices and sold statuses do not prove payment or earnings.",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "listings",
+    "title": "Marketplace",
+    "group": "Marketplace",
+    "endpoint": "/marketplace",
+    "columns": [
+      {
+        "key": "title",
+        "label": "Listing",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "description",
+        "label": "Description",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "category",
+        "label": "Category",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "price",
+        "label": "Price (USD)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "vendor.name",
+        "label": "Listed by",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "campus.name",
+        "label": "Campus",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "images",
+        "label": "Listing images",
+        "type": "text",
+        "required": false,
+        "optional": true
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "create": {
+      "endpoint": "/marketplace",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "type": "select",
+          "required": true,
+          "options": [
+            "FURNITURE",
+            "LAB_HARDWARE",
+            "ELECTRONICS",
+            "TIMBER_MATERIALS",
+            "SOLAR_CLEAN",
+            "MATERIALS",
+            "MACHINERY",
+            "ORGANIC"
+          ]
+        },
+        {
+          "key": "price",
+          "label": "Price (USD; zero for donation)",
+          "type": "number",
+          "required": true,
+          "min": 0
+        },
+        {
+          "key": "campusId",
+          "label": "Campus",
+          "type": "select",
+          "required": false,
+          "source": "/campuses"
+        },
+        {
+          "key": "images",
+          "label": "Listing images",
+          "type": "asset",
+          "required": false,
+          "uploadEndpoint": "/upload/listing-images",
+          "formKey": "images",
+          "multiple": true,
+          "maxFiles": 5
+        }
+      ],
+      "roles": [
+        "STUDENT",
+        "VOLUNTEER",
+        "STAFF",
+        "WASTE_STAFF",
+        "CAMPUS_ADMIN",
+        "ADMIN",
+        "PLATFORM_ADMIN",
+        "VENDOR",
+        "CONSULTANT",
+        "EVENT_ORGANIZER"
+      ]
+    },
+    "note": "Listings and prices are saved records. Online checkout and escrow settlement are unavailable.",
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "rfps",
+    "title": "Requests for proposal",
+    "group": "Marketplace",
+    "endpoint": "/marketplace/rfp",
+    "columns": [
+      {
+        "key": "title",
+        "label": "Request",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "description",
+        "label": "Description",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "requirements",
+        "label": "Requirements",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "deadline",
+        "label": "Deadline",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "status",
+        "label": "Status",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "campus.name",
+        "label": "Campus",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "create": {
+      "endpoint": "/marketplace/rfp",
+      "fields": [
+        {
+          "key": "campusId",
+          "label": "Campus",
+          "type": "select",
+          "required": true,
+          "source": "/campuses"
+        },
+        {
+          "key": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "key": "requirements",
+          "label": "Requirements",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "key": "deadline",
+          "label": "Deadline",
+          "type": "datetime",
+          "required": true
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"]
+    },
+    "actions": [
+      {
+        "label": "Submit quote",
+        "endpoint": "/marketplace/rfp/{id}/quote",
+        "method": "POST",
+        "body": {},
+        "roles": ["VENDOR"],
+        "fields": [
+          {
+            "key": "amount",
+            "label": "Amount (USD)",
+            "type": "number",
+            "required": true,
+            "min": 0.01
+          },
+          {
+            "key": "proposalDetails",
+            "label": "Proposal",
+            "type": "textarea",
+            "required": true
+          }
+        ],
+        "requiresVerifiedVendor": true,
+        "when": {
+          "status": "OPEN"
+        }
+      }
+    ],
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "toolbar": []
+  },
+  {
+    "key": "quotes",
+    "title": "Submitted quotes",
+    "group": "Marketplace",
+    "endpoint": "/marketplace/quotes",
+    "columns": [
+      {
+        "key": "rfp.title",
+        "label": "Request",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "vendor.name",
+        "label": "Vendor",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "amount",
+        "label": "Amount (USD)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "proposalDetails",
+        "label": "Proposal",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "status",
+        "label": "Status",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF", "VENDOR"],
+    "note": "Quote status does not indicate a payment. Award and settlement require an external payment provider.",
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "vendors",
+    "title": "Vendors & verification",
+    "group": "Marketplace",
+    "endpoint": "/marketplace/vendors",
+    "columns": [
+      {
+        "key": "name",
+        "label": "Vendor",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "email",
+        "label": "Email",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "kycStatus",
+        "label": "Verification status",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "isActive",
+        "label": "Active",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"],
+    "actions": [
+      {
+        "label": "Approve verification",
+        "endpoint": "/marketplace/vendors/{id}/verify",
+        "method": "PATCH",
+        "body": {
+          "status": "VERIFIED"
+        },
+        "roles": ["ADMIN", "PLATFORM_ADMIN"],
+        "fields": [],
+        "confirm": true,
+        "when": {
+          "kycStatus": "PENDING"
+        }
+      },
+      {
+        "label": "Reject verification",
+        "endpoint": "/marketplace/vendors/{id}/verify",
+        "method": "PATCH",
+        "body": {
+          "status": "REJECTED"
+        },
+        "roles": ["ADMIN", "PLATFORM_ADMIN"],
+        "fields": [],
+        "confirm": true,
+        "when": {
+          "kycStatus": "PENDING"
+        }
+      }
+    ],
+    "nested": ["vendorVerifications"],
+    "kind": "records",
+    "export": true,
+    "toolbar": []
+  },
+  {
+    "key": "escrow",
+    "title": "Payment records",
+    "group": "Marketplace",
+    "endpoint": "/marketplace/escrow",
+    "columns": [
+      {
+        "key": "listing.title",
+        "label": "Listing",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "buyer.name",
+        "label": "Buyer",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "seller.name",
+        "label": "Seller",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "amount",
+        "label": "Recorded amount (USD)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "status",
+        "label": "Stored status",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "createdAt",
+        "label": "Created",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "note": "Only existing transaction records are shown. Online collection, release, refund, and financial settlement are unavailable until a provider is configured.",
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  }
+]

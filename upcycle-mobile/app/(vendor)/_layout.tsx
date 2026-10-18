@@ -1,9 +1,4 @@
 import { Stack } from 'expo-router';
-
-export default function VendorLayout() {
-  return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" />
-    </Stack>
-  );
+export default function Layout() {
+  return <Stack screenOptions={{ headerShown: false }} />;
 }

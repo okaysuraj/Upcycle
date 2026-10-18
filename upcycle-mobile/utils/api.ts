@@ -1,31 +1,31 @@
+// Send bounded authenticated requests to the configured application API.
 import Constants from 'expo-constants';
 import { auth } from '../config/firebase';
+import { apiRequestURL, fetchWithTimeout } from '../../shared/request.mjs';
 
-const debuggerHost = Constants.expoConfig?.hostUri;
-const localhost = debuggerHost?.split(':')[0] || 'localhost';
-const API_BASE_URL = `http://${localhost}:5000/api`;
+const host = Constants.expoConfig?.hostUri?.split(':')[0] || 'localhost';
+export const API_BASE_URL = (
+  process.env.EXPO_PUBLIC_API_URL || (__DEV__ ? `http://${host}:5000/api` : '')
+).replace(/\/$/, '');
 
 export const authFetch = async (url: string, options: RequestInit = {}) => {
+  if (!API_BASE_URL)
+    throw new Error('The app API is not configured. Set EXPO_PUBLIC_API_URL before building.');
+  if (!__DEV__ && !API_BASE_URL.startsWith('https://'))
+    throw new Error('The production API must use HTTPS.');
+  const headers = new Headers(options.headers);
+  if (options.body && !(options.body instanceof FormData) && !headers.has('Content-Type'))
+    headers.set('Content-Type', 'application/json');
   const user = auth.currentUser;
-  let token = null;
-
-  if (user) {
-    token = await user.getIdToken();
+  if (user) headers.set('Authorization', `Bearer ${await user.getIdToken()}`);
+  const fullUrl = apiRequestURL(API_BASE_URL, url);
+  const response = await fetchWithTimeout(fullUrl, { ...options, headers });
+  if (!response.ok && options.method && options.method.toUpperCase() !== 'GET') {
+    const data = await response
+      .clone()
+      .json()
+      .catch(() => ({}));
+    throw new Error(data.message || data.error || 'Changes could not be saved.');
   }
-
-  const headers: Record<string, string> = {
-    ...(options.headers as Record<string, string>),
-    'Content-Type': (options.headers as any)?.['Content-Type'] || 'application/json',
-  };
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
-
-  return fetch(fullUrl, {
-    ...options,
-    headers,
-  });
+  return response;
 };

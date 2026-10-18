@@ -1,64 +1,71 @@
-const express = require('express');
-const router = express.Router();
-const { pool } = require('../config/db');
-const { auth } = require('./auth');
-
-// GET /api/horticulture/plants
-router.get('/plants', auth, async (req, res) => {
-  try {
-    const plants = await pool.query('SELECT * FROM plants ORDER BY "plantedDate" DESC');
-    res.json(plants.rows);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// POST /api/horticulture/plants
-router.post('/plants', auth, async (req, res) => {
-  try {
-    const { name, location, plantedDate, status } = req.body;
-    const newPlant = await pool.query(`
-      INSERT INTO plants (name, location, "plantedDate", status)
-      VALUES ($1, $2, $3, $4)
-      RETURNING *
-    `, [name, location, plantedDate, status || 'Healthy']);
-    res.status(201).json(newPlant.rows[0]);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// GET /api/horticulture/harvests
-router.get('/harvests', auth, async (req, res) => {
-  try {
-    const harvests = await pool.query(`
-      SELECT h.*, p.name as "plantName", p.location
-      FROM harvests h
-      JOIN plants p ON h."plantId" = p.id
-      ORDER BY h.date DESC
-    `);
-    res.json(harvests.rows);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// POST /api/horticulture/plants/:id/harvest
-router.post('/plants/:id/harvest', auth, async (req, res) => {
-  try {
-    const plantId = req.params.id;
-    const { quantity, unit, date } = req.body;
-
-    const newHarvest = await pool.query(`
-      INSERT INTO harvests ("plantId", quantity, unit, date)
-      VALUES ($1, $2, $3, $4)
-      RETURNING *
-    `, [plantId, quantity, unit, date || new Date()]);
-
-    res.status(201).json(newHarvest.rows[0]);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
+// Manage plant inventory and recorded harvests.
+const router = require('express').Router();
+const { prisma } = require('../config/db');
+const { auth } = require('../middleware/auth');
+const { requireRole } = require('../middleware/rbac');
+const { route, httpError, positiveNumber, operationsRoles } = require('../utils/http');
+router.get(
+  '/plants',
+  auth,
+  route(async (req, res) =>
+    res.json(await prisma.plant.findMany({ orderBy: { plantedDate: 'desc' } }))
+  )
+);
+router.post(
+  '/plants',
+  auth,
+  requireRole(operationsRoles),
+  route(async (req, res) => {
+    const { name, location, plantedDate, status = 'Healthy' } = req.body;
+    if (!name?.trim()) throw httpError(400, 'Plant name is required');
+    if (plantedDate && Number.isNaN(Date.parse(plantedDate)))
+      throw httpError(400, 'Invalid planting date');
+    res
+      .status(201)
+      .json(
+        await prisma.plant.create({
+          data: { name, location, plantedDate: plantedDate ? new Date(plantedDate) : null, status },
+        })
+      );
+  })
+);
+router.get(
+  '/harvests',
+  auth,
+  route(async (req, res) => {
+    const harvests = await prisma.harvest.findMany({
+      include: { plant: { select: { name: true, location: true } } },
+      orderBy: { date: 'desc' },
+    });
+    res.json(
+      harvests.map(({ plant, ...harvest }) => ({
+        ...harvest,
+        plantName: plant.name,
+        location: plant.location,
+      }))
+    );
+  })
+);
+router.post(
+  '/plants/:id/harvest',
+  auth,
+  requireRole(operationsRoles),
+  route(async (req, res) => {
+    const { unit, date } = req.body;
+    if (!unit) throw httpError(400, 'Unit is required');
+    if (date && Number.isNaN(Date.parse(date))) throw httpError(400, 'Invalid harvest date');
+    res
+      .status(201)
+      .json(
+        await prisma.harvest.create({
+          data: {
+            plantId: req.params.id,
+            quantity: positiveNumber(req.body.quantity),
+            unit,
+            date: date ? new Date(date) : new Date(),
+          },
+        })
+      );
+  })
+);
 module.exports = router;

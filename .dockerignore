@@ -1,0 +1,13 @@
+.git
+.agents
+.vscode
+.audit-backups
+**/node_modules
+**/.env
+**/.env.*
+**/dist
+**/dist-*
+**/.expo
+**/*.log
+frontend
+upcycle-mobile

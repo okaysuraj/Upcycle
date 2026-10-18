@@ -1,0 +1,828 @@
+[
+  {
+    "key": "shifts",
+    "title": "Volunteer shifts",
+    "group": "Community",
+    "endpoint": "/shifts",
+    "columns": [
+      {
+        "key": "role",
+        "label": "Role",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "date",
+        "label": "Date",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "startTime",
+        "label": "Start",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "endTime",
+        "label": "End",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "location",
+        "label": "Location",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "slotsRemaining",
+        "label": "Remaining places",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "hours",
+        "label": "Planned hours",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "create": {
+      "endpoint": "/shifts",
+      "fields": [
+        {
+          "key": "campusId",
+          "label": "Campus",
+          "type": "select",
+          "required": true,
+          "source": "/campuses"
+        },
+        {
+          "key": "role",
+          "label": "Role",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "date",
+          "label": "Date",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "key": "startTime",
+          "label": "Start time (HH:mm)",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "endTime",
+          "label": "End time (HH:mm)",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "location",
+          "label": "Location",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "hours",
+          "label": "Planned hours",
+          "type": "number",
+          "required": true,
+          "min": 0.01
+        },
+        {
+          "key": "points",
+          "label": "Points on completion",
+          "type": "integer",
+          "required": true,
+          "min": 0
+        },
+        {
+          "key": "maxSlots",
+          "label": "Capacity",
+          "type": "integer",
+          "required": true,
+          "min": 1
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"]
+    },
+    "actions": [
+      {
+        "label": "Reserve place",
+        "endpoint": "/shifts/{id}/signup",
+        "method": "POST",
+        "body": {},
+        "roles": [
+          "STUDENT",
+          "VOLUNTEER",
+          "STAFF",
+          "WASTE_STAFF",
+          "CAMPUS_ADMIN",
+          "ADMIN",
+          "PLATFORM_ADMIN",
+          "VENDOR",
+          "CONSULTANT",
+          "EVENT_ORGANIZER"
+        ],
+        "fields": [],
+        "when": {
+          "userSignedUp": false
+        }
+      },
+      {
+        "label": "Cancel reservation",
+        "endpoint": "/shifts/{id}/signup",
+        "method": "DELETE",
+        "body": {},
+        "roles": [
+          "STUDENT",
+          "VOLUNTEER",
+          "STAFF",
+          "WASTE_STAFF",
+          "CAMPUS_ADMIN",
+          "ADMIN",
+          "PLATFORM_ADMIN",
+          "VENDOR",
+          "CONSULTANT",
+          "EVENT_ORGANIZER"
+        ],
+        "fields": [],
+        "when": {
+          "userSignedUp": true
+        },
+        "confirm": true
+      }
+    ],
+    "note": "A signup reserves a place; it does not award completion points.",
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "toolbar": []
+  },
+  {
+    "key": "events",
+    "title": "Campus events",
+    "group": "Community",
+    "endpoint": "/events",
+    "columns": [
+      {
+        "key": "title",
+        "label": "Event",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "date",
+        "label": "Date",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "location",
+        "label": "Location",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "status",
+        "label": "Status",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "maxAttendees",
+        "label": "Capacity",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "userRegistered",
+        "label": "Registered",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "coverImageUrl",
+        "label": "Event cover",
+        "type": "text",
+        "required": false,
+        "optional": true
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "dataPath": "events",
+    "create": {
+      "endpoint": "/events",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "key": "date",
+          "label": "Date",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "key": "location",
+          "label": "Location",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "maxVolunteers",
+          "label": "Capacity",
+          "type": "integer",
+          "required": false,
+          "min": 1
+        },
+        {
+          "key": "campusId",
+          "label": "Campus",
+          "type": "select",
+          "required": false,
+          "source": "/campuses"
+        },
+        {
+          "key": "coverImageUrl",
+          "label": "Event cover",
+          "type": "asset",
+          "required": false,
+          "uploadEndpoint": "/upload/event-cover",
+          "formKey": "image",
+          "multiple": false,
+          "maxFiles": 1
+        }
+      ],
+      "roles": [
+        "ADMIN",
+        "PLATFORM_ADMIN",
+        "CAMPUS_ADMIN",
+        "STAFF",
+        "WASTE_STAFF",
+        "EVENT_ORGANIZER"
+      ]
+    },
+    "actions": [
+      {
+        "label": "Register",
+        "endpoint": "/events/{id}/rsvp",
+        "method": "POST",
+        "body": {},
+        "roles": [
+          "STUDENT",
+          "VOLUNTEER",
+          "STAFF",
+          "WASTE_STAFF",
+          "CAMPUS_ADMIN",
+          "ADMIN",
+          "PLATFORM_ADMIN",
+          "VENDOR",
+          "CONSULTANT",
+          "EVENT_ORGANIZER"
+        ],
+        "fields": [],
+        "when": {
+          "userRegistered": false
+        }
+      },
+      {
+        "label": "Cancel registration",
+        "endpoint": "/events/{id}/rsvp",
+        "method": "DELETE",
+        "body": {},
+        "roles": [
+          "STUDENT",
+          "VOLUNTEER",
+          "STAFF",
+          "WASTE_STAFF",
+          "CAMPUS_ADMIN",
+          "ADMIN",
+          "PLATFORM_ADMIN",
+          "VENDOR",
+          "CONSULTANT",
+          "EVENT_ORGANIZER"
+        ],
+        "fields": [],
+        "when": {
+          "userRegistered": true
+        },
+        "confirm": true
+      },
+      {
+        "label": "Record attendee hours",
+        "endpoint": "/events/{id}/log-hours",
+        "method": "POST",
+        "body": {},
+        "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"],
+        "fields": [
+          {
+            "key": "userId",
+            "label": "Attendee",
+            "type": "select",
+            "required": true,
+            "source": "/events/{id}/registrations",
+            "labelKey": "user.name",
+            "valueKey": "userId"
+          },
+          {
+            "key": "hours",
+            "label": "Hours attended",
+            "type": "number",
+            "required": true,
+            "min": 0.01,
+            "max": 24
+          }
+        ]
+      }
+    ],
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "toolbar": []
+  },
+  {
+    "key": "groups",
+    "title": "Organizations",
+    "group": "Community",
+    "endpoint": "/community/groups",
+    "columns": [
+      {
+        "key": "name",
+        "label": "Organization",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "description",
+        "label": "Description",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "_count.members",
+        "label": "Members",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "create": {
+      "endpoint": "/community/groups",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "key": "campusId",
+          "label": "Campus",
+          "type": "select",
+          "required": false,
+          "source": "/campuses"
+        }
+      ],
+      "roles": [
+        "STUDENT",
+        "VOLUNTEER",
+        "STAFF",
+        "WASTE_STAFF",
+        "CAMPUS_ADMIN",
+        "ADMIN",
+        "PLATFORM_ADMIN",
+        "VENDOR",
+        "CONSULTANT",
+        "EVENT_ORGANIZER"
+      ]
+    },
+    "actions": [
+      {
+        "label": "Join",
+        "endpoint": "/community/groups/{id}/join",
+        "method": "POST",
+        "body": {},
+        "roles": [
+          "STUDENT",
+          "VOLUNTEER",
+          "STAFF",
+          "WASTE_STAFF",
+          "CAMPUS_ADMIN",
+          "ADMIN",
+          "PLATFORM_ADMIN",
+          "VENDOR",
+          "CONSULTANT",
+          "EVENT_ORGANIZER"
+        ],
+        "fields": [],
+        "unlessMember": true
+      },
+      {
+        "label": "Leave",
+        "endpoint": "/community/groups/{id}/join",
+        "method": "DELETE",
+        "body": {},
+        "roles": [
+          "STUDENT",
+          "VOLUNTEER",
+          "STAFF",
+          "WASTE_STAFF",
+          "CAMPUS_ADMIN",
+          "ADMIN",
+          "PLATFORM_ADMIN",
+          "VENDOR",
+          "CONSULTANT",
+          "EVENT_ORGANIZER"
+        ],
+        "fields": [],
+        "ifMember": true,
+        "confirm": true
+      }
+    ],
+    "nested": ["members"],
+    "detailEndpoint": "/community/groups/{id}",
+    "kind": "records",
+    "export": true,
+    "toolbar": []
+  },
+  {
+    "key": "posts",
+    "title": "Community feed",
+    "group": "Community",
+    "endpoint": "/community/posts",
+    "columns": [
+      {
+        "key": "author.name",
+        "label": "Author",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "content",
+        "label": "Post",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "likes",
+        "label": "Likes",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "createdAt",
+        "label": "Posted at",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "group.name",
+        "label": "Organization",
+        "type": "text",
+        "required": false,
+        "optional": true
+      },
+      {
+        "key": "imageUrl",
+        "label": "Post image",
+        "type": "text",
+        "required": false,
+        "optional": true
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "create": {
+      "endpoint": "/community/posts",
+      "fields": [
+        {
+          "key": "content",
+          "label": "Your post",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "key": "campusId",
+          "label": "Campus",
+          "type": "select",
+          "required": false,
+          "source": "/campuses"
+        },
+        {
+          "key": "groupId",
+          "label": "Organization (members only)",
+          "type": "select",
+          "required": false,
+          "source": "/community/groups",
+          "memberOnly": true
+        },
+        {
+          "key": "imageUrl",
+          "label": "Post image",
+          "type": "asset",
+          "required": false,
+          "uploadEndpoint": "/upload/post-image",
+          "formKey": "image",
+          "multiple": false,
+          "maxFiles": 1
+        }
+      ],
+      "roles": [
+        "STUDENT",
+        "VOLUNTEER",
+        "STAFF",
+        "WASTE_STAFF",
+        "CAMPUS_ADMIN",
+        "ADMIN",
+        "PLATFORM_ADMIN",
+        "VENDOR",
+        "CONSULTANT",
+        "EVENT_ORGANIZER"
+      ]
+    },
+    "actions": [
+      {
+        "label": "Like",
+        "endpoint": "/community/posts/{id}/like",
+        "method": "POST",
+        "body": {},
+        "roles": [
+          "STUDENT",
+          "VOLUNTEER",
+          "STAFF",
+          "WASTE_STAFF",
+          "CAMPUS_ADMIN",
+          "ADMIN",
+          "PLATFORM_ADMIN",
+          "VENDOR",
+          "CONSULTANT",
+          "EVENT_ORGANIZER"
+        ],
+        "fields": []
+      },
+      {
+        "label": "Comment",
+        "endpoint": "/community/posts/{id}/comment",
+        "method": "POST",
+        "body": {},
+        "roles": [
+          "STUDENT",
+          "VOLUNTEER",
+          "STAFF",
+          "WASTE_STAFF",
+          "CAMPUS_ADMIN",
+          "ADMIN",
+          "PLATFORM_ADMIN",
+          "VENDOR",
+          "CONSULTANT",
+          "EVENT_ORGANIZER"
+        ],
+        "fields": [
+          {
+            "key": "content",
+            "label": "Comment",
+            "type": "textarea",
+            "required": true
+          }
+        ]
+      },
+      {
+        "label": "Report",
+        "endpoint": "/community/posts/{id}/report",
+        "method": "POST",
+        "body": {},
+        "roles": [
+          "STUDENT",
+          "VOLUNTEER",
+          "STAFF",
+          "WASTE_STAFF",
+          "CAMPUS_ADMIN",
+          "ADMIN",
+          "PLATFORM_ADMIN",
+          "VENDOR",
+          "CONSULTANT",
+          "EVENT_ORGANIZER"
+        ],
+        "fields": [
+          {
+            "key": "reason",
+            "label": "Reason",
+            "type": "textarea",
+            "required": true
+          }
+        ]
+      }
+    ],
+    "nested": ["comments"],
+    "kind": "records",
+    "export": true,
+    "toolbar": [],
+    "note": "Posts and comments are saved in the database. Each account can like a post once. Historical aggregate likes are retained; their authors cannot be reconstructed."
+  },
+  {
+    "key": "courses",
+    "title": "Learning hub",
+    "group": "Community",
+    "endpoint": "/education/courses",
+    "columns": [
+      {
+        "key": "code",
+        "label": "Code",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "title",
+        "label": "Course",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "description",
+        "label": "Description",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "category",
+        "label": "Category",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "durationHrs",
+        "label": "Duration (hours)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "level",
+        "label": "Level",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "create": {
+      "endpoint": "/education/courses",
+      "fields": [
+        {
+          "key": "code",
+          "label": "Code",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "durationHrs",
+          "label": "Duration (hours)",
+          "type": "number",
+          "required": true,
+          "min": 0.01
+        },
+        {
+          "key": "level",
+          "label": "Level",
+          "type": "select",
+          "required": true,
+          "options": ["BEGINNER", "INTERMEDIATE", "ADVANCED"]
+        },
+        {
+          "key": "modules",
+          "label": "Course modules",
+          "type": "collection",
+          "required": true,
+          "fields": [
+            {
+              "key": "title",
+              "label": "Title",
+              "type": "text",
+              "required": true
+            },
+            {
+              "key": "lessons",
+              "label": "Lessons",
+              "type": "collection",
+              "required": true,
+              "fields": [
+                {
+                  "key": "title",
+                  "label": "Title",
+                  "type": "text",
+                  "required": true
+                },
+                {
+                  "key": "url",
+                  "label": "Lesson URL",
+                  "type": "url",
+                  "required": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"]
+    },
+    "nested": ["modules"],
+    "note": "Only stored curriculum and lesson links are shown. No accreditation, progress, ratings, or certificate is inferred.",
+    "kind": "records",
+    "export": true,
+    "actions": [],
+    "toolbar": []
+  }
+]

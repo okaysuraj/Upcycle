@@ -1,0 +1,68 @@
+{
+  "login": {
+    "title": "Sign in",
+    "description": "Use your verified email and password to open your workspace.",
+    "button": "Sign in",
+    "fields": [
+      { "key": "email", "label": "Email address", "type": "email" },
+      { "key": "password", "label": "Password", "type": "password" }
+    ]
+  },
+  "register": {
+    "title": "Create account",
+    "description": "Create your account, then verify your email. Staff and administrator access is assigned by an administrator.",
+    "button": "Create account",
+    "fields": [
+      { "key": "name", "label": "Full name", "type": "text" },
+      { "key": "email", "label": "Email address", "type": "email" },
+      { "key": "password", "label": "Password (at least eight characters)", "type": "password" },
+      { "key": "confirmPassword", "label": "Confirm password", "type": "password" },
+      {
+        "key": "role",
+        "label": "Account role",
+        "type": "select",
+        "options": ["STUDENT", "VOLUNTEER", "VENDOR"]
+      }
+    ]
+  },
+  "forgot": {
+    "title": "Reset password",
+    "description": "Enter your account email to request a password reset link.",
+    "button": "Send reset link",
+    "fields": [{ "key": "email", "label": "Email address", "type": "email" }]
+  },
+  "reset": {
+    "title": "Choose a new password",
+    "description": "Open the password reset link from your email before saving a new password.",
+    "button": "Save password",
+    "fields": [
+      { "key": "password", "label": "Password (at least eight characters)", "type": "password" },
+      { "key": "confirmPassword", "label": "Confirm password", "type": "password" }
+    ]
+  },
+  "verify": {
+    "title": "Verify your email",
+    "description": "Open the Firebase verification link sent to your email. Once verified, return to sign in. To request another link, use your email and password on the sign-in screen.",
+    "fields": []
+  },
+  "welcome": {
+    "title": "Welcome to Upcycle",
+    "description": "Coordinate campus waste, community activities, and sustainability records from one workspace.",
+    "fields": []
+  },
+  "role": {
+    "title": "Choose your access",
+    "description": "Select student, volunteer, or vendor when creating your account. An administrator assigns campus and staff access.",
+    "fields": []
+  },
+  "mfa": {
+    "title": "Two-factor authentication",
+    "description": "Authenticator setup and verification are unavailable until an MFA provider is configured and enforced by the backend.",
+    "fields": []
+  },
+  "success": {
+    "title": "Return to your email",
+    "description": "For password recovery, follow the reset link sent after a successful request. Return to sign in after completing the reset.",
+    "fields": []
+  }
+}

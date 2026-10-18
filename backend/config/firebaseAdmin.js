@@ -1,3 +1,4 @@
+// Initialize the server SDK used to verify Firebase sessions.
 const { getApps, initializeApp, cert } = require('firebase-admin/app');
 const admin = require('firebase-admin');
 
@@ -13,12 +14,13 @@ if (getApps().length === 0) {
     initializeApp({
       credential: cert(serviceAccount),
     });
-    console.log('✅ Firebase Admin initialized');
   } catch (error) {
+    if (process.env.NODE_ENV === 'production')
+      throw new Error('Firebase Admin credentials are invalid');
     console.error('Firebase admin initialization error:', error.message);
     // Fallback: initialize without credentials (token verification will fail)
     initializeApp({
-      projectId: process.env.FIREBASE_PROJECT_ID || 'upcycle-mock',
+      projectId: process.env.FIREBASE_PROJECT_ID,
     });
   }
 }

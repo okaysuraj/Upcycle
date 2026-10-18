@@ -1,0 +1,161 @@
+[
+  {
+    "key": "badges",
+    "title": "Badges",
+    "group": "Rewards",
+    "endpoint": "/gamification/badges/{userId}",
+    "columns": [
+      {
+        "key": "badge.name",
+        "label": "Badge",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "badge.description",
+        "label": "Description",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "earnedAt",
+        "label": "Earned at",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "leaderboard",
+    "title": "Leaderboard",
+    "group": "Rewards",
+    "endpoint": "/gamification/leaderboard",
+    "columns": [
+      {
+        "key": "name",
+        "label": "Participant",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "role",
+        "label": "Role",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "points",
+        "label": "Points",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "note": "Ranking follows stored points and privacy preferences.",
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "rewards",
+    "title": "Rewards",
+    "group": "Rewards",
+    "endpoint": "/gamification/rewards",
+    "columns": [
+      {
+        "key": "name",
+        "label": "Reward",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "description",
+        "label": "Description",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "pointsCost",
+        "label": "Points required",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "quantityAvailable",
+        "label": "Available",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "actions": [
+      {
+        "label": "Redeem",
+        "endpoint": "/gamification/redeem",
+        "method": "POST",
+        "body": {
+          "rewardId": "{id}"
+        },
+        "roles": [
+          "STUDENT",
+          "VOLUNTEER",
+          "STAFF",
+          "WASTE_STAFF",
+          "CAMPUS_ADMIN",
+          "ADMIN",
+          "PLATFORM_ADMIN",
+          "VENDOR",
+          "CONSULTANT",
+          "EVENT_ORGANIZER"
+        ],
+        "fields": [],
+        "confirm": true
+      }
+    ],
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "toolbar": []
+  }
+]

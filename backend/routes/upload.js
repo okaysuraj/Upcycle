@@ -1,8 +1,17 @@
+// Validate file uploads and save them to the configured storage provider.
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { auth } = require('./auth');
+const { auth } = require('../middleware/auth');
+const { requireRole } = require('../middleware/rbac');
 const { uploadToCloudinary, generateUploadSignature } = require('../config/cloudinary');
+const { storageStatus } = require('../utils/storageStatus');
+router.use(auth);
+router.use(async (req, res, next) => {
+  const status = await storageStatus();
+  if (!status.available) return res.status(503).json({ message: status.reason });
+  next();
+});
 
 // Configure multer for memory storage (files stay in buffer, not written to disk)
 const upload = multer({
@@ -22,7 +31,7 @@ const upload = multer({
 
 // POST /api/upload/profile-pic
 // Upload a single profile picture
-router.post('/profile-pic', auth, upload.single('image'), async (req, res) => {
+router.post('/profile-pic', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'No image file provided' });
@@ -39,13 +48,13 @@ router.post('/profile-pic', auth, upload.single('image'), async (req, res) => {
       message: 'Profile picture uploaded successfully',
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Unable to complete the request. Please try again.' });
   }
 });
 
 // POST /api/upload/listing-images
 // Upload multiple images for a marketplace listing (max 5)
-router.post('/listing-images', auth, upload.array('images', 5), async (req, res) => {
+router.post('/listing-images', upload.array('images', 5), async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: 'No image files provided' });
@@ -65,13 +74,13 @@ router.post('/listing-images', auth, upload.array('images', 5), async (req, res)
       message: `${urls.length} image(s) uploaded successfully`,
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Unable to complete the request. Please try again.' });
   }
 });
 
 // POST /api/upload/post-image
 // Upload a single image for a community post
-router.post('/post-image', auth, upload.single('image'), async (req, res) => {
+router.post('/post-image', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'No image file provided' });
@@ -87,40 +96,45 @@ router.post('/post-image', auth, upload.single('image'), async (req, res) => {
       message: 'Post image uploaded successfully',
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Unable to complete the request. Please try again.' });
   }
 });
 
 // POST /api/upload/kyc-documents
 // Upload KYC verification documents (max 3)
-router.post('/kyc-documents', auth, upload.array('documents', 3), async (req, res) => {
-  try {
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ message: 'No document files provided' });
+router.post(
+  '/kyc-documents',
+  requireRole(['VENDOR']),
+  upload.array('documents', 3),
+  async (req, res) => {
+    try {
+      if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ message: 'No document files provided' });
+      }
+
+      const uploadPromises = req.files.map((file) =>
+        uploadToCloudinary(file.buffer, {
+          folder: 'upcycle/kyc',
+          resource_type: 'auto',
+        })
+      );
+
+      const results = await Promise.all(uploadPromises);
+      const urls = results.map((r) => r.url);
+
+      res.json({
+        urls,
+        message: `${urls.length} document(s) uploaded successfully`,
+      });
+    } catch (err) {
+      res.status(500).json({ message: 'Unable to complete the request. Please try again.' });
     }
-
-    const uploadPromises = req.files.map((file) =>
-      uploadToCloudinary(file.buffer, {
-        folder: 'upcycle/kyc',
-        resource_type: 'auto',
-      })
-    );
-
-    const results = await Promise.all(uploadPromises);
-    const urls = results.map((r) => r.url);
-
-    res.json({
-      urls,
-      message: `${urls.length} document(s) uploaded successfully`,
-    });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
   }
-});
+);
 
 // POST /api/upload/waste-photo
 // Upload a waste log photo proof
-router.post('/waste-photo', auth, upload.single('image'), async (req, res) => {
+router.post('/waste-photo', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'No image file provided' });
@@ -136,13 +150,13 @@ router.post('/waste-photo', auth, upload.single('image'), async (req, res) => {
       message: 'Waste photo uploaded successfully',
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Unable to complete the request. Please try again.' });
   }
 });
 
 // POST /api/upload/event-cover
 // Upload an event cover image
-router.post('/event-cover', auth, upload.single('image'), async (req, res) => {
+router.post('/event-cover', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'No image file provided' });
@@ -159,21 +173,34 @@ router.post('/event-cover', auth, upload.single('image'), async (req, res) => {
       message: 'Event cover image uploaded successfully',
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Unable to complete the request. Please try again.' });
   }
 });
 
+const ALLOWED_UPLOAD_FOLDERS = [
+  'upcycle/general',
+  'upcycle/profiles',
+  'upcycle/marketplace',
+  'upcycle/posts',
+  'upcycle/kyc',
+  'upcycle/waste-logs',
+  'upcycle/events',
+];
+
 // GET /api/upload/signature
 // Generate a signed upload signature for client-side direct uploads
-router.get('/signature', auth, async (req, res) => {
+router.get('/signature', async (req, res) => {
   try {
-    const { folder } = req.query;
+    const folder = req.query.folder || 'upcycle/general';
+    if (!ALLOWED_UPLOAD_FOLDERS.includes(folder)) {
+      return res.status(400).json({ message: 'Invalid or unauthorized upload destination folder' });
+    }
     const signatureData = generateUploadSignature({
-      folder: folder || 'upcycle/general',
+      folder,
     });
     res.json(signatureData);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Unable to complete the request. Please try again.' });
   }
 });
 

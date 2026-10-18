@@ -1,7 +1,9 @@
+// Manage campus records, approvals, and campus summaries.
 const express = require('express');
 const router = express.Router();
+const { operationsRoles, adminRoles } = require('../utils/http');
 const { prisma } = require('../config/db');
-const { auth } = require('./auth'); // Reuse auth middleware
+const { auth } = require('../middleware/auth'); // Reuse auth middleware
 const { requireRole } = require('../middleware/rbac');
 
 // GET /api/campuses
@@ -10,13 +12,46 @@ router.get('/', auth, async (req, res) => {
     const campuses = await prisma.campus.findMany({
       include: {
         _count: {
-          select: { users: true, bins: true, events: true }
-        }
-      }
+          select: { users: true, bins: true, events: true },
+        },
+      },
     });
     res.json(campuses);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Unable to complete the request. Please try again.' });
+  }
+});
+
+// Static routes must precede /:id.
+router.get('/stats', auth, async (req, res) => {
+  try {
+    const where = req.user.campusId ? { campusId: req.user.campusId } : {};
+    const [waste, carbon, energy, bins] = await Promise.all([
+      prisma.wasteLog.aggregate({ where, _sum: { quantityKg: true } }),
+      prisma.carbonFootprint.aggregate({ where, _sum: { reduction: true } }),
+      prisma.energyUsage.aggregate({
+        where,
+        _sum: { kwhUsed: true },
+        _avg: { percentageRenewable: true },
+      }),
+      prisma.smartBin.findMany({ where: { ...where, fillLevel: { gte: 90 } }, take: 10 }),
+    ]);
+    res.json({
+      carbonOffset: carbon._sum.reduction || 0,
+      carbonOffsetTrend: null,
+      wasteDiverted: waste._sum.quantityKg || 0,
+      wasteDivertedTarget: null,
+      energyUsage: energy._sum.kwhUsed || 0,
+      gridEfficiency: energy._avg.percentageRenewable || 0,
+      urgentTasks: bins.map((bin) => ({
+        id: bin.id,
+        title: 'Bin collection needed',
+        desc: `${bin.location}: ${bin.fillLevel}% full`,
+        type: 'waste',
+      })),
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Could not load campus statistics' });
   }
 });
 
@@ -27,15 +62,15 @@ router.get('/:id', auth, async (req, res) => {
       where: { id: req.params.id },
       include: {
         users: {
-          select: { id: true, name: true, role: true }
+          select: { id: true, name: true, role: true },
         },
         bins: true,
-      }
+      },
     });
     if (!campus) return res.status(404).json({ message: 'Campus not found' });
     res.json(campus);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Unable to complete the request. Please try again.' });
   }
 });
 
@@ -48,72 +83,42 @@ router.post('/', auth, requireRole(['PLATFORM_ADMIN']), async (req, res) => {
         name,
         domain,
         location,
-        sustainabilityScore: 50.0 // Default starting score
-      }
+      },
     });
     res.status(201).json(campus);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Unable to complete the request. Please try again.' });
+  }
+});
+
+// PUT /api/campuses/:id
+router.put('/:id', auth, requireRole(operationsRoles), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, domain, location } = req.body;
+    const updated = await prisma.campus.update({
+      where: { id },
+      data: {
+        ...(name && { name }),
+        ...(domain && { domain }),
+        ...(location && { location }),
+      },
+    });
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ message: 'Unable to complete the request. Please try again.' });
   }
 });
 
 // POST /api/campuses/:id/ai-score
-// Mock endpoint for AI calculating the sustainability score based on waste and energy
-router.post('/:id/ai-score', auth, requireRole(['PLATFORM_ADMIN', 'CAMPUS_ADMIN']), async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    // In a real implementation, this would aggregate WasteLogs, fetch Energy data via IoT/APIs, 
-    // and pass it to an LLM/ML model to generate a score and recommendations.
-    
-    // MOCK AI GENERATION
-    const newScore = Math.floor(Math.random() * 30) + 60; // Random score 60-90
-    const suggestions = [
-      "Increase composting capacity by 20% to reduce organic waste.",
-      "Optimize smart bin pickup routes in the north sector.",
-      "Switch cafeteria packaging to compostable alternatives."
-    ];
-
-    const campus = await prisma.campus.update({
-      where: { id },
-      data: { sustainabilityScore: newScore }
-    });
-
-    res.json({
-      campus,
-      aiInsights: suggestions,
-      message: 'Sustainability score updated successfully by AI engine.'
-    });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// GET /api/campuses/stats
-router.get('/stats', auth, async (req, res) => {
-  try {
-    const campusId = req.user.campusId; // Scope to user's campus if they have one
-
-    // In a real app, these would aggregate actual IoT tables, energy bills, and task alerts.
-    // For now, we will return some mock calculated KPI data that powers the CampusAdmin Dashboard.
-    const stats = {
-      carbonOffset: 42.8,
-      carbonOffsetTrend: 12,
-      wasteDiverted: 68,
-      wasteDivertedTarget: 75,
-      energyUsage: 12.4,
-      gridEfficiency: 88,
-      urgentTasks: [
-        { id: 1, title: 'Sensor Failure: West Wing', desc: 'Water flow meter at Building 4 is unresponsive.', type: 'warning' },
-        { id: 2, title: 'Bin Capacity Reached', desc: 'Main Library recycling cluster is at 95% capacity.', type: 'waste' },
-        { id: 3, title: 'Anomalous Usage Spike', desc: 'Gymnasium HVAC system exceeding baseline by 24%.', type: 'energy' }
-      ]
-    };
-
-    res.json(stats);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+// No model or scoring methodology is configured.
+router.post('/:id/ai-score', auth, requireRole(['PLATFORM_ADMIN', 'CAMPUS_ADMIN']), (req, res) =>
+  res
+    .status(501)
+    .json({
+      message:
+        'Automated campus scoring is not configured. The current score has not been changed.',
+    })
+);
 
 module.exports = router;

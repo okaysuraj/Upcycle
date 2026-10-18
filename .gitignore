@@ -1,46 +1,41 @@
-# Dependency directories
+# Dependencies and generated builds
 node_modules/
-jspm_packages/
-skills/
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
+.npm/
+dist/
+dist-*/
+build/
+.expo/
+web-build/
+generated/
+*.tsbuildinfo
 .eslintcache
 
-# dotenv environment variables file
+# Local secrets and database backups
 .env
-.env.test
-.env.production
-.env.local
+.env.*
 *.env
+!.env.example
+.audit-backups/
+*.pem
+*.key
+*.p8
+*.p12
+*.jks
+*.mobileprovision
 
-# Build outputs
-build/
-dist/
-dist-ssr/
-out/
-.next/
-.nuxt/
+# Expo generates these native projects from app.json
+/upcycle-mobile/ios/
+/upcycle-mobile/android/
+expo-env.d.ts
+.kotlin/
+.metro-health-check*
+*.orig.*
 
-# Logs
-logs
+# Local logs and editor settings
+logs/
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# Editor/OS files
-.DS_Store
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+.vscode/
 .idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+.DS_Store
+Thumbs.db
+skills/

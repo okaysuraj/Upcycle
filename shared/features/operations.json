@@ -1,0 +1,1189 @@
+[
+  {
+    "key": "buildings",
+    "title": "Buildings & zones",
+    "group": "Operations",
+    "endpoint": "/buildings",
+    "columns": [
+      {
+        "key": "name",
+        "label": "Building",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "code",
+        "label": "Code",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "sector",
+        "label": "Sector",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "zonesCount",
+        "label": "Zones",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "status",
+        "label": "Status",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "_count.bins",
+        "label": "Bins",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "create": {
+      "endpoint": "/buildings",
+      "fields": [
+        {
+          "key": "campusId",
+          "label": "Campus",
+          "type": "select",
+          "required": true,
+          "source": "/campuses"
+        },
+        {
+          "key": "name",
+          "label": "Name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "code",
+          "label": "Code",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "sector",
+          "label": "Sector",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "zonesCount",
+          "label": "Zones",
+          "type": "integer",
+          "required": true,
+          "min": 1
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"]
+    },
+    "edit": {
+      "endpoint": "/buildings/{id}",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "sector",
+          "label": "Sector",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "zonesCount",
+          "label": "Zones",
+          "type": "integer",
+          "required": true,
+          "min": 1
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "select",
+          "required": true,
+          "options": ["OPERATIONAL", "MAINTENANCE", "CLOSED"]
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"],
+      "method": "PUT"
+    },
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "bins",
+    "title": "Smart bins",
+    "group": "Operations",
+    "endpoint": "/waste/bins",
+    "columns": [
+      {
+        "key": "location",
+        "label": "Location",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "category",
+        "label": "Category",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "fillLevel",
+        "label": "Recorded fill (%)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "lastEmptied",
+        "label": "Last emptied",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "campus.name",
+        "label": "Campus",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "create": {
+      "endpoint": "/waste/bins",
+      "fields": [
+        {
+          "key": "campusId",
+          "label": "Campus",
+          "type": "select",
+          "required": true,
+          "source": "/campuses"
+        },
+        {
+          "key": "buildingId",
+          "label": "Building",
+          "type": "select",
+          "required": false,
+          "source": "/buildings"
+        },
+        {
+          "key": "location",
+          "label": "Location",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "type": "select",
+          "required": true,
+          "options": [
+            "PLASTIC",
+            "PAPER",
+            "GLASS",
+            "METAL",
+            "ORGANIC",
+            "E_WASTE",
+            "HAZARDOUS",
+            "GENERAL"
+          ]
+        },
+        {
+          "key": "fillLevel",
+          "label": "Observed fill (%)",
+          "type": "number",
+          "required": true,
+          "min": 0,
+          "max": 100
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"]
+    },
+    "actions": [
+      {
+        "label": "Record fill level",
+        "endpoint": "/waste/bins/{id}/fill",
+        "method": "PATCH",
+        "body": {},
+        "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"],
+        "fields": [
+          {
+            "key": "fillLevel",
+            "label": "Observed fill (%)",
+            "type": "number",
+            "required": true,
+            "min": 0,
+            "max": 100
+          }
+        ]
+      },
+      {
+        "label": "Mark emptied",
+        "endpoint": "/waste/bins/{id}/empty",
+        "method": "POST",
+        "body": {},
+        "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"],
+        "fields": [],
+        "confirm": true
+      }
+    ],
+    "note": "Recorded readings are shown as stored. Refresh fetches the latest saved reading; it does not simulate sensor activity.",
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "toolbar": []
+  },
+  {
+    "key": "tasks",
+    "title": "Tasks",
+    "group": "Operations",
+    "endpoint": "/tasks",
+    "columns": [
+      {
+        "key": "title",
+        "label": "Task",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "category",
+        "label": "Category",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "priority",
+        "label": "Priority",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "status",
+        "label": "Status",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "assigneeName",
+        "label": "Assignee",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "dueDate",
+        "label": "Due date",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "create": {
+      "endpoint": "/tasks",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "priority",
+          "label": "Priority",
+          "type": "select",
+          "required": true,
+          "options": ["Low", "Medium", "High"]
+        },
+        {
+          "key": "dueDate",
+          "label": "Due date",
+          "type": "datetime",
+          "required": false
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"]
+    },
+    "edit": {
+      "endpoint": "/tasks/{id}",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "key": "priority",
+          "label": "Priority",
+          "type": "select",
+          "required": true,
+          "options": ["Low", "Medium", "High"]
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "select",
+          "required": true,
+          "options": ["Pending", "Assigned", "In-Progress", "Completed"]
+        },
+        {
+          "key": "notes",
+          "label": "Notes",
+          "type": "textarea",
+          "required": false
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"],
+      "method": "PUT"
+    },
+    "actions": [
+      {
+        "label": "Update status",
+        "endpoint": "/tasks/{id}",
+        "method": "PUT",
+        "body": {},
+        "roles": [
+          "STUDENT",
+          "VOLUNTEER",
+          "STAFF",
+          "WASTE_STAFF",
+          "CAMPUS_ADMIN",
+          "ADMIN",
+          "PLATFORM_ADMIN",
+          "VENDOR",
+          "CONSULTANT",
+          "EVENT_ORGANIZER"
+        ],
+        "fields": [
+          {
+            "key": "status",
+            "label": "Status",
+            "type": "select",
+            "required": true,
+            "options": ["Pending", "Assigned", "In-Progress", "Completed"]
+          },
+          {
+            "key": "notes",
+            "label": "Notes",
+            "type": "textarea",
+            "required": false
+          }
+        ]
+      },
+      {
+        "label": "Auto-assign",
+        "endpoint": "/tasks/{id}/auto-assign",
+        "method": "POST",
+        "body": {},
+        "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"],
+        "fields": []
+      },
+      {
+        "label": "Assign to person",
+        "endpoint": "/tasks/{id}/assign",
+        "method": "POST",
+        "body": {},
+        "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"],
+        "fields": [
+          {
+            "key": "userId",
+            "label": "Assignee",
+            "type": "select",
+            "required": true,
+            "source": "/auth/volunteers"
+          }
+        ]
+      }
+    ],
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "toolbar": []
+  },
+  {
+    "key": "dispatches",
+    "title": "Collection dispatches",
+    "group": "Operations",
+    "endpoint": "/fleet/dispatches",
+    "columns": [
+      {
+        "key": "id",
+        "label": "Dispatch",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "campus.name",
+        "label": "Campus",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "vehicle.name",
+        "label": "Vehicle",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "status",
+        "label": "Status",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "payloadKg",
+        "label": "Recorded payload (kg)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "etaMinutes",
+        "label": "Planned ETA (min)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "targetBins",
+        "label": "Target bins",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "create": {
+      "endpoint": "/fleet/dispatches",
+      "fields": [
+        {
+          "key": "campusId",
+          "label": "Campus",
+          "type": "select",
+          "required": true,
+          "source": "/campuses"
+        },
+        {
+          "key": "vehicleId",
+          "label": "Vehicle",
+          "type": "select",
+          "required": false,
+          "source": "/fleet/vehicles"
+        },
+        {
+          "key": "targetBins",
+          "label": "Target bins",
+          "type": "select",
+          "required": false,
+          "source": "/waste/bins",
+          "multiple": true
+        },
+        {
+          "key": "payloadKg",
+          "label": "Planned payload (kg)",
+          "type": "number",
+          "required": true,
+          "min": 0
+        },
+        {
+          "key": "etaMinutes",
+          "label": "Planned ETA (min)",
+          "type": "integer",
+          "required": true,
+          "min": 0
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"]
+    },
+    "actions": [
+      {
+        "label": "Update / verify pickup",
+        "endpoint": "/fleet/dispatches/{id}",
+        "method": "PATCH",
+        "body": {},
+        "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"],
+        "fields": [
+          {
+            "key": "status",
+            "label": "Status",
+            "type": "select",
+            "required": true,
+            "options": ["QUEUED", "EN_ROUTE", "COMPLETED", "CANCELLED"]
+          }
+        ]
+      }
+    ],
+    "note": "Dispatch records and planned ETA values are stored data. No live GPS position is invented.",
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "toolbar": []
+  },
+  {
+    "key": "vehicles",
+    "title": "Fleet",
+    "group": "Operations",
+    "endpoint": "/fleet/vehicles",
+    "columns": [
+      {
+        "key": "name",
+        "label": "Vehicle",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "code",
+        "label": "Code",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "type",
+        "label": "Type",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "status",
+        "label": "Status",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "batteryPct",
+        "label": "Recorded battery (%)",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "latitude",
+        "label": "Latitude",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "longitude",
+        "label": "Longitude",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "create": {
+      "endpoint": "/fleet/vehicles",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "code",
+          "label": "Code",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "type",
+          "label": "Type",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "batteryPct",
+          "label": "Observed battery (%)",
+          "type": "integer",
+          "required": true,
+          "min": 0,
+          "max": 100
+        },
+        {
+          "key": "latitude",
+          "label": "Latitude",
+          "type": "number",
+          "required": false,
+          "min": -90,
+          "max": 90
+        },
+        {
+          "key": "longitude",
+          "label": "Longitude",
+          "type": "number",
+          "required": false,
+          "min": -180,
+          "max": 180
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"]
+    },
+    "map": true,
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "directory",
+    "title": "Staff & volunteers",
+    "group": "Operations",
+    "endpoint": "/auth/volunteers",
+    "columns": [
+      {
+        "key": "name",
+        "label": "Name",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "role",
+        "label": "Role",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "skills",
+        "label": "Skills",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "activeTasks",
+        "label": "Active tasks",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "availabilityHours",
+        "label": "Available hours",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"],
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "insights",
+    "title": "Collection recommendations",
+    "group": "Operations",
+    "endpoint": "/analytics/insights",
+    "columns": [
+      {
+        "key": "title",
+        "label": "Recommendation",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "impact",
+        "label": "Priority",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "desc",
+        "label": "Reason",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "fillLevel",
+        "label": "Recorded fill (%)",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"],
+    "dataPath": "insights",
+    "note": "Rules based on stored bin fill readings. These are not AI predictions or certified scores.",
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "scan",
+    "title": "Scan a bin",
+    "group": "Operations",
+    "endpoint": "/waste/bins",
+    "columns": [
+      {
+        "key": "location",
+        "label": "Location",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "category",
+        "label": "Category",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "fillLevel",
+        "label": "Recorded fill (%)",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"],
+    "kind": "scan",
+    "actions": [
+      {
+        "label": "Mark emptied",
+        "endpoint": "/waste/bins/{id}/empty",
+        "method": "POST",
+        "body": {},
+        "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"],
+        "fields": [],
+        "confirm": true
+      }
+    ],
+    "note": "Scan or enter the ID of a real saved bin. Unrecognized IDs are rejected.",
+    "export": true,
+    "nested": [],
+    "toolbar": []
+  },
+  {
+    "key": "resources",
+    "title": "Resource inventory",
+    "group": "Operations",
+    "endpoint": "/resources",
+    "columns": [
+      {
+        "key": "name",
+        "label": "Resource",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "quantity",
+        "label": "Recorded quantity",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "unit",
+        "label": "Unit",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "threshold",
+        "label": "Low-stock threshold",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "category",
+        "label": "Category",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "toolbar": [],
+    "actions": [
+      {
+        "label": "Consume stock",
+        "endpoint": "/resources/{id}/consume",
+        "method": "POST",
+        "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"],
+        "fields": [
+          {
+            "key": "amount",
+            "label": "Quantity",
+            "type": "integer",
+            "required": true,
+            "min": 1
+          }
+        ]
+      },
+      {
+        "label": "Restock",
+        "endpoint": "/resources/{id}/restock",
+        "method": "POST",
+        "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"],
+        "fields": [
+          {
+            "key": "amount",
+            "label": "Quantity",
+            "type": "integer",
+            "required": true,
+            "min": 1
+          }
+        ]
+      }
+    ],
+    "create": {
+      "endpoint": "/resources",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Resource",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "quantity",
+          "label": "Recorded quantity",
+          "type": "integer",
+          "required": true,
+          "min": 0
+        },
+        {
+          "key": "unit",
+          "label": "Unit",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "threshold",
+          "label": "Low-stock threshold",
+          "type": "integer",
+          "required": true,
+          "min": 0
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "type": "text",
+          "required": true
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"]
+    },
+    "edit": {
+      "endpoint": "/resources/{id}",
+      "method": "PUT",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Resource",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "quantity",
+          "label": "Recorded quantity",
+          "type": "integer",
+          "required": true,
+          "min": 0
+        },
+        {
+          "key": "unit",
+          "label": "Unit",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "threshold",
+          "label": "Low-stock threshold",
+          "type": "integer",
+          "required": true,
+          "min": 0
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "type": "text",
+          "required": true
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"]
+    }
+  },
+  {
+    "key": "plants",
+    "title": "Plants and gardens",
+    "group": "Operations",
+    "endpoint": "/horticulture/plants",
+    "columns": [
+      {
+        "key": "name",
+        "label": "Plant",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "location",
+        "label": "Location",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "plantedDate",
+        "label": "Planting date",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "status",
+        "label": "Observed condition",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "toolbar": [],
+    "actions": [
+      {
+        "label": "Record harvest",
+        "endpoint": "/horticulture/plants/{id}/harvest",
+        "method": "POST",
+        "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"],
+        "fields": [
+          {
+            "key": "quantity",
+            "label": "Harvest quantity",
+            "type": "number",
+            "required": true,
+            "min": 0.001
+          },
+          {
+            "key": "unit",
+            "label": "Unit",
+            "type": "text",
+            "required": true
+          },
+          {
+            "key": "date",
+            "label": "Harvest date",
+            "type": "datetime",
+            "required": true
+          }
+        ]
+      }
+    ],
+    "create": {
+      "endpoint": "/horticulture/plants",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Plant",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "location",
+          "label": "Location",
+          "type": "text",
+          "required": false
+        },
+        {
+          "key": "plantedDate",
+          "label": "Planting date",
+          "type": "datetime",
+          "required": false
+        },
+        {
+          "key": "status",
+          "label": "Observed condition",
+          "type": "text",
+          "required": true
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"]
+    }
+  },
+  {
+    "key": "harvests",
+    "title": "Harvest records",
+    "group": "Operations",
+    "endpoint": "/horticulture/harvests",
+    "columns": [
+      {
+        "key": "plantName",
+        "label": "Plant",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "location",
+        "label": "Location",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "quantity",
+        "label": "Quantity",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "unit",
+        "label": "Unit",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "date",
+        "label": "Harvest date",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "toolbar": [],
+    "actions": [],
+    "create": {
+      "endpoint": "/horticulture/plants/{plantId}/harvest",
+      "fields": [
+        {
+          "key": "plantId",
+          "label": "Plant",
+          "type": "select",
+          "required": true,
+          "source": "/horticulture/plants"
+        },
+        {
+          "key": "quantity",
+          "label": "Harvest quantity",
+          "type": "number",
+          "required": true,
+          "min": 0.001
+        },
+        {
+          "key": "unit",
+          "label": "Unit",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "date",
+          "label": "Harvest date",
+          "type": "datetime",
+          "required": true
+        }
+      ],
+      "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"]
+    }
+  }
+]

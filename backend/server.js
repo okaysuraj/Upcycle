@@ -1,84 +1,86 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { connectDB } = require('./config/db');
+const { connectDB, prisma, pool } = require('./config/db');
+const {
+  configureProduction,
+  validateEnvironment,
+  errorHandler,
+} = require('./middleware/production');
 
 const app = express();
+configureProduction(app);
 
-// ─── Middleware ───────────────────────────────────────────────────────────────
 const allowedOrigins = [
-  'http://localhost:5173',
-  process.env.FRONTEND_URL
+  ...(process.env.NODE_ENV !== 'production'
+    ? [
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+        'http://localhost:8081',
+        'http://127.0.0.1:8081',
+      ]
+    : []),
+  ...(process.env.FRONTEND_URL || '').split(',').map((origin) => origin.trim()),
 ].filter(Boolean);
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
-app.use(express.json());
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(Object.assign(new Error('Origin is not allowed'), { status: 403 }));
+      }
+    },
+    credentials: true,
+  })
+);
+app.use(express.json({ limit: '256kb' }));
+app.use('/api', require('./middleware/featureValidation').featureValidation);
 
-// ─── Routes ───────────────────────────────────────────────────────────────────
-const { router: authRouter } = require('./routes/auth');
-const usersRouter = require('./routes/users');
-const tasksRouter = require('./routes/tasks');
-const resourcesRouter = require('./routes/resources');
-const notificationsRouter = require('./routes/notifications');
-const eventsRouter = require('./routes/events');
-const recyclingRouter = require('./routes/recycling');
-const horticultureRouter = require('./routes/horticulture');
-const campusRouter = require('./routes/campus');
-const wasteRouter = require('./routes/waste');
-const marketplaceRouter = require('./routes/marketplace');
-const paymentsRouter = require('./routes/payments');
-const esgRouter = require('./routes/esg');
-const gamificationRouter = require('./routes/gamification');
-const communityRouter = require('./routes/community');
-const adminRouter = require('./routes/admin');
-const educationRouter = require('./routes/education');
-const uploadRouter = require('./routes/upload');
-const analyticsRouter = require('./routes/analytics');
-
-app.use('/api/auth', authRouter);
-app.use('/api/users', usersRouter);
-app.use('/api/tasks', tasksRouter);
-app.use('/api/resources', resourcesRouter);
-app.use('/api/notifications', notificationsRouter);
-app.use('/api/events', eventsRouter);
-app.use('/api/recycling', recyclingRouter);
-app.use('/api/horticulture', horticultureRouter);
-app.use('/api/campuses', campusRouter);
-app.use('/api/waste', wasteRouter);
-app.use('/api/marketplace', marketplaceRouter);
-app.use('/api/payments', paymentsRouter);
-app.use('/api/esg', esgRouter);
-app.use('/api/gamification', gamificationRouter);
-app.use('/api/community', communityRouter);
-app.use('/api/admin', adminRouter);
-app.use('/api/education', educationRouter);
-app.use('/api/upload', uploadRouter);
-app.use('/api/analytics', analyticsRouter);
+require('./routes')(app);
 
 // Health check
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    db: 'postgresql',
-    timestamp: new Date().toISOString()
-  });
+app.get('/api/live', (_req, res) => res.json({ status: 'ok' }));
+app.get('/api/health', async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ status: 'ok', db: 'connected', timestamp: new Date().toISOString() });
+  } catch {
+    res.status(503).json({ status: 'unavailable', db: 'disconnected' });
+  }
 });
 
-// ─── Start Server ─────────────────────────────────────────────────────────────
+app.use('/api', (req, res) => res.status(404).json({ message: 'API endpoint not found' }));
+app.use(errorHandler);
+
 const PORT = process.env.PORT || 5000;
 
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`\n🌿 Upcycle API running on http://localhost:${PORT}`);
-    console.log(`📋 Health: http://localhost:${PORT}/api/health\n`);
+if (require.main === module) {
+  validateEnvironment();
+  connectDB().then(() => {
+    const server = app.listen(PORT, () => console.log(`Upcycle API listening on port ${PORT}`));
+    server.requestTimeout = 60_000;
+    server.headersTimeout = 65_000;
+    let stopping = false;
+    const shutdown = () => {
+      if (stopping) return;
+      stopping = true;
+      const deadline = setTimeout(() => process.exit(1), 15_000).unref();
+      server.close(async () => {
+        try {
+          await prisma.$disconnect();
+          await pool.end();
+          clearTimeout(deadline);
+          process.exitCode = 0;
+        } catch {
+          process.exitCode = 1;
+        }
+      });
+    };
+    process.once('SIGTERM', shutdown);
+    process.once('SIGINT', shutdown);
   });
-});
+}
+
+module.exports = app;

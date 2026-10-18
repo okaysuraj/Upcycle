@@ -1,0 +1,567 @@
+[
+  {
+    "key": "notifications",
+    "title": "Notifications",
+    "group": "Account",
+    "endpoint": "/notifications",
+    "columns": [
+      {
+        "key": "message",
+        "label": "Message",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "type",
+        "label": "Type",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "read",
+        "label": "Read",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "createdAt",
+        "label": "Received",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "actions": [
+      {
+        "label": "Mark read",
+        "endpoint": "/notifications/{id}/read",
+        "method": "PUT",
+        "body": {},
+        "roles": [
+          "STUDENT",
+          "VOLUNTEER",
+          "STAFF",
+          "WASTE_STAFF",
+          "CAMPUS_ADMIN",
+          "ADMIN",
+          "PLATFORM_ADMIN",
+          "VENDOR",
+          "CONSULTANT",
+          "EVENT_ORGANIZER"
+        ],
+        "fields": [],
+        "when": {
+          "read": false
+        }
+      }
+    ],
+    "toolbar": [
+      {
+        "label": "Mark all read",
+        "endpoint": "/notifications/mark-all-read",
+        "method": "PUT",
+        "body": {},
+        "roles": [
+          "STUDENT",
+          "VOLUNTEER",
+          "STAFF",
+          "WASTE_STAFF",
+          "CAMPUS_ADMIN",
+          "ADMIN",
+          "PLATFORM_ADMIN",
+          "VENDOR",
+          "CONSULTANT",
+          "EVENT_ORGANIZER"
+        ],
+        "fields": []
+      }
+    ],
+    "kind": "records",
+    "export": true,
+    "nested": []
+  },
+  {
+    "key": "support",
+    "title": "Support tickets",
+    "group": "Account",
+    "endpoint": "/support/tickets",
+    "columns": [
+      {
+        "key": "subject",
+        "label": "Subject",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "category",
+        "label": "Category",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "priority",
+        "label": "Priority",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "status",
+        "label": "Status",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "description",
+        "label": "Description",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "create": {
+      "endpoint": "/support/tickets",
+      "fields": [
+        {
+          "key": "subject",
+          "label": "Subject",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "type": "select",
+          "required": true,
+          "options": ["GENERAL", "ACCOUNT", "WASTE", "MARKETPLACE", "TECHNICAL"]
+        },
+        {
+          "key": "priority",
+          "label": "Priority",
+          "type": "select",
+          "required": true,
+          "options": ["LOW", "MEDIUM", "HIGH"]
+        }
+      ],
+      "roles": [
+        "STUDENT",
+        "VOLUNTEER",
+        "STAFF",
+        "WASTE_STAFF",
+        "CAMPUS_ADMIN",
+        "ADMIN",
+        "PLATFORM_ADMIN",
+        "VENDOR",
+        "CONSULTANT",
+        "EVENT_ORGANIZER"
+      ]
+    },
+    "actions": [
+      {
+        "label": "Update ticket",
+        "endpoint": "/support/tickets/{id}",
+        "method": "PUT",
+        "body": {},
+        "roles": ["ADMIN", "PLATFORM_ADMIN", "CAMPUS_ADMIN", "STAFF", "WASTE_STAFF"],
+        "fields": [
+          {
+            "key": "status",
+            "label": "Status",
+            "type": "select",
+            "required": true,
+            "options": ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"]
+          }
+        ]
+      }
+    ],
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "toolbar": []
+  },
+  {
+    "key": "profile",
+    "title": "Your profile",
+    "group": "Account",
+    "endpoint": "/auth/me",
+    "columns": [
+      {
+        "key": "name",
+        "label": "Name",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "email",
+        "label": "Email",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "role",
+        "label": "Role",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "campus.name",
+        "label": "Campus",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "points",
+        "label": "Points",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "kycStatus",
+        "label": "Vendor verification",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "skills",
+        "label": "Skills",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "availabilityHours",
+        "label": "Available hours",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "kind": "profile",
+    "edit": {
+      "endpoint": "/users/profile",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "skills",
+          "label": "Skills (comma separated)",
+          "type": "array",
+          "required": false
+        },
+        {
+          "key": "availabilityHours",
+          "label": "Available hours",
+          "type": "integer",
+          "required": true,
+          "min": 0
+        }
+      ],
+      "roles": [
+        "STUDENT",
+        "VOLUNTEER",
+        "STAFF",
+        "WASTE_STAFF",
+        "CAMPUS_ADMIN",
+        "ADMIN",
+        "PLATFORM_ADMIN",
+        "VENDOR",
+        "CONSULTANT",
+        "EVENT_ORGANIZER"
+      ],
+      "method": "PUT"
+    },
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "privacy",
+    "title": "Privacy preferences",
+    "group": "Account",
+    "endpoint": "/auth/me",
+    "columns": [
+      {
+        "key": "privacySettings.profileVisible",
+        "label": "Public profile",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "privacySettings.shareImpact",
+        "label": "Share impact",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "kind": "profile",
+    "edit": {
+      "endpoint": "/users/profile",
+      "fields": [
+        {
+          "key": "privacySettings.profileVisible",
+          "label": "Public profile",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "key": "privacySettings.shareImpact",
+          "label": "Share impact",
+          "type": "boolean",
+          "required": false
+        }
+      ],
+      "roles": [
+        "STUDENT",
+        "VOLUNTEER",
+        "STAFF",
+        "WASTE_STAFF",
+        "CAMPUS_ADMIN",
+        "ADMIN",
+        "PLATFORM_ADMIN",
+        "VENDOR",
+        "CONSULTANT",
+        "EVENT_ORGANIZER"
+      ],
+      "method": "PUT"
+    },
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "preferences",
+    "title": "Notification preferences",
+    "group": "Account",
+    "endpoint": "/auth/me",
+    "columns": [
+      {
+        "key": "roleMetadata.notificationSettings.masterAlerts",
+        "label": "In-app alerts",
+        "type": "text",
+        "required": false,
+        "optional": true
+      },
+      {
+        "key": "roleMetadata.notificationSettings.quietHours",
+        "label": "Quiet hours preference",
+        "type": "text",
+        "required": false,
+        "optional": true
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "kind": "profile",
+    "edit": {
+      "endpoint": "/users/profile",
+      "fields": [
+        {
+          "key": "roleMetadata.notificationSettings.masterAlerts",
+          "label": "In-app alerts",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "key": "roleMetadata.notificationSettings.quietHours",
+          "label": "Quiet hours preference",
+          "type": "boolean",
+          "required": false
+        }
+      ],
+      "roles": [
+        "STUDENT",
+        "VOLUNTEER",
+        "STAFF",
+        "WASTE_STAFF",
+        "CAMPUS_ADMIN",
+        "ADMIN",
+        "PLATFORM_ADMIN",
+        "VENDOR",
+        "CONSULTANT",
+        "EVENT_ORGANIZER"
+      ],
+      "method": "PUT"
+    },
+    "note": "Preferences are saved to your account. External delivery services are unavailable.",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  },
+  {
+    "key": "deactivate",
+    "title": "Deactivate account",
+    "group": "Account",
+    "endpoint": "/auth/me",
+    "columns": [
+      {
+        "key": "name",
+        "label": "Name",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "email",
+        "label": "Email",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "kind": "profile",
+    "actions": [
+      {
+        "label": "Deactivate account",
+        "endpoint": "/users/deactivate",
+        "method": "DELETE",
+        "body": {},
+        "roles": [
+          "STUDENT",
+          "VOLUNTEER",
+          "STAFF",
+          "WASTE_STAFF",
+          "CAMPUS_ADMIN",
+          "ADMIN",
+          "PLATFORM_ADMIN",
+          "VENDOR",
+          "CONSULTANT",
+          "EVENT_ORGANIZER"
+        ],
+        "fields": [
+          {
+            "key": "confirmation",
+            "label": "Type DEACTIVATE to confirm",
+            "type": "text",
+            "required": true,
+            "equals": "DEACTIVATE"
+          }
+        ],
+        "confirm": true
+      }
+    ],
+    "note": "Deactivation disables access to this account. Stored records are retained; no data purge or credential deletion is claimed.",
+    "export": true,
+    "nested": [],
+    "toolbar": []
+  },
+  {
+    "key": "integrations",
+    "title": "Integration availability",
+    "group": "Account",
+    "endpoint": "/records/capabilities",
+    "columns": [
+      {
+        "key": "name",
+        "label": "Service",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "available",
+        "label": "Available",
+        "type": "text",
+        "required": false
+      },
+      {
+        "key": "reason",
+        "label": "Status",
+        "type": "text",
+        "required": false
+      }
+    ],
+    "roles": [
+      "STUDENT",
+      "VOLUNTEER",
+      "STAFF",
+      "WASTE_STAFF",
+      "CAMPUS_ADMIN",
+      "ADMIN",
+      "PLATFORM_ADMIN",
+      "VENDOR",
+      "CONSULTANT",
+      "EVENT_ORGANIZER"
+    ],
+    "note": "Availability is reported by the backend. No external service is represented as active without a working integration.",
+    "kind": "records",
+    "export": true,
+    "nested": [],
+    "actions": [],
+    "toolbar": []
+  }
+]
